@@ -1,12 +1,31 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 @config "../tailwind.config.js";
+
+/* Lenis hardware-accelerated smooth scrolling */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
 
 @layer base {
   :root {
     --canvas: #F5F2EA;
     --mineral: #F5F2EA;
     --mineral-card: #FFFFFF;
-    --mineral-surface: #EFECE3;
+    --mineral-surface: #EDE9DF;
     --persimmon: #FF6747;
     --periwinkle: #8177FF;
     --botanical: #174D3B;
@@ -17,28 +36,37 @@
   body {
     background-color: var(--canvas);
     color: var(--carbon);
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
     overflow-x: hidden;
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    touch-action: pan-y;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.025em;
     font-weight: 800;
+    line-height: 1.05;
+  }
+
+  /* Form and UI elements marked data-ui keep necessary functional lines */
+  [data-ui] input,
+  [data-ui] textarea,
+  [data-ui] select {
+    border: 1px solid rgba(32, 35, 31, 0.15);
   }
 }
 
-/* Mineral architectural grain & ambient lighting */
-.bg-mineral-cyclorama {
-  background: radial-gradient(circle at 75% 20%, rgba(221, 232, 248, 0.45) 0%, rgba(245, 242, 234, 1) 60%),
-              radial-gradient(circle at 90% 90%, rgba(255, 103, 71, 0.08) 0%, transparent 40%);
+/* Surfaces defined by tone steps instead of thin divider lines */
+.bg-mineral-soft {
+  background-color: #EDE9DF;
 }
 
-.bg-mineral-soft {
-  background-color: #FAF8F4;
+.bg-mineral-card {
+  background-color: #FFFFFF;
 }
 
 .bg-botanical-contrast {
@@ -46,31 +74,20 @@
   color: #F5F2EA;
 }
 
-/* Glassmorphism tuned for bright mineral environments */
-.glass-mineral {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(32, 35, 31, 0.08);
+.bg-carbon-contrast {
+  background-color: #161815;
+  color: #F5F2EA;
 }
 
-.glass-mineral-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(32, 35, 31, 0.06);
-}
-
-.glass-botanical {
-  background: rgba(23, 77, 59, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(245, 242, 234, 0.12);
+/* Subtle focus indicators for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #FF6747;
+  outline-offset: 2px;
 }
 
 /* Custom minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -79,23 +96,14 @@
 
 ::-webkit-scrollbar-thumb {
   background: #C4BEB0;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #A39B8B;
 }
 
-/* Refined text stroke and editorial utilities */
-.tracking-architectural {
-  letter-spacing: 0.18em;
-}
-
-.editorial-shadow {
-  box-shadow: 0 20px 40px -15px rgba(32, 35, 31, 0.07);
-}
-
-/* Reduced motion compliance per PDF brief */
+/* Reduced motion compliance */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;

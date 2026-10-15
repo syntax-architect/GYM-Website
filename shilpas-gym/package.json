@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --emptyOutDir false",
     "lint": "oxlint",
     "preview": "vite preview",
     "process:a01": "node scripts/process-sequences.js a01",

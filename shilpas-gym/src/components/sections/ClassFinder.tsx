@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { CheckCircle2, ArrowRight, Calendar, UserCheck, Flame } from 'lucide-react';
 import { SectionHeader } from '../ui/SectionHeader';
-import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { ArrowRight } from 'lucide-react';
 
 export interface ClassFinderProps {
   onSelectClass?: (className: string) => void;
 }
-
 
 export const ClassFinder: React.FC<ClassFinderProps> = ({ onSelectClass }) => {
   const [goal, setGoal] = useState<string>('strength');
@@ -18,228 +16,205 @@ export const ClassFinder: React.FC<ClassFinderProps> = ({ onSelectClass }) => {
   const getRecommendation = () => {
     if (goal === 'strength') {
       return {
-        title: 'UNISEX GYM & STRENGTH ARCHITECTURE',
-        coach: 'Senior Fitness Coach',
-        time: schedule === 'morning' ? '06:00 – 10:00 (Morning Slot)' : schedule === 'evening' ? '17:00 – 22:00 (Evening Peak)' : '12:00 – 16:00 (Midday Focus)',
-        focus: 'Biomechanical machine guidance, posture correction, free weight form, progressive overload',
-        tag: 'FITNESS FLOOR',
-        load: 'AIR-CONDITIONED UNISEX GYM',
+        title: 'Unisex Gym & Strength Architecture',
+        coach: 'Senior Biomechanics Floor Coach',
+        time: schedule === 'morning' ? '06:00 – 10:00 (Morning Focus)' : schedule === 'evening' ? '17:00 – 22:00 (Evening Peak)' : '12:00 – 16:00 (Midday Power)',
+        focus: 'Biomechanical machine guidance, posture correction, Olympic barbell lifting, progressive overload',
+        category: 'Gym Floor',
+        plan: 'Unisex Gym Access (₹1,499/mo)',
       };
     }
 
     if (goal === 'conditioning') {
       return {
-        title: 'TRANSFORMATION & PERSONAL COACHING',
-        coach: 'Certified Personal Trainer (Male/Female)',
-        time: schedule === 'morning' ? '06:30 – 08:30 (Dawn Prime)' : schedule === 'evening' ? '18:00 – 20:30 (Evening)' : '13:00 – 15:00',
-        focus: 'Targeted fat loss, cardio endurance, high-protein nutrition guidance, dedicated 1-on-1 supervision',
-        tag: 'FAT LOSS & TONING',
-        load: 'CUSTOM GOAL PROTOCOL',
+        title: 'Personal Training & Body Transformation',
+        coach: 'Dedicated Personal Trainer (Male or Female)',
+        time: schedule === 'morning' ? '06:30 – 08:30 (Dawn Prime)' : schedule === 'evening' ? '18:00 – 20:30 (Evening Focus)' : '13:00 – 15:00',
+        focus: 'Targeted fat loss, cardio endurance, high-protein nutrition blueprint, dedicated 1-on-1 coaching',
+        category: 'Personal Coaching',
+        plan: 'PT Transformation (₹3,499/mo)',
       };
     }
 
     if (goal === 'keratin') {
       return {
-        title: 'PREMIUM KERATIN & HAIR RESTORATION',
-        coach: 'Master Hair Stylist',
+        title: 'Keratin Smoothing & Hair Restoration',
+        coach: 'Senior Hair Stylist & Technician',
         time: schedule === 'morning' ? '10:00 – 13:00' : schedule === 'evening' ? '16:00 – 19:30' : '12:00 – 15:00',
-        focus: 'Formaldehyde-free keratin smoothing, deep hair botox, protein spa infusion, long-lasting silk gloss',
-        tag: 'SALON SIGNATURE',
-        load: 'LUXURY SALON SECTION',
+        focus: 'Formaldehyde-free keratin smoothing, deep hair botox, protein spa infusion, long-lasting silk shine',
+        category: 'Private Salon',
+        plan: 'Keratin Lounge Session',
       };
     }
 
     // Bridal & Makeup
     return {
-      title: 'BRIDAL & CELEBRATION GLAMOUR STUDIO',
+      title: 'Bridal & Celebration Glamour Studio',
       coach: 'Lead Makeup & Aesthetic Artist',
-      time: 'Appointment by Booking (Flexible Hours)',
+      time: 'Appointment by Booking (Flexible Slots)',
       focus: 'High-definition bridal makeup, party looks, skin brightening, unisex facial therapies',
-      tag: 'MAKEUP ARTISTRY',
-      load: 'PREMIUM DERMA PRODUCTS',
+      category: 'Beauty Studio',
+      plan: 'Bridal & Event Consultation',
     };
   };
 
-  const recommendation = getRecommendation();
+  const rec = getRecommendation();
 
   return (
-    <section id="class-finder" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#F5F2EA] border-b border-[#20231F]/10">
+    <section id="class-finder" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#F5F2EA]">
       <div className="max-w-[1440px] mx-auto">
         <SectionHeader
-          index="05"
-          tag="SMART SERVICE SELECTOR"
-          title="FIND YOUR SERVICE."
-          accentTitle="THREE QUICK QUESTIONS."
-          description="Whether you're looking for intense workout sessions, personal training, hair keratin smoothing, or party makeup, get an instant customized recommendation."
+          title="Find Your Service."
+          description="Answer three quick questions to receive an instant, tailored recommendation for your gym training or salon appointment in Khardaha."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Left Column: 3 Practical Questions */}
           <div className="lg:col-span-7 space-y-8">
-            {/* Question 01: Goal */}
-            <div className="bg-white p-6 sm:p-8 rounded-sm border border-[#20231F]/10 shadow-xs">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="font-mono text-xs text-[#FF6747] font-bold">STEP 01</span>
-                <span className="font-mono text-xs uppercase text-[#20231F]/70 font-semibold">
-                  // SELECT PRIMARY SERVICE
-                </span>
-              </div>
+            {/* Question 1: Goal */}
+            <div className="bg-white p-7 sm:p-9 rounded-sm">
+              <span className="block text-sm font-bold text-[#FF6747] mb-2">
+                First Decision
+              </span>
+              <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-[#20231F] mb-5">
+                What is your primary goal?
+              </h3>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
-                  { id: 'strength', label: 'Unisex Gym & Iron', sublabel: 'Workout machinery & weight training' },
-                  { id: 'conditioning', label: 'Fat Loss & PT', sublabel: '1-on-1 personal trainer & diet plan' },
-                  { id: 'keratin', label: 'Keratin & Hair Spa', sublabel: 'Hair smoothing & deep restoration' },
-                  { id: 'makeup', label: 'Bridal & Makeup', sublabel: 'HD party glamour & skin grooming' },
+                  { id: 'strength', label: 'Unisex Gym & Iron', sublabel: 'Machinery, barbells & free weights' },
+                  { id: 'conditioning', label: 'Fat Loss & 1-on-1 PT', sublabel: 'Dedicated personal trainer & nutrition' },
+                  { id: 'keratin', label: 'Keratin & Hair Spa', sublabel: 'Hair smoothing & deep conditioning' },
+                  { id: 'makeup', label: 'Bridal & Makeup Studio', sublabel: 'HD party glamour & skin grooming' },
                 ].map((opt) => (
                   <button
                     key={opt.id}
                     onClick={() => setGoal(opt.id)}
-                    className={`p-4 rounded-sm text-left border transition-all cursor-pointer ${
+                    className={`p-5 rounded-xs text-left transition-colors duration-200 cursor-pointer ${
                       goal === opt.id
-                        ? 'border-[#FF6747] bg-[#FF6747]/5 shadow-xs'
-                        : 'border-[#20231F]/10 hover:border-[#20231F]/30 bg-white'
+                        ? 'bg-[#20231F] text-white'
+                        : 'bg-[#FAF8F4] text-[#20231F] hover:bg-[#EDE9DF]'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-display font-bold text-sm uppercase text-[#20231F]">
-                        {opt.label}
-                      </span>
-                      {goal === opt.id && <CheckCircle2 className="w-4 h-4 text-[#FF6747]" />}
-                    </div>
-                    <span className="text-xs text-[#4C514A] font-sans">{opt.sublabel}</span>
+                    <span className="block text-base font-bold mb-1">{opt.label}</span>
+                    <span className={`text-sm block ${goal === opt.id ? 'text-white/80' : 'text-[#5A6057]'}`}>
+                      {opt.sublabel}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Question 02: Experience */}
-            <div className="bg-white p-6 sm:p-8 rounded-sm border border-[#20231F]/10 shadow-xs">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="font-mono text-xs text-[#8177FF] font-bold">STEP 02</span>
-                <span className="font-mono text-xs uppercase text-[#20231F]/70 font-semibold">
-                  // CURRENT TRAINING PROFICIENCY
-                </span>
-              </div>
+            {/* Question 2: Experience */}
+            <div className="bg-white p-7 sm:p-9 rounded-sm">
+              <span className="block text-sm font-bold text-[#FF6747] mb-2">
+                Second Decision
+              </span>
+              <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-[#20231F] mb-5">
+                What is your experience level?
+              </h3>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { id: 'foundational', label: 'Foundational', sublabel: 'Under 1 yr structured lifting' },
-                  { id: 'intermediate', label: 'Intermediate', sublabel: '1–3 yrs consistent barbell work' },
-                  { id: 'advanced', label: 'Advanced', sublabel: '3+ yrs competitive / athletic loading' },
+                  { id: 'beginner', label: 'First Time / Beginner', sub: 'Need guided form instruction' },
+                  { id: 'intermediate', label: 'Regular Member', sub: 'Know the basics, want progression' },
+                  { id: 'advanced', label: 'Experienced Lifter', sub: 'Heavy loading & high intensity' },
                 ].map((opt) => (
                   <button
                     key={opt.id}
                     onClick={() => setExperience(opt.id)}
-                    className={`p-4 rounded-sm text-left border transition-all cursor-pointer ${
+                    className={`p-4 rounded-xs text-left transition-colors duration-200 cursor-pointer ${
                       experience === opt.id
-                        ? 'border-[#8177FF] bg-[#8177FF]/5 shadow-xs'
-                        : 'border-[#20231F]/10 hover:border-[#20231F]/30 bg-white'
+                        ? 'bg-[#20231F] text-white'
+                        : 'bg-[#FAF8F4] text-[#20231F] hover:bg-[#EDE9DF]'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-display font-bold text-sm uppercase text-[#20231F]">
-                        {opt.label}
-                      </span>
-                      {experience === opt.id && <CheckCircle2 className="w-4 h-4 text-[#8177FF]" />}
-                    </div>
-                    <span className="text-xs text-[#4C514A] font-sans">{opt.sublabel}</span>
+                    <span className="block text-sm font-bold mb-1">{opt.label}</span>
+                    <span className={`text-sm block ${experience === opt.id ? 'text-white/80' : 'text-[#5A6057]'}`}>
+                      {opt.sub}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Question 03: Schedule */}
-            <div className="bg-white p-6 sm:p-8 rounded-sm border border-[#20231F]/10 shadow-xs">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="font-mono text-xs text-[#174D3B] font-bold">STEP 03</span>
-                <span className="font-mono text-xs uppercase text-[#20231F]/70 font-semibold">
-                  // PREFERRED TIMETABLE WINDOW
-                </span>
-              </div>
+            {/* Question 3: Schedule */}
+            <div className="bg-white p-7 sm:p-9 rounded-sm">
+              <span className="block text-sm font-bold text-[#FF6747] mb-2">
+                Third Decision
+              </span>
+              <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-[#20231F] mb-5">
+                When do you prefer to visit?
+              </h3>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { id: 'morning', label: 'Morning Dawn', sublabel: '06:00 – 09:00 prime' },
-                  { id: 'midday', label: 'Midday Focus', sublabel: '12:00 – 14:00 recharge' },
-                  { id: 'evening', label: 'Evening Peak', sublabel: '17:30 – 20:30 high velocity' },
+                  { id: 'morning', label: 'Morning Slot', sub: '06:00 – 10:00 AM' },
+                  { id: 'midday', label: 'Midday Focus', sub: '11:00 AM – 04:00 PM' },
+                  { id: 'evening', label: 'Evening Peak', sub: '05:00 – 10:00 PM' },
                 ].map((opt) => (
                   <button
                     key={opt.id}
                     onClick={() => setSchedule(opt.id)}
-                    className={`p-4 rounded-sm text-left border transition-all cursor-pointer ${
+                    className={`p-4 rounded-xs text-left transition-colors duration-200 cursor-pointer ${
                       schedule === opt.id
-                        ? 'border-[#174D3B] bg-[#174D3B]/5 shadow-xs'
-                        : 'border-[#20231F]/10 hover:border-[#20231F]/30 bg-white'
+                        ? 'bg-[#20231F] text-white'
+                        : 'bg-[#FAF8F4] text-[#20231F] hover:bg-[#EDE9DF]'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-display font-bold text-sm uppercase text-[#20231F]">
-                        {opt.label}
-                      </span>
-                      {schedule === opt.id && <CheckCircle2 className="w-4 h-4 text-[#174D3B]" />}
-                    </div>
-                    <span className="text-xs text-[#4C514A] font-sans">{opt.sublabel}</span>
+                    <span className="block text-sm font-bold mb-1">{opt.label}</span>
+                    <span className={`text-sm block ${schedule === opt.id ? 'text-white/80' : 'text-[#5A6057]'}`}>
+                      {opt.sub}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Right Column: Tailored Recommendation Result */}
-          <div className="lg:col-span-5 sticky top-28">
-            <div className="bg-white p-8 sm:p-10 rounded-sm border border-[#20231F]/12 border-l-4 border-l-[#FF6747] shadow-sculptural relative">
-              <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-[#20231F]/10">
-                <span className="font-mono text-xs uppercase tracking-widest text-[#FF6747] font-bold">
-                  PRESCRIBED PROTOCOL
-                </span>
-                <Badge variant="mineral">{recommendation.tag}</Badge>
-              </div>
-
-              <h3 className="text-2xl sm:text-3xl font-display font-extrabold uppercase text-[#20231F] tracking-tight leading-tight mb-4">
-                {recommendation.title}
-              </h3>
-
-              <p className="text-sm text-[#4C514A] leading-relaxed mb-6 font-normal">
-                {recommendation.focus}
-              </p>
-
-              <div className="space-y-3 font-mono text-xs bg-[#FAF8F4] p-4 rounded-sm border border-[#20231F]/10 mb-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-[#20231F]/60 flex items-center gap-1.5">
-                    <UserCheck className="w-3.5 h-3.5" /> LEAD COACH:
-                  </span>
-                  <span className="font-bold text-[#20231F]">{recommendation.coach}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[#20231F]/60 flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" /> RECOM. TIME:
-                  </span>
-                  <span className="font-bold text-[#FF6747]">{recommendation.time}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[#20231F]/60 flex items-center gap-1.5">
-                    <Flame className="w-3.5 h-3.5" /> INTENSITY:
-                  </span>
-                  <span className="font-bold text-[#20231F]">{recommendation.load}</span>
-                </div>
-              </div>
-
-              <Button
-                variant="primary"
-                size="md"
-                className="w-full justify-center"
-                onClick={() => {
-                  onSelectClass?.(recommendation.title);
-                  const el = document.getElementById('timetable');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                icon={<ArrowRight className="w-4 h-4" />}
-              >
-                VIEW ON LIVE TIMETABLE
-              </Button>
-
-              <p className="font-mono text-[11px] text-[#20231F]/60 text-center mt-3">
-                // COMPREHENSIVE BIOMECHANICAL MOVEMENT SCREEN INCLUDED
-              </p>
+          {/* Right Column: Dynamic Recommendation */}
+          <div className="lg:col-span-5 sticky top-28 bg-[#174D3B] text-[#F5F2EA] p-8 sm:p-10 rounded-sm">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-bold text-[#FF6747]">
+                Tailored Recommendation
+              </span>
+              <span className="text-sm text-[#DDE8F8] font-medium">
+                {rec.category}
+              </span>
             </div>
+
+            <h4 className="text-2xl sm:text-3xl font-display font-extrabold uppercase tracking-tight text-white mb-4 leading-snug">
+              {rec.title}
+            </h4>
+
+            <p className="text-base text-[#DDE8F8] leading-relaxed mb-6">
+              {rec.focus}
+            </p>
+
+            <div className="space-y-4 bg-white/10 p-5 rounded-xs mb-8 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-white/70">Assigned Coach</span>
+                <span className="font-bold text-white">{rec.coach}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-white/70">Optimal Window</span>
+                <span className="font-bold text-white tabular-nums">{rec.time}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-white/70">Recommended Plan</span>
+                <span className="font-bold text-[#FF6747]">{rec.plan}</span>
+              </div>
+            </div>
+
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full text-center justify-center"
+              onClick={() => onSelectClass?.(rec.title)}
+              icon={<ArrowRight className="w-4 h-4" />}
+            >
+              BOOK THIS RECOMMENDATION
+            </Button>
           </div>
         </div>
       </div>

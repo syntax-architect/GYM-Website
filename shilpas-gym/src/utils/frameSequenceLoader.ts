@@ -7,6 +7,7 @@ export interface LoaderOptions {
   concurrency?: number;
   onProgress?: (progress: SequenceProgress) => void;
   onInitialReady?: (initialFrame: HTMLImageElement) => void;
+  onFrameLoaded?: (frameNumber: number, img: HTMLImageElement) => void;
 }
 
 export class FrameSequenceLoader {
@@ -35,6 +36,7 @@ export class FrameSequenceLoader {
 
   private onProgress?: (progress: SequenceProgress) => void;
   private onInitialReady?: (initialFrame: HTMLImageElement) => void;
+  private onFrameLoaded?: (frameNumber: number, img: HTMLImageElement) => void;
 
   constructor(
     basePath: string,
@@ -51,6 +53,7 @@ export class FrameSequenceLoader {
     this.concurrency = options.concurrency ?? 4;
     this.onProgress = options.onProgress;
     this.onInitialReady = options.onInitialReady;
+    this.onFrameLoaded = options.onFrameLoaded;
   }
 
   /**
@@ -206,6 +209,7 @@ export class FrameSequenceLoader {
         this.frames.set(frameNumber, img);
         this.insertSortedIndex(frameNumber);
         this.emitProgress();
+        this.onFrameLoaded?.(frameNumber, img);
         resolve(img);
       };
 
@@ -257,12 +261,16 @@ export class FrameSequenceLoader {
    * Get nearest loaded frame to prevent blank flicker during high-speed scrubbing
    */
   public getNearestFrame(frameNumber: number): HTMLImageElement | null {
+    const isReady = (im: HTMLImageElement | null | undefined): im is HTMLImageElement =>
+      !!im && im.complete && im.naturalWidth > 0;
+
     if (this.frames.has(frameNumber)) {
-      return this.frames.get(frameNumber)!;
+      const candidate = this.frames.get(frameNumber);
+      if (isReady(candidate)) return candidate;
     }
 
     if (this.loadedIndices.length === 0) {
-      return this.posterImage;
+      return isReady(this.posterImage) ? this.posterImage : null;
     }
 
     // Binary search for closest loaded frame
@@ -291,11 +299,16 @@ export class FrameSequenceLoader {
       }
     }
 
-    return this.frames.get(closestIndex) ?? this.posterImage;
+    const candidate = this.frames.get(closestIndex);
+    if (isReady(candidate)) return candidate;
+    return isReady(this.posterImage) ? this.posterImage : null;
   }
 
   public getPoster(): HTMLImageElement | null {
-    return this.posterImage;
+    if (this.posterImage && this.posterImage.complete && this.posterImage.naturalWidth > 0) {
+      return this.posterImage;
+    }
+    return null;
   }
 
   /**

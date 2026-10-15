@@ -30,7 +30,7 @@ export function App() {
 
   return (
     <SmoothScrollProvider>
-      <div className="min-h-screen bg-[#F5F2EA] text-[#20231F] font-sans selection:bg-[#FF6747] selection:text-white flex flex-col antialiased">
+      <div className="min-h-[100svh] bg-[#F5F2EA] text-[#20231F] font-sans selection:bg-[#FF6747] selection:text-white flex flex-col antialiased">
         {/* Global Navigation Header */}
         <Header onOpenInquiry={() => handleOpenInquiry()} />
 

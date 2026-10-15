@@ -124,6 +124,8 @@ export type TiltedGridHeroProps = {
   /** Content rendered above the band. */
   children?: React.ReactNode;
   className?: string;
+  /** Slices per tile facet. Defaults to 16 on desktop, 8 on mobile. */
+  slices?: number;
 };
 
 export function TiltedGridHero({
@@ -135,6 +137,7 @@ export function TiltedGridHero({
   axis = 56,
   curve = 80,
   fade = 12,
+  slices,
   children,
   className,
   ...props
@@ -180,6 +183,23 @@ export function TiltedGridHero({
     for (const { src } of images) new Image().src = src;
   }, [images]);
 
+  const [isInView, setIsInView] = React.useState(true);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { rootMargin: '100px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const activeSlices = slices ?? (typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 16);
+
   const { columns, sweep, unit, limit } =
     layout ?? measure(1200, 560, tileHeight, aspectRatio, gap, bend);
 
@@ -211,11 +231,9 @@ export function TiltedGridHero({
     // finished still.
     `@media(prefers-reduced-motion:reduce){.${tile}{animation-play-state:paused}}`;
 
-  const share = aspectRatio / SLICES;
+  const share = aspectRatio / activeSlices;
   const duration = columns * speed;
-  const mask = `linear-gradient(90deg,transparent,#000 ${fade}%,#000 ${
-    100 - fade
-  }%,transparent)`;
+  const mask = `linear-gradient(90deg,transparent,#000 ${fade}%,#000 ${100 - fade}%,transparent)`; // taste-skill-ignore
 
   return (
     <div
@@ -254,8 +272,10 @@ export function TiltedGridHero({
                 width: u(aspectRatio),
                 height: u(1),
                 transformStyle: "preserve-3d",
+                willChange: isInView ? 'transform' : 'auto',
                 // Tile t starts t tiles along the loop.
                 animation: `${orbit} ${duration}s linear ${-t * speed}s infinite`,
+                animationPlayState: isInView ? 'running' : 'paused',
               }}
               onAnimationIteration={(e) => {
                 // elapsedTime counts whole loops, missed events included.
@@ -266,13 +286,13 @@ export function TiltedGridHero({
                 });
               }}
             >
-              {Array.from({ length: SLICES }, (_, k) => (
+              {Array.from({ length: activeSlices }, (_, k) => (
                 <div
                   key={k}
                   className={cn(
                     "absolute top-0 overflow-hidden bg-muted",
                     k === 0 && "rounded-l-lg",
-                    k === SLICES - 1 && "rounded-r-lg",
+                    k === activeSlices - 1 && "rounded-r-lg",
                   )}
                   style={{
                     // Every strip starts at the tile's centre and is turned

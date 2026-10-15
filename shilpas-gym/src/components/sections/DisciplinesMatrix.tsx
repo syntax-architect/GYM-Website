@@ -1,86 +1,75 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { SectionHeader } from '../ui/SectionHeader';
-import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { PULSEFORM_ASSETS } from '../../config/assets';
 
 interface TrainingMode {
   id: string;
-  number: string;
   title: string;
-  subtitle: string;
+  category: string;
+  tagline: string;
   description: string;
   imageSrc: string;
   videoSrc?: string;
   specs: { label: string; value: string }[];
-  tag: string;
-  accent: 'persimmon' | 'periwinkle' | 'botanical' | 'carbon';
 }
 
 const MODES: TrainingMode[] = [
   {
     id: 'strength',
-    number: '01',
     title: 'Unisex Strength & Iron',
-    subtitle: 'Latest Calibrated Machinery & Free Weights',
-    description: 'World-class biomechanical selectorized machines, Olympic squat racks, dumbbells, and cable systems designed for safe muscular hypertrophy and posture alignment.',
+    category: 'Gym Floor',
+    tagline: 'Calibrated Machinery & Free Weights',
+    description: 'Biomechanical selectorized machines, Olympic squat racks, dumbbells, and cable systems designed for safe muscular hypertrophy and posture alignment.',
     imageSrc: PULSEFORM_ASSETS.I04.src,
     videoSrc: PULSEFORM_ASSETS.V06.src,
-    tag: 'UNISEX GYM',
-    accent: 'persimmon',
     specs: [
-      { label: 'EQUIPMENT', value: 'Imported Biomechanical' },
-      { label: 'ATMOSPHERE', value: 'Air-Conditioned Floor' },
-      { label: 'SUPERVISION', value: 'Experienced Trainers' },
+      { label: 'Equipment', value: 'Imported Biomechanical Machinery' },
+      { label: 'Atmosphere', value: 'Air-Conditioned Unisex Floor' },
+      { label: 'Supervision', value: 'Certified Floor Instructors' },
     ],
   },
   {
     id: 'conditioning',
-    number: '02',
-    title: 'Fat Loss & Personal Training',
-    subtitle: 'Targeted Weight Loss & Certified Coaching',
+    title: 'Fat Loss & Personal Coaching',
+    category: '1-on-1 Coaching',
+    tagline: 'Targeted Weight Loss & Nutrition Blueprint',
     description: 'High-intensity interval conditioning, cardio lines, and 1-on-1 personal training with certified male and female fitness instructors tailored to your body composition.',
     imageSrc: PULSEFORM_ASSETS.I05.src,
     videoSrc: PULSEFORM_ASSETS.V05.src,
-    tag: 'PERSONAL COACHING',
-    accent: 'periwinkle',
     specs: [
-      { label: 'TRAINERS', value: 'Male & Female Available' },
-      { label: 'PROGRAMS', value: 'Weight Loss / Weight Gain' },
-      { label: 'DIET PLAN', value: 'Personalized Nutrition' },
+      { label: 'Trainers', value: 'Male & Female Available' },
+      { label: 'Programs', value: 'Weight Loss & Muscle Gain' },
+      { label: 'Diet Plan', value: 'Custom Macro Nutrition' },
     ],
   },
   {
     id: 'keratin',
-    number: '03',
     title: 'Keratin & Hair Spa Lounge',
-    subtitle: 'Advanced Hair Smoothing & Deep Nourishment',
+    category: 'Private Salon',
+    tagline: 'Advanced Hair Smoothing & Deep Nourishment',
     description: 'Our top-rated salon service: premium keratin smoothing, hair botox, deep protein spa, and scalp revival therapies administered by senior salon technicians.',
     imageSrc: PULSEFORM_ASSETS.I06.src,
     videoSrc: PULSEFORM_ASSETS.V07.src,
-    tag: 'SALON FAVORITE',
-    accent: 'botanical',
     specs: [
-      { label: 'POPULAR', value: 'Keratin & Hair Botox' },
-      { label: 'FACILITY', value: 'Separate Salon Section' },
-      { label: 'CARE', value: 'Zero Frizz / High Gloss' },
+      { label: 'Signature', value: 'Formaldehyde-Free Keratin & Botox' },
+      { label: 'Facility', value: 'Separate Private Salon Suite' },
+      { label: 'Outcome', value: 'High Gloss & Zero Frizz' },
     ],
   },
   {
     id: 'makeup',
-    number: '04',
     title: 'Bridal & Makeup Studio',
-    subtitle: 'HD Party Glamour & Aesthetic Grooming',
+    category: 'Beauty Studio',
+    tagline: 'HD Party Glamour & Aesthetic Grooming',
     description: 'A complete glamour studio catering to bridal makeup, reception looks, pre-wedding skin therapies, and unisex aesthetic facial grooming in Rahara.',
     imageSrc: PULSEFORM_ASSETS.I07.src,
-    tag: 'BEAUTY STUDIO',
-    accent: 'carbon',
     specs: [
-      { label: 'BRIDAL', value: 'HD & Airbrush Available' },
-      { label: 'CLIENTELE', value: 'Unisex Parlour Care' },
-      { label: 'PRODUCTS', value: 'Dermatologist Certified' },
+      { label: 'Bridal Artistry', value: 'HD & Airbrush Available' },
+      { label: 'Clientele', value: 'Unisex Parlour & Skin Care' },
+      { label: 'Products', value: 'Dermatologist Certified' },
     ],
   },
 ];
@@ -90,113 +79,129 @@ export interface DisciplinesMatrixProps {
 }
 
 export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInquiry }) => {
-  const [activeCard, setActiveCard] = useState<string>('strength');
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string>('strength');
+  const activeMode = MODES.find((m) => m.id === selectedId) || MODES[0];
 
   return (
-    <section id="disciplines" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#FAF8F4] border-b border-[#20231F]/10">
+    <section id="disciplines" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#EDE9DF]">
       <div className="max-w-[1440px] mx-auto">
         <SectionHeader
-          index="04"
-          tag="ONE-STOP DESTINATION"
-          title="FITNESS & GLAMOUR."
-          accentTitle="ALL UNDER ONE ROOF."
-          description="Recognized by over 355+ verified Google reviews as Khardaha's best unisex gym and beauty salon. Modern workout machinery combined with a private, dedicated unisex parlour."
+          title="Fitness & Glamour Under One Roof."
+          description="Explore our specialized unisex gym floor and private salon suites in Khardaha. Select any discipline to inspect equipment and specifications."
         />
 
-        {/* 4 Editorial Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
-          {MODES.map((mode, idx) => {
-            const isHovered = hoveredCard === mode.id || activeCard === mode.id;
+        {/* Asymmetric Studio Split Showcase */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
+          {/* Left Column: Interactive Selector List */}
+          <div className="lg:col-span-5 flex flex-col justify-between gap-3">
+            {MODES.map((mode) => {
+              const isSelected = mode.id === selectedId;
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setSelectedId(mode.id)}
+                  className={`w-full p-6 sm:p-7 rounded-sm text-left transition-colors duration-200 cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#20231F] text-[#F5F2EA]'
+                      : 'bg-white text-[#20231F] hover:bg-white/80'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-sm font-bold uppercase ${
+                      isSelected ? 'text-[#FF6747]' : 'text-[#174D3B]'
+                    }`}>
+                      {mode.category}
+                    </span>
+                    {isSelected && (
+                      <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
+                    )}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase tracking-tight mb-2">
+                    {mode.title}
+                  </h3>
+                  <p className={`text-sm leading-relaxed ${
+                    isSelected ? 'text-[#F5F2EA]/80' : 'text-[#50554E]'
+                  }`}>
+                    {mode.tagline}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
 
-            return (
+          {/* Right Column: Visual Showcase & Specifications */}
+          <div className="lg:col-span-7 bg-white rounded-sm p-6 sm:p-10 flex flex-col justify-between">
+            <AnimatePresence mode="wait">
               <motion.div
-                key={mode.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                onMouseEnter={() => setHoveredCard(mode.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => setActiveCard(mode.id)}
-                className="group relative flex flex-col justify-between bg-white rounded-sm border border-[#20231F]/10 overflow-hidden shadow-xs hover:shadow-sculptural hover:-translate-y-1.5 transition-all duration-300 cursor-pointer"
+                key={activeMode.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-6"
               >
-                {/* Media Container (4:5 Aspect Ratio) */}
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#EFECE3]">
-                  {mode.videoSrc && isHovered ? (
+                {/* Visual Media Frame */}
+                <div className="relative w-full aspect-[16/10] bg-[#20231F] rounded-sm overflow-hidden">
+                  {activeMode.videoSrc ? (
                     <video
-                      src={mode.videoSrc}
-                      poster={mode.imageSrc}
+                      src={activeMode.videoSrc}
+                      poster={activeMode.imageSrc}
                       autoPlay
                       loop
                       muted
                       playsInline
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <img
-                      src={mode.imageSrc}
-                      alt={mode.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      src={activeMode.imageSrc}
+                      alt={activeMode.title}
+                      className="w-full h-full object-cover"
                     />
                   )}
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#20231F]/80 via-transparent to-transparent pointer-events-none" />
-
-                  {/* Top Badge & Number */}
-                  <div className="absolute top-4 inset-x-4 flex justify-between items-center z-10 pointer-events-none">
-                    <span className="font-mono text-xs font-bold text-white bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-xs tracking-wider">
-                      PILLAR 0{idx + 1}
-                    </span>
-                    <Badge variant={mode.accent === 'persimmon' ? 'persimmon' : mode.accent === 'periwinkle' ? 'periwinkle' : 'mineral'}>
-                      {mode.tag}
-                    </Badge>
-                  </div>
-
-                  {/* Bottom Image Headline */}
-                  <div className="absolute bottom-4 inset-x-4 z-10 pointer-events-none">
-                    <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-white tracking-tight leading-tight">
-                      {mode.title}
-                    </h3>
-                    <p className="text-xs text-white/80 font-sans mt-0.5 line-clamp-1">
-                      {mode.subtitle}
-                    </p>
+                  <div className="absolute top-4 left-4 bg-[#20231F] text-[#F5F2EA] px-3.5 py-1.5 rounded-xs text-sm font-bold uppercase">
+                    {activeMode.category}
                   </div>
                 </div>
 
-                {/* Editorial Details & Specs */}
-                <div className="p-6 flex flex-col justify-between flex-1 bg-white">
-                  <p className="text-sm text-[#4C514A] leading-relaxed mb-6 font-normal">
-                    {mode.description}
+                {/* Information & Details */}
+                <div>
+                  <h4 className="text-2xl sm:text-3xl font-display font-extrabold uppercase tracking-tight text-[#20231F] mb-3">
+                    {activeMode.title}
+                  </h4>
+                  <p className="text-base text-[#3E423C] leading-relaxed">
+                    {activeMode.description}
                   </p>
+                </div>
 
-                  <div className="space-y-2.5 pt-4 border-t border-[#20231F]/10 mb-6 font-mono text-xs">
-                    {mode.specs.map((spec) => (
-                      <div key={spec.label} className="flex justify-between items-center">
-                        <span className="text-[#20231F]/60 uppercase">{spec.label}</span>
-                        <span className="font-semibold text-[#20231F]">{spec.value}</span>
-                      </div>
-                    ))}
-                  </div>
+                {/* Specifications Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  {activeMode.specs.map((spec) => (
+                    <div key={spec.label} className="bg-[#FAF8F4] p-4 rounded-xs">
+                      <span className="block text-sm uppercase font-bold text-[#FF6747] mb-1">
+                        {spec.label}
+                      </span>
+                      <span className="text-sm font-semibold text-[#20231F]">
+                        {spec.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
 
+                {/* Conversion Trigger */}
+                <div className="pt-4 flex flex-wrap items-center gap-4">
                   <Button
-                    variant={isHovered ? 'primary' : 'outline'}
-                    size="sm"
-                    magnetic={true}
-                    className="w-full justify-between"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenInquiry(`Discipline: ${mode.title}`);
-                    }}
-                    icon={<ArrowUpRight className="w-3.5 h-3.5" />}
+                    variant="primary"
+                    size="md"
+                    onClick={() => onOpenInquiry(activeMode.title)}
+                    icon={<ArrowUpRight className="w-4 h-4" />}
                   >
-                    <span>INQUIRE // {mode.title.split(' ')[0].toUpperCase()}</span>
+                    INQUIRE ABOUT {activeMode.category.toUpperCase()}
                   </Button>
                 </div>
               </motion.div>
-            );
-          })}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </section>

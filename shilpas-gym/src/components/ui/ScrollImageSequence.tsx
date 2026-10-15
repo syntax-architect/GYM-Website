@@ -39,12 +39,15 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const loaderRef = useRef<FrameSequenceLoader | null>(null);
 
-  const [isMobile, setIsMobile] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < mobileBreakpoint;
-    }
-    return false;
-  });
+  // Use refs for values needed inside drawCanvas to avoid stale closures
+  // and prevent useCallback identity changes that would destroy the loader
+  const isMobileRef = useRef<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth < mobileBreakpoint : false
+  );
+  const lastDrawnImageRef = useRef<HTMLImageElement | null>(null);
+  const hasCanvasPaintedRef = useRef<boolean>(false);
+
+  const [showPosterFallback, setShowPosterFallback] = useState(true);
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -65,10 +68,16 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
   const rafIdRef = useRef<number | null>(null);
   const isRenderPendingRef = useRef<boolean>(false);
 
-  const activeSequencePath = isMobile && mobileSequence ? mobileSequence : sequencePath;
-  const activeFrameCount = isMobile && mobileFrameCount ? mobileFrameCount : frameCount;
+  const activeSequencePath = isMobileRef.current && mobileSequence ? mobileSequence : sequencePath;
+  const activeFrameCount = isMobileRef.current && mobileFrameCount ? mobileFrameCount : frameCount;
   const activeEndFrame = endFrame ?? activeFrameCount;
 
+  /**
+   * Core canvas draw function.
+   * Uses refs instead of state for isMobile to keep callback identity stable
+   * and prevent the loader effect from re-running (which would destroy + recreate
+   * the loader before images finish loading).
+   */
   const drawCanvas = useCallback(
     (frameIndex: number) => {
       const canvas = canvasRef.current;
@@ -77,14 +86,33 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
       if (!ctx) return;
 
       const loader = loaderRef.current;
-      const img = prefersReducedMotion
-        ? loader?.getPoster()
-        : loader?.getNearestFrame(frameIndex) ?? loader?.getPoster();
+      let img: HTMLImageElement | null | undefined;
 
-      if (!img) return;
+      if (prefersReducedMotion) {
+        img = loader?.getPoster();
+      } else {
+        img = loader?.getNearestFrame(frameIndex) ?? loader?.getPoster();
+      }
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Fallback to the last successfully drawn image to prevent blank frames
+      if (!img || !img.complete || img.naturalWidth === 0) {
+        img = lastDrawnImageRef.current;
+      }
+
+      // If still no valid image, do NOT clear — keep whatever is on the canvas
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+
+      // Remember this image as fallback for future frames during fast scrubbing
+      lastDrawnImageRef.current = img;
+
+      const dpr = isMobileRef.current
+        ? Math.min(window.devicePixelRatio || 1, 1.5)
+        : Math.min(window.devicePixelRatio || 1, 2);
       const rect = canvas.getBoundingClientRect();
+
+      // Guard against zero-dimension canvas (element not yet laid out)
+      if (rect.width === 0 || rect.height === 0) return;
+
       const targetCanvasWidth = Math.round(rect.width * dpr);
       const targetCanvasHeight = Math.round(rect.height * dpr);
 
@@ -93,6 +121,7 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
         canvas.height = targetCanvasHeight;
       }
 
+      // Clear only because we have a valid image to paint immediately after
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const imgRatio = (img.naturalWidth || width) / (img.naturalHeight || height);
@@ -116,6 +145,7 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
           drawY = 0;
         }
       } else {
+        // contain
         if (canvasRatio > imgRatio) {
           drawH = canvas.height;
           drawW = canvas.height * imgRatio;
@@ -132,7 +162,15 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+      // Hide poster fallback <img> after first successful canvas paint
+      if (!hasCanvasPaintedRef.current) {
+        hasCanvasPaintedRef.current = true;
+        setShowPosterFallback(false);
+      }
     },
+    // IMPORTANT: isMobile is read via ref, not state, so it's NOT in this array.
+    // This keeps drawCanvas identity stable so the loader effect doesn't re-run.
     [objectFit, prefersReducedMotion, width, height]
   );
 
@@ -150,14 +188,14 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
     [drawCanvas]
   );
 
+  // Resize and motion preference listeners
   useEffect(() => {
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const handleMotionChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     motionQuery.addEventListener('change', handleMotionChange);
 
     const handleResize = () => {
-      const mob = window.innerWidth < mobileBreakpoint;
-      setIsMobile((prev) => (prev !== mob ? mob : prev));
+      isMobileRef.current = window.innerWidth < mobileBreakpoint;
       requestFrameRender(activeFrameRef.current);
     };
 
@@ -175,6 +213,7 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
       const posterImg = new Image();
       posterImg.src = poster;
       posterImg.onload = () => {
+        lastDrawnImageRef.current = posterImg;
         drawCanvas(startFrame);
         setProgress({
           loaded: 1,
@@ -196,6 +235,15 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
       onInitialReady: () => {
         requestFrameRender(startFrame);
       },
+      onFrameLoaded: (frameNum) => {
+        // When a frame near the current scrub position finishes loading,
+        // re-render to upgrade from the nearest-neighbor approximation
+        if (Math.abs(frameNum - activeFrameRef.current) <= 4) {
+          // Force a new rAF even if one is pending so the fresh frame gets painted
+          isRenderPendingRef.current = false;
+          requestFrameRender(activeFrameRef.current);
+        }
+      },
     });
 
     loaderRef.current = loader;
@@ -210,14 +258,28 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
     };
   }, [activeSequencePath, activeFrameCount, activeEndFrame, startFrame, poster, prefersReducedMotion, drawCanvas, requestFrameRender]);
 
-  // Rock-solid sticky scroll progress calculation without GSAP pin conflicts
+  // Scroll-driven frame rendering (sticky scroll progress)
   useEffect(() => {
     if (prefersReducedMotion) return;
 
-    const handleScroll = () => {
-      const container = containerRef.current;
-      if (!container) return;
+    let inView = true;
+    const container = containerRef.current;
+    if (!container) return;
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        // When section scrolls into view, immediately try to paint
+        if (entry.isIntersecting) {
+          requestFrameRender(activeFrameRef.current);
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+    observer.observe(container);
+
+    const handleScroll = () => {
+      if (!inView) return;
       const rect = container.getBoundingClientRect();
       const totalScrollable = container.offsetHeight - window.innerHeight;
       if (totalScrollable <= 0) return;
@@ -231,9 +293,17 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Initial paint attempt — try repeatedly in case images aren't loaded yet
     handleScroll();
+    const retryTimer = setTimeout(() => {
+      isRenderPendingRef.current = false;
+      handleScroll();
+    }, 500);
 
     return () => {
+      clearTimeout(retryTimer);
+      observer.disconnect();
       window.removeEventListener('scroll', handleScroll);
     };
   }, [startFrame, activeEndFrame, prefersReducedMotion, requestFrameRender]);
@@ -241,24 +311,35 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full ${prefersReducedMotion ? 'min-h-screen' : ''} ${className}`}
+      className={`relative w-full ${prefersReducedMotion ? 'min-h-[100svh]' : ''} ${className}`}
       style={{
         height: prefersReducedMotion ? 'auto' : `calc(100vh + ${scrollDistance})`,
       }}
     >
-      {/* Pure CSS Sticky viewport: Never conflicts with layout or multiplies scroll space */}
-      <div className="sticky top-0 w-full h-screen overflow-hidden bg-[#F5F2EA] flex flex-col justify-between">
+      {/* Pure CSS Sticky viewport */}
+      <div className="sticky top-0 w-full h-[100svh] overflow-hidden bg-[#F5F2EA]">
+        {/* Poster fallback — visible until the canvas paints its first frame */}
+        {showPosterFallback && (
+          <img
+            src={poster}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full z-[5] pointer-events-none"
+            style={{
+              objectFit: objectFit === 'cover' ? 'cover' : 'contain',
+              objectPosition: 'center',
+            }}
+          />
+        )}
+
+        {/* Canvas for scroll-driven frame sequence */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full block pointer-events-none brightness-[1.0] contrast-[1.02]"
+          className="absolute inset-0 w-full h-full block z-10 pointer-events-none"
         />
 
-        {/* Ambient mineral edge gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#F5F2EA]/90 via-transparent to-[#F5F2EA]/50 pointer-events-none z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#F5F2EA]/60 via-transparent to-[#F5F2EA]/60 pointer-events-none z-10" />
-
         {/* Foreground Content */}
-        <div className="relative z-20 w-full h-full flex flex-col justify-between pt-24 pb-12">
+        <div className="relative z-20 w-full h-full flex flex-col justify-between pt-16 sm:pt-24 pb-4 sm:pb-12">
           {children}
         </div>
       </div>

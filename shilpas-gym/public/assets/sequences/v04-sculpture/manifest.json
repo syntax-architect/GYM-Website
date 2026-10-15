@@ -1,0 +1,24 @@
+{
+  "id": "v04-sculpture",
+  "name": "PULSEFORM 3D Signature Sculptural Dumbbell Sequence",
+  "aspectRatio": "16:9",
+  "generatedAt": "2026-10-15T12:39:08.944Z",
+  "desktop": {
+    "frameCount": 192,
+    "fps": 24,
+    "width": 960,
+    "height": 540,
+    "pattern": "%04d.webp",
+    "sampleFile": "0001.webp"
+  },
+  "mobile": {
+    "frameCount": 96,
+    "fps": 12,
+    "width": 640,
+    "height": 360,
+    "subDir": "mobile",
+    "pattern": "mobile/%04d.webp",
+    "sampleFile": "0001.webp"
+  },
+  "poster": "poster.webp"
+}

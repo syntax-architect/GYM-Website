@@ -1,0 +1,30 @@
+{
+  "id": "a01-hero",
+  "name": "A01 Hero Scroll Master",
+  "aspectRatio": "16:9",
+  "generatedAt": "2026-09-28T14:53:58.130Z",
+  "desktop": {
+    "frameCount": 192,
+    "fps": 24,
+    "width": 848,
+    "height": 478,
+    "pattern": "%04d.webp",
+    "sampleFile": "0001.webp",
+    "totalBytes": 4142256,
+    "totalMb": 3.95,
+    "avgKbPerFrame": 21.07
+  },
+  "mobile": {
+    "frameCount": 96,
+    "fps": 12,
+    "width": 640,
+    "height": 360,
+    "subDir": "mobile",
+    "pattern": "mobile/%04d.webp",
+    "sampleFile": "0001.webp",
+    "totalBytes": 1347546,
+    "totalMb": 1.29,
+    "avgKbPerFrame": 13.71
+  },
+  "poster": "poster.webp"
+}

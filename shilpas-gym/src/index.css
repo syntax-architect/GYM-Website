@@ -1,26 +1,106 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap');
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
 @layer base {
+  :root {
+    --canvas: #F5F2EA;
+    --mineral: #F5F2EA;
+    --mineral-card: #FFFFFF;
+    --mineral-surface: #EFECE3;
+    --persimmon: #FF6747;
+    --periwinkle: #8177FF;
+    --botanical: #174D3B;
+    --carbon: #20231F;
+    --cloud: #DDE8F8;
+  }
+
   body {
-    @apply bg-gym-black text-white font-sans antialiased overflow-x-hidden;
+    background-color: var(--canvas);
+    color: var(--carbon);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
-    @apply uppercase tracking-tighter font-black;
-  }
-
-  .tabular-nums {
-    font-variant-numeric: tabular-nums;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    letter-spacing: -0.035em;
+    font-weight: 800;
   }
 }
 
-/* Hide scrollbar for swiper but allow scrolling */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Mineral architectural grain & ambient lighting */
+.bg-mineral-cyclorama {
+  background: radial-gradient(circle at 75% 20%, rgba(221, 232, 248, 0.45) 0%, rgba(245, 242, 234, 1) 60%),
+              radial-gradient(circle at 90% 90%, rgba(255, 103, 71, 0.08) 0%, transparent 40%);
 }
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+.bg-mineral-soft {
+  background-color: #FAF8F4;
+}
+
+.bg-botanical-contrast {
+  background-color: #174D3B;
+  color: #F5F2EA;
+}
+
+/* Glassmorphism tuned for bright mineral environments */
+.glass-mineral {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(32, 35, 31, 0.08);
+}
+
+.glass-mineral-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(32, 35, 31, 0.06);
+}
+
+.glass-botanical {
+  background: rgba(23, 77, 59, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 242, 234, 0.12);
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EAE6DC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C4BEB0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A39B8B;
+}
+
+/* Refined text stroke and editorial utilities */
+.tracking-architectural {
+  letter-spacing: 0.18em;
+}
+
+.editorial-shadow {
+  box-shadow: 0 20px 40px -15px rgba(32, 35, 31, 0.07);
+}
+
+/* Reduced motion compliance per PDF brief */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

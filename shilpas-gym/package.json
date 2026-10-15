@@ -7,13 +7,21 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "process:a01": "node scripts/process-sequences.js a01",
+    "process:all": "node scripts/process-sequences.js --all"
   },
   "dependencies": {
+    "@types/three": "^0.186.0",
+    "clsx": "^2.1.1",
     "framer-motion": "^13.4.3",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
     "lucide-react": "^1.48.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.7.0",
+    "three": "^0.186.1",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { SectionHeader } from '../ui/SectionHeader';
 import { Button } from '../ui/Button';
 
@@ -165,9 +165,11 @@ export const MembershipTiers: React.FC<MembershipTiersProps> = ({ onSelectTier }
                   <div className="space-y-3.5 mb-10">
                     {tier.features.map((feat) => (
                       <div key={feat} className="flex items-start gap-3">
-                        <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
+                        <span className={`text-base font-bold flex-shrink-0 leading-none mt-0.5 ${
                           isHighlighted ? 'text-[#FF6747]' : 'text-[#174D3B]'
-                        }`} />
+                        }`}>
+                          +
+                        </span>
                         <span className={`text-sm leading-snug ${
                           isHighlighted ? 'text-[#F5F2EA]' : 'text-[#3E423C]'
                         }`}>

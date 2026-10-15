@@ -178,7 +178,7 @@ export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInqu
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                   {activeMode.specs.map((spec) => (
                     <div key={spec.label} className="bg-[#FAF8F4] p-4 rounded-xs">
-                      <span className="block text-sm uppercase font-bold text-[#FF6747] mb-1">
+                      <span className="block text-sm uppercase font-bold text-[#174D3B] mb-1">
                         {spec.label}
                       </span>
                       <span className="text-sm font-semibold text-[#20231F]">

@@ -24,13 +24,13 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
   }, []);
 
   return (
-    <section className="relative w-full min-h-[95svh] pt-28 sm:pt-32 pb-14 sm:pb-16 px-4 sm:px-10 lg:px-16 flex flex-col justify-between overflow-hidden bg-[#F5F2EA]">
-      {/* Main Hero Grid: 55% Editorial Space, 45% Sculptural 3D Canvas / Video */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center my-auto w-full max-w-[1440px] mx-auto">
+    <section className="relative w-full min-h-[92svh] pt-24 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-10 lg:px-16 flex flex-col justify-between overflow-hidden bg-[#F5F2EA]">
+      {/* Main Hero Grid: Balanced Editorial Space & Expansive 3D Canvas / Video */}
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-center my-auto w-full max-w-[1440px] mx-auto">
         {/* Left Column: Bold Typography & Conversion Deck */}
-        <div className="lg:col-span-7 flex flex-col justify-center">
+        <div className="lg:col-span-6 xl:col-span-6 flex flex-col justify-center z-10">
           {/* Trust Metric Statement */}
-          <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6 text-sm font-semibold text-[#174D3B]">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4 text-sm font-semibold text-[#174D3B]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#174D3B] flex-shrink-0 animate-pulse" />
             <span>4.7 rating across 355+ Google reviews · Rahara & Khardaha</span>
           </div>
@@ -40,12 +40,12 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
             Strength Meets Glamour.
           </h1>
 
-          <p className="mt-5 sm:mt-7 text-sm sm:text-base lg:text-lg text-[#3C403A] font-normal leading-relaxed max-w-xl font-sans">
+          <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg text-[#3C403A] font-normal leading-relaxed max-w-xl font-sans">
             Khardaha's premier unisex fitness atelier and private beauty studio. Biomechanical strength training meets bespoke salon care under one refined roof.
           </p>
 
           {/* Confident Actions with Clear Boutique Affordance */}
-          <div className="mt-8 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <Button
               variant="primary"
               size="lg"
@@ -76,147 +76,169 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
           </div>
         </div>
 
-        {/* Right Column: Interactive 3D WebGL Dumbbell & Atmospheric Loop */}
-        <div className="lg:col-span-5 relative w-full flex flex-col items-center justify-center">
-          {/* Double-Bezel Hardware Enclosure */}
-          <div className="relative w-full aspect-square max-w-[500px] p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-[2rem] shadow-xl">
-            <div className="relative w-full h-full bg-[#EDE9DF] rounded-[calc(2rem-0.5rem)] overflow-hidden flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
-              {viewMode === '3d' ? (
-                <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
-                  <SculpturalDumbbellCanvas
-                    interactivePointer={true}
-                    finish={finish}
-                    exploded={exploded}
-                    wireframe={wireframe}
-                    onTelemetryChange={handleTelemetryChange}
-                    className="w-full h-full"
-                  />
+        {/* Right Column: Seamless Expansive 3D Stage & Cinematic Video Playback (NO BOX) */}
+        <div className="lg:col-span-6 xl:col-span-6 relative w-full flex flex-col items-center justify-center min-h-[460px] sm:min-h-[560px] lg:min-h-[660px]">
+          {/* Ambient Studio Lighting (Organic atmospheric radial glow, zero harsh box edges) */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,rgba(255,103,71,0.14)_0%,rgba(129,119,255,0.06)_45%,transparent_75%)] pointer-events-none blur-3xl -z-10" />
 
-                  {/* Bottom Telemetry & Quick Action Bar */}
-                  <div className="absolute bottom-3 inset-x-3 flex flex-wrap items-center justify-between gap-2 text-xs text-[#20231F]/90 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-xs border border-[#20231F]/10 pointer-events-auto">
-                    <div className="flex items-center gap-2 font-medium">
-                      <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
-                      <span className="font-bold text-[11px] uppercase tracking-wider">Drag 360°:</span>
-                      <span ref={telemetryDegRef} className="font-bold tabular-nums text-[#FF6747]">28°</span>
-                    </div>
+          {/* Floating Top Control Dock: Finish Swatches (when in 3D) & View Mode Switcher */}
+          <div className="absolute top-2 right-2 sm:right-4 z-30 flex flex-wrap items-center gap-2 pointer-events-auto">
+            {/* Material Finish Swatches - shown in 3D mode */}
+            {viewMode === '3d' && (
+              <div className="flex items-center gap-1 bg-white/85 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10">
+                <button
+                  type="button"
+                  onClick={() => setFinish('signature')}
+                  title="Signature Persimmon & Periwinkle Finish"
+                  className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                    finish === 'signature'
+                      ? 'bg-[#20231F] text-white shadow-xs'
+                      : 'text-[#20231F]/70 hover:text-[#20231F]'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
+                  <span className="hidden sm:inline">Signature</span>
+                </button>
 
-                    {/* Exploded & Wireframe Tactile Toggle Buttons */}
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => setExploded(!exploded)}
-                        className={`px-3 py-1 text-[11px] font-bold rounded-full transition-all cursor-pointer border active:scale-95 ${
-                          exploded
-                            ? 'bg-[#FF6747] text-white border-[#FF6747] shadow-xs'
-                            : 'bg-white text-[#20231F] border-[#20231F]/20 hover:border-[#FF6747]'
-                        }`}
-                      >
-                        {exploded ? 'Collapsed' : 'Explode Spec'}
-                      </button>
+                <button
+                  type="button"
+                  onClick={() => setFinish('stealth')}
+                  title="Stealth Black Oxide Finish"
+                  className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                    finish === 'stealth'
+                      ? 'bg-[#20231F] text-white shadow-xs'
+                      : 'text-[#20231F]/70 hover:text-[#20231F]'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#20231F]" />
+                  <span className="hidden sm:inline">Stealth</span>
+                </button>
 
-                      <button
-                        onClick={() => setWireframe(!wireframe)}
-                        className={`px-3 py-1 text-[11px] font-bold rounded-full transition-all cursor-pointer border active:scale-95 ${
-                          wireframe
-                            ? 'bg-[#8177FF] text-white border-[#8177FF] shadow-xs'
-                            : 'bg-white text-[#20231F] border-[#20231F]/20 hover:border-[#8177FF]'
-                        }`}
-                      >
-                        {wireframe ? 'Shaded' : 'Wireframe'}
-                      </button>
-                    </div>
-                  </div>
+                <button
+                  type="button"
+                  onClick={() => setFinish('prestige')}
+                  title="Prestige Champagne Gold Finish"
+                  className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                    finish === 'prestige'
+                      ? 'bg-[#20231F] text-white shadow-xs'
+                      : 'text-[#20231F]/70 hover:text-[#20231F]'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
+                  <span className="hidden sm:inline">Prestige</span>
+                </button>
+              </div>
+            )}
+
+            {/* View Mode Switcher */}
+            <div className="flex items-center gap-1 bg-white/85 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10">
+              <button
+                type="button"
+                onClick={() => setViewMode('3d')}
+                className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                  viewMode === '3d'
+                    ? 'bg-[#20231F] text-white shadow-xs'
+                    : 'text-[#20231F]/70 hover:text-[#20231F]'
+                }`}
+              >
+                <Box className="w-3.5 h-3.5" />
+                <span>3D</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('video')}
+                className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                  viewMode === 'video'
+                    ? 'bg-[#20231F] text-white shadow-xs'
+                    : 'text-[#20231F]/70 hover:text-[#20231F]'
+                }`}
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Loop</span>
+              </button>
+            </div>
+          </div>
+
+          {viewMode === '3d' ? (
+            <div className="w-full h-full min-h-[460px] sm:min-h-[560px] lg:min-h-[660px] relative flex items-center justify-center cursor-grab active:cursor-grabbing select-none">
+              <SculpturalDumbbellCanvas
+                interactivePointer={true}
+                finish={finish}
+                exploded={exploded}
+                wireframe={wireframe}
+                onTelemetryChange={handleTelemetryChange}
+                className="w-full h-full"
+              />
+
+              {/* Floating Bottom Telemetry & Quick Action Bar */}
+              <div className="absolute bottom-2 inset-x-2 sm:inset-x-4 flex flex-wrap items-center justify-between gap-2 z-20 pointer-events-auto">
+                <div className="flex items-center gap-2 bg-white/85 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs text-[#20231F]/90 shadow-xs border border-[#20231F]/10 font-bold uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
+                  <span>Drag 360°:</span>
+                  <span ref={telemetryDegRef} className="font-bold tabular-nums text-[#FF6747]">28°</span>
                 </div>
-              ) : (
-                <LazyVideo
-                  src={PULSEFORM_ASSETS.V01.src}
-                  poster={PULSEFORM_ASSETS.I01.src}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
-              )}
 
-              {/* Top Finish Swatches & Model Switcher */}
-              <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2 z-20 pointer-events-auto">
-                {/* Material Finish Swatches */}
-                {viewMode === '3d' && (
-                  <div className="flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10">
-                    <button
-                      onClick={() => setFinish('signature')}
-                      title="Signature Persimmon & Periwinkle Finish"
-                      className={`px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                        finish === 'signature'
-                          ? 'bg-[#20231F] text-white shadow-xs'
-                          : 'text-[#20231F]/70 hover:text-[#20231F]'
-                      }`}
-                    >
-                      <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
-                      <span className="hidden sm:inline">Signature</span>
-                    </button>
-
-                    <button
-                      onClick={() => setFinish('stealth')}
-                      title="Stealth Black Oxide Finish"
-                      className={`px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                        finish === 'stealth'
-                          ? 'bg-[#20231F] text-white shadow-xs'
-                          : 'text-[#20231F]/70 hover:text-[#20231F]'
-                      }`}
-                    >
-                      <span className="w-2 h-2 rounded-full bg-[#20231F]" />
-                      <span className="hidden sm:inline">Stealth</span>
-                    </button>
-
-                    <button
-                      onClick={() => setFinish('prestige')}
-                      title="Prestige Champagne Gold Finish"
-                      className={`px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                        finish === 'prestige'
-                          ? 'bg-[#20231F] text-white shadow-xs'
-                          : 'text-[#20231F]/70 hover:text-[#20231F]'
-                      }`}
-                    >
-                      <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
-                      <span className="hidden sm:inline">Prestige</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* View Mode Switcher */}
-                <div className="flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10 ml-auto">
+                {/* Exploded & Wireframe Tactile Toggle Buttons */}
+                <div className="flex items-center gap-1.5 bg-white/85 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10">
                   <button
-                    onClick={() => setViewMode('3d')}
-                    className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                      viewMode === '3d'
-                        ? 'bg-[#20231F] text-white shadow-xs'
-                        : 'text-[#20231F]/70 hover:text-[#20231F]'
+                    type="button"
+                    onClick={() => setExploded(!exploded)}
+                    className={`px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider rounded-full transition-all cursor-pointer border active:scale-95 ${
+                      exploded
+                        ? 'bg-[#FF6747] text-white border-[#FF6747] shadow-xs'
+                        : 'bg-white text-[#20231F] border-[#20231F]/15 hover:border-[#FF6747]'
                     }`}
                   >
-                    <Box className="w-3.5 h-3.5" />
-                    <span>3D</span>
+                    {exploded ? 'Collapsed' : 'Explode Spec'}
                   </button>
+
                   <button
-                    onClick={() => setViewMode('video')}
-                    className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                      viewMode === 'video'
-                        ? 'bg-[#20231F] text-white shadow-xs'
-                        : 'text-[#20231F]/70 hover:text-[#20231F]'
+                    type="button"
+                    onClick={() => setWireframe(!wireframe)}
+                    className={`px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider rounded-full transition-all cursor-pointer border active:scale-95 ${
+                      wireframe
+                        ? 'bg-[#8177FF] text-white border-[#8177FF] shadow-xs'
+                        : 'bg-white text-[#20231F] border-[#20231F]/15 hover:border-[#8177FF]'
                     }`}
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Loop</span>
+                    {wireframe ? 'Shaded' : 'Wireframe'}
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Cinematic Video Playback with Adjusted Luxury Dimensions */
+            <div className="w-full max-w-[660px] aspect-[16/10] sm:aspect-[16/9] relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#20231F]/10 bg-[#161815] group">
+              <LazyVideo
+                src={PULSEFORM_ASSETS.V01.src}
+                poster={PULSEFORM_ASSETS.I01.src}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              {/* Ambient Gradient Vignette */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
+
+              {/* Status Badge */}
+              <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider text-white border border-white/15">
+                <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
+                <span>Live Studio Feed · Khardaha Floor</span>
+              </div>
+
+              {/* Bottom Cinematic Telemetry */}
+              <div className="absolute bottom-4 inset-x-4 flex items-center justify-between text-xs text-white/90 font-mono pointer-events-none z-10">
+                <span>CINEMATIC REEL // 01</span>
+                <span className="text-[#FF6747] font-bold">ATMOSPHERIC PLAYBACK</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Grounded Studio Metadata Bar: Clean tone block, no hairline rules, no monospace */}
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto mt-12 pt-6 flex flex-wrap items-center justify-between gap-4 text-sm text-[#20231F]/80">
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto mt-6 sm:mt-8 pt-4 border-t border-[#20231F]/5 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-[#20231F]/80">
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           <span className="flex items-center gap-2 font-semibold text-[#20231F]">
             <span className="w-2 h-2 rounded-full bg-[#FF6747]" />

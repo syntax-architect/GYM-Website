@@ -141,9 +141,9 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
 
     const scene = new THREE.Scene();
 
-    // 70mm product photography camera
+    // 70mm product photography camera with ample breathing room
     const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
-    camera.position.set(0, 0.35, 5.2);
+    camera.position.set(0, 0.2, 5.5);
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -503,7 +503,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      className={`relative w-full h-full min-h-[380px] sm:min-h-[460px] md:min-h-[520px] select-none touch-none ${
+      className={`relative w-full h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[600px] select-none touch-none ${
         cursorState === 'grabbing' ? 'cursor-grabbing' : 'cursor-grab'
       } ${className}`}
       aria-label="Interactive 3D Sculptural Training Object — Drag to rotate in 360 degrees"

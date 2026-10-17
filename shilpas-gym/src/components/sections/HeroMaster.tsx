@@ -1,254 +1,394 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { ArrowUpRight, Phone, RotateCcw, Box } from 'lucide-react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { ArrowUpRight, Phone, MapPin, Clock, Sparkles, Layers, Eye, Play, Box } from 'lucide-react';
+import {
+  SculpturalDumbbellCanvas,
+  type DumbbellFinish,
+} from '../3d/SculpturalDumbbellCanvas';
 import { Button } from '../ui/Button';
-import { LazyVideo } from '../ui/LazyVideo';
-import { PULSEFORM_ASSETS } from '../../config/assets';
-import { SculpturalDumbbellCanvas } from '../3d/SculpturalDumbbellCanvas';
 
 export interface HeroMasterProps {
   onOpenInquiry: () => void;
-  onExploreModes?: () => void;
 }
 
+const FINISH_SPECS: Record<
+  DumbbellFinish,
+  { label: string; dot: string; code: string; materialNote: string }
+> = {
+  signature: {
+    label: 'SIGNATURE',
+    dot: 'bg-[#FF6747]',
+    code: 'SPEC // 01 · PERSIMMON & PERIWINKLE',
+    materialNote: '216,000 PSI Carbon Shaft · Dual Urethane Heads',
+  },
+  stealth: {
+    label: 'STEALTH',
+    dot: 'bg-[#20231F]',
+    code: 'SPEC // 02 · BLACK OXIDE GUNMETAL',
+    materialNote: 'Matte Black Oxide · Volcano Knurl Tolerance',
+  },
+  prestige: {
+    label: 'PRESTIGE',
+    dot: 'bg-[#CFA852]',
+    code: 'SPEC // 03 · CHAMPAGNE BRONZE',
+    materialNote: 'Hand-Polished Brass Alloy · Atelier Edition',
+  },
+};
+
 export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
-  const [viewMode, setViewMode] = useState<'3d' | 'video'>('3d');
-  const [finish, setFinish] = useState<'signature' | 'stealth' | 'prestige'>('signature');
+  const [finish, setFinish] = useState<DumbbellFinish>('signature');
   const [exploded, setExploded] = useState<boolean>(false);
   const [wireframe, setWireframe] = useState<boolean>(false);
-  const telemetryDegRef = useRef<HTMLSpanElement>(null);
+  const [viewMode, setViewMode] = useState<'3d' | 'loop'>('3d');
+  const [rotationY, setRotationY] = useState<number>(32);
+  const [velocityLabel, setVelocityLabel] = useState<string>('0.4x IDLE');
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
 
-  const handleTelemetryChange = useCallback((data: { rotationY: number }) => {
-    if (telemetryDegRef.current) {
-      telemetryDegRef.current.textContent = `${data.rotationY}°`;
-    }
+  const lastAngleRef = useRef<number>(32);
+  const lastTimeRef = useRef<number>(performance.now());
+
+  // Track subtle window scroll for 3D parallax coupling
+  useEffect(() => {
+    const onScroll = () => {
+      const progress = Math.min(1, window.scrollY / window.innerHeight);
+      setScrollProgress(progress);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Calculate Valmora-style real-time angular velocity telemetry
+  const handleTelemetryChange = useCallback(
+    (data: { rotationY: number; finish: DumbbellFinish; isExploded: boolean }) => {
+      const now = performance.now();
+      const dt = Math.max(16, now - lastTimeRef.current);
+
+      if (dt > 80) {
+        let deltaDeg = Math.abs(data.rotationY - lastAngleRef.current);
+        if (deltaDeg > 180) deltaDeg = 360 - deltaDeg;
+
+        const degPerSec = (deltaDeg / dt) * 1000;
+        const multiplier = Math.max(0.4, Math.min(4.8, +(degPerSec / 28).toFixed(1)));
+
+        if (multiplier > 1.2) {
+          setVelocityLabel(`>> ${multiplier.toFixed(1)}x SCRUB`);
+        } else if (multiplier < 0.6) {
+          setVelocityLabel(`< 0.4x SLOW`);
+        } else {
+          setVelocityLabel(`${multiplier.toFixed(1)}x ORBIT`);
+        }
+
+        lastAngleRef.current = data.rotationY;
+        lastTimeRef.current = now;
+        setRotationY(data.rotationY);
+      }
+    },
+    []
+  );
+
+  // Format angle into Valmora timecode style (00:03:42)
+  const paddedAngle = String(rotationY).padStart(3, '0');
+  const activeSpec = FINISH_SPECS[finish];
+
   return (
-    <section className="relative w-full min-h-[92svh] pt-24 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-10 lg:px-16 flex flex-col justify-between overflow-hidden bg-[#F5F2EA]">
-      {/* Main Hero Grid: Balanced Editorial Space & Expansive 3D Canvas / Video */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-center my-auto w-full max-w-[1440px] mx-auto">
-        {/* Left Column: Bold Typography & Conversion Deck */}
-        <div className="lg:col-span-6 xl:col-span-6 flex flex-col justify-center z-10">
-          {/* Trust Metric Statement */}
-          <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4 text-sm font-semibold text-[#174D3B]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#174D3B] flex-shrink-0 animate-pulse" />
-            <span>4.7 rating across 355+ Google reviews · Rahara & Khardaha</span>
+    <section className="relative w-full min-h-[100svh] bg-[#F5F2EA] text-[#20231F] overflow-hidden flex flex-col justify-between pt-24 pb-6 select-none">
+      {/* Subtle Architectural Radial Spotlight & Grid Lines */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 68% 46%, rgba(255, 103, 71, 0.10) 0%, rgba(129, 119, 255, 0.08) 32%, rgba(245, 242, 234, 0) 70%)',
+        }}
+      />
+
+      {/* Fine 1px Architectural Crosshairs (Valmora Atelier Motif) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-24 h-px bg-[#20231F]/10"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none hidden lg:block absolute top-24 bottom-16 left-[52%] w-px bg-[#20231F]/8"
+      />
+
+      {/* FULL-BLEED INTERACTIVE 3D / VIDEO STAGE (Unboxed) */}
+      <div className="relative lg:absolute lg:inset-y-16 lg:right-0 lg:w-[58%] h-[420px] sm:h-[500px] lg:h-auto z-10 flex items-center justify-center order-2 lg:order-none">
+        {/* Valmora-Inspired SVG Orbital Drag Arc & Leader Reticle */}
+        {viewMode === '3d' && (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 600 600"
+            className="pointer-events-none absolute w-[88%] max-w-[540px] h-auto opacity-65"
+          >
+            {/* Dashed Orbital Ring */}
+            <circle
+              cx="300"
+              cy="300"
+              r="230"
+              fill="none"
+              stroke="#20231F"
+              strokeWidth="1"
+              strokeDasharray="4 6"
+              opacity="0.25"
+            />
+            {/* Active Scrubbing Arc */}
+            <path
+              d="M 120 160 A 230 230 0 0 1 515 380"
+              fill="none"
+              stroke="#FF6747"
+              strokeWidth="1.5"
+              strokeDasharray="360"
+              strokeDashoffset={Math.round(360 - (rotationY / 360) * 360)}
+              className="transition-all duration-150"
+            />
+            {/* Target Reticle Dot on Arc */}
+            <circle cx="485" cy="165" r="4" fill="#FF6747" />
+            <circle
+              cx="485"
+              cy="165"
+              r="11"
+              fill="none"
+              stroke="#FF6747"
+              strokeWidth="1"
+              opacity="0.5"
+            />
+          </svg>
+        )}
+
+        {/* Drag-to-Reveal Floating Prompt (Valmora Motif) */}
+        {viewMode === '3d' && (
+          <div className="pointer-events-none absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#20231F]/90 text-[#F5F2EA] backdrop-blur-md shadow-lg border border-white/10">
+            <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-ping" />
+            <span className="font-mono text-[11px] uppercase tracking-[0.18em]">
+              DRAG TO ORBIT · {paddedAngle}°
+            </span>
           </div>
+        )}
 
-          {/* Master Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[84px] font-display font-extrabold uppercase tracking-tight text-[#20231F] leading-[0.98] break-words">
-            Strength Meets Glamour.
-          </h1>
-
-          <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg text-[#3C403A] font-normal leading-relaxed max-w-xl font-sans">
-            Khardaha's premier unisex fitness atelier and private beauty studio. Biomechanical strength training meets bespoke salon care under one refined roof.
-          </p>
-
-          {/* Confident Actions with Clear Boutique Affordance */}
-          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={onOpenInquiry}
-              className="w-full sm:w-auto justify-center"
-              icon={<ArrowUpRight className="w-4 h-4" />}
-            >
-              BOOK FREE TRIAL PASS
-            </Button>
-
-            <a
-              href="tel:07439761994"
-              className="group px-6 py-3.5 rounded-full bg-white/80 hover:bg-[#20231F] hover:text-[#F5F2EA] text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#20231F] border-2 border-[#20231F]/15 hover:border-[#20231F] shadow-xs hover:shadow-md transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer min-h-[54px] active:scale-[0.97]"
-            >
-              <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF6747]/15 group-hover:bg-[#FF6747] flex items-center justify-center transition-colors">
-                <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF6747] group-hover:text-white transition-colors" />
-              </span>
-              <span className="tabular-nums">074397 61994</span>
-            </a>
+        {/* 3D Canvas or Master Loop Video */}
+        {viewMode === '3d' ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <SculpturalDumbbellCanvas
+              className="w-full h-full"
+              exploded={exploded}
+              finish={finish}
+              onTelemetryChange={handleTelemetryChange}
+              scrollProgress={scrollProgress}
+              wireframe={wireframe}
+            />
           </div>
-
-          <div className="mt-8 flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-[#20231F]/80 font-bold uppercase tracking-wider">
-            <span>Women-Owned Studio</span>
-            <span className="text-[#FF6747]">·</span>
-            <span>Unisex Fitness Floor</span>
-            <span className="text-[#FF6747]">·</span>
-            <span>Private Salon Wing</span>
-          </div>
-        </div>
-
-        {/* Right Column: Seamless Expansive 3D Stage & Cinematic Video Playback (NO BOX) */}
-        <div className="lg:col-span-6 xl:col-span-6 relative w-full flex flex-col items-center justify-center min-h-[460px] sm:min-h-[560px] lg:min-h-[660px]">
-          {/* Ambient Studio Lighting (Organic atmospheric radial glow, zero harsh box edges) */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,rgba(255,103,71,0.14)_0%,rgba(129,119,255,0.06)_45%,transparent_75%)] pointer-events-none blur-3xl -z-10" />
-
-          {/* Floating Top Control Dock: Finish Swatches (when in 3D) & View Mode Switcher */}
-          <div className="absolute top-2 right-2 sm:right-4 z-30 flex flex-wrap items-center gap-2 pointer-events-auto">
-            {/* Material Finish Swatches - shown in 3D mode */}
-            {viewMode === '3d' && (
-              <div className="flex items-center gap-1 bg-white/85 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10">
-                <button
-                  type="button"
-                  onClick={() => setFinish('signature')}
-                  title="Signature Persimmon & Periwinkle Finish"
-                  className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                    finish === 'signature'
-                      ? 'bg-[#20231F] text-white shadow-xs'
-                      : 'text-[#20231F]/70 hover:text-[#20231F]'
-                  }`}
-                >
-                  <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
-                  <span className="hidden sm:inline">Signature</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setFinish('stealth')}
-                  title="Stealth Black Oxide Finish"
-                  className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                    finish === 'stealth'
-                      ? 'bg-[#20231F] text-white shadow-xs'
-                      : 'text-[#20231F]/70 hover:text-[#20231F]'
-                  }`}
-                >
-                  <span className="w-2 h-2 rounded-full bg-[#20231F]" />
-                  <span className="hidden sm:inline">Stealth</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setFinish('prestige')}
-                  title="Prestige Champagne Gold Finish"
-                  className={`px-3 py-1 text-[11px] font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                    finish === 'prestige'
-                      ? 'bg-[#20231F] text-white shadow-xs'
-                      : 'text-[#20231F]/70 hover:text-[#20231F]'
-                  }`}
-                >
-                  <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
-                  <span className="hidden sm:inline">Prestige</span>
-                </button>
-              </div>
-            )}
-
-            {/* View Mode Switcher */}
-            <div className="flex items-center gap-1 bg-white/85 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10">
-              <button
-                type="button"
-                onClick={() => setViewMode('3d')}
-                className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                  viewMode === '3d'
-                    ? 'bg-[#20231F] text-white shadow-xs'
-                    : 'text-[#20231F]/70 hover:text-[#20231F]'
-                }`}
-              >
-                <Box className="w-3.5 h-3.5" />
-                <span>3D</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('video')}
-                className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                  viewMode === 'video'
-                    ? 'bg-[#20231F] text-white shadow-xs'
-                    : 'text-[#20231F]/70 hover:text-[#20231F]'
-                }`}
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Loop</span>
-              </button>
-            </div>
-          </div>
-
-          {viewMode === '3d' ? (
-            <div className="w-full h-full min-h-[460px] sm:min-h-[560px] lg:min-h-[660px] relative flex items-center justify-center cursor-grab active:cursor-grabbing select-none">
-              <SculpturalDumbbellCanvas
-                interactivePointer={true}
-                finish={finish}
-                exploded={exploded}
-                wireframe={wireframe}
-                onTelemetryChange={handleTelemetryChange}
-                className="w-full h-full"
-              />
-
-              {/* Floating Bottom Telemetry & Quick Action Bar */}
-              <div className="absolute bottom-2 inset-x-2 sm:inset-x-4 flex flex-wrap items-center justify-between gap-2 z-20 pointer-events-auto">
-                <div className="flex items-center gap-2 bg-white/85 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs text-[#20231F]/90 shadow-xs border border-[#20231F]/10 font-bold uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
-                  <span>Drag 360°:</span>
-                  <span ref={telemetryDegRef} className="font-bold tabular-nums text-[#FF6747]">28°</span>
-                </div>
-
-                {/* Exploded & Wireframe Tactile Toggle Buttons */}
-                <div className="flex items-center gap-1.5 bg-white/85 backdrop-blur-md p-1 rounded-full shadow-xs border border-[#20231F]/10">
-                  <button
-                    type="button"
-                    onClick={() => setExploded(!exploded)}
-                    className={`px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider rounded-full transition-all cursor-pointer border active:scale-95 ${
-                      exploded
-                        ? 'bg-[#FF6747] text-white border-[#FF6747] shadow-xs'
-                        : 'bg-white text-[#20231F] border-[#20231F]/15 hover:border-[#FF6747]'
-                    }`}
-                  >
-                    {exploded ? 'Collapsed' : 'Explode Spec'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setWireframe(!wireframe)}
-                    className={`px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider rounded-full transition-all cursor-pointer border active:scale-95 ${
-                      wireframe
-                        ? 'bg-[#8177FF] text-white border-[#8177FF] shadow-xs'
-                        : 'bg-white text-[#20231F] border-[#20231F]/15 hover:border-[#8177FF]'
-                    }`}
-                  >
-                    {wireframe ? 'Shaded' : 'Wireframe'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* Cinematic Video Playback with Adjusted Luxury Dimensions */
-            <div className="w-full max-w-[660px] aspect-[16/10] sm:aspect-[16/9] relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#20231F]/10 bg-[#161815] group">
-              <LazyVideo
-                src={PULSEFORM_ASSETS.V01.src}
-                poster={PULSEFORM_ASSETS.I01.src}
+        ) : (
+          <div className="w-full h-full px-4 sm:px-10 lg:px-14 flex items-center justify-center">
+            <div className="relative w-full max-w-[680px] aspect-video rounded-2xl overflow-hidden shadow-2xl ring-1 ring-[#20231F]/15">
+              <video
+                src="/assets/videos/v01-hero-loop.mp4"
+                poster="/assets/images/i01-hero-still.webp"
                 autoPlay
                 loop
                 muted
                 playsInline
                 className="w-full h-full object-cover"
               />
-              {/* Ambient Gradient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
-
-              {/* Status Badge */}
-              <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider text-white border border-white/15">
-                <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
-                <span>Live Studio Feed · Khardaha Floor</span>
-              </div>
-
-              {/* Bottom Cinematic Telemetry */}
-              <div className="absolute bottom-4 inset-x-4 flex items-center justify-between text-xs text-white/90 font-mono pointer-events-none z-10">
-                <span>CINEMATIC REEL // 01</span>
-                <span className="text-[#FF6747] font-bold">ATMOSPHERIC PLAYBACK</span>
+              <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-black/70 text-white font-mono text-[10px] uppercase tracking-widest">
+                MASTER REEL // V01 STUDIO LOOP
               </div>
             </div>
-          )}
+          </div>
+        )}
+      </div>
+
+      {/* TOP TELEMETRY BAR (Valmora + Oddball HUD) */}
+      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-2 flex flex-wrap items-center justify-between gap-4">
+        {/* Verified Local Authority Pill */}
+        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/85 backdrop-blur-md border border-[#20231F]/12 shadow-xs">
+          <span className="w-2 h-2 rounded-full bg-[#174D3B]" />
+          <span className="font-sans text-xs sm:text-sm font-bold text-[#20231F]">
+            4.7 Rating across 355+ Google Reviews · Rahara & Khardaha
+          </span>
+        </div>
+
+        {/* Live Telemetry Readout (Top-Right HUD) */}
+        <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-full bg-[#20231F] text-[#F5F2EA] font-mono text-xs tracking-wider shadow-md">
+          <span className="text-[#FF6747] font-bold">REEL 01</span>
+          <span className="text-white/30">·</span>
+          <span className="tabular-nums">
+            00:0{finish === 'signature' ? '1' : finish === 'stealth' ? '2' : '3'}:{paddedAngle.slice(0, 2)}
+          </span>
+          <span className="text-white/30">·</span>
+          <span className="text-[#DDE8F8] tabular-nums">{velocityLabel}</span>
         </div>
       </div>
 
-      {/* Grounded Studio Metadata Bar: Clean tone block, no hairline rules, no monospace */}
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto mt-6 sm:mt-8 pt-4 border-t border-[#20231F]/5 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-[#20231F]/80">
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-          <span className="flex items-center gap-2 font-semibold text-[#20231F]">
-            <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
-            Naskarhat Madhya Para, Rahara, Khardaha · Kolkata 700118
-          </span>
-          <span className="hidden md:inline text-[#20231F]/40">·</span>
-          <span className="text-[#174D3B] font-bold">Open Daily: 06:00 AM – 10:00 PM</span>
+      {/* MAIN EDITORIAL FOREGROUND */}
+      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto py-6 lg:py-12 pointer-events-none">
+        <div className="max-w-2xl space-y-6 pointer-events-auto">
+          {/* Technical Act Tag */}
+          <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.2em] text-[#174D3B] font-semibold">
+            <span>ACT I // DUAL SANCTUARY</span>
+            <span className="w-8 h-px bg-[#174D3B]/40" />
+            <span className="text-[#20231F]/60">{activeSpec.code}</span>
+          </div>
+
+          {/* High-Contrast Valmora / Oddball Display Typography */}
+          <h1 className="font-display text-5xl sm:text-7xl xl:text-[5.4rem] font-extrabold uppercase tracking-[-0.035em] text-[#20231F] leading-[0.94]">
+            STRENGTH <br />
+            MEETS{' '}
+            <span className="font-serif italic font-normal capitalize tracking-normal text-[#FF6747] pr-2">
+              Glamour.
+            </span>
+          </h1>
+
+          {/* Concise Editorial Copy */}
+          <p className="font-sans text-base sm:text-lg text-[#4C514A] max-w-xl leading-relaxed font-normal">
+            Khardaha’s premier unisex fitness atelier and private beauty studio.
+            Biomechanical strength training meets bespoke keratin & bridal artistry
+            under one calibrated roof.
+          </p>
+
+          {/* Primary Conversion Actions */}
+          <div className="flex flex-wrap items-center gap-3.5 pt-2">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={onOpenInquiry}
+              icon={<ArrowUpRight className="w-4 h-4" />}
+              className="min-h-[54px] px-8 shadow-persimmon-subtle"
+            >
+              BOOK FREE TRIAL PASS
+            </Button>
+
+            <a
+              href="tel:07439761994"
+              className="inline-flex items-center gap-3 px-6 min-h-[54px] rounded-full bg-white/90 hover:bg-[#20231F] text-[#20231F] hover:text-[#F5F2EA] border border-[#20231F]/15 font-mono text-xs sm:text-sm font-bold tracking-wider transition-all duration-200 shadow-xs active:scale-95"
+            >
+              <Phone className="w-4 h-4 text-[#FF6747]" />
+              <span className="tabular-nums">074397 61994</span>
+            </a>
+          </div>
+
+          {/* 3-Pillar Micro Badges */}
+          <div className="pt-4 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#20231F]/75 font-semibold">
+            <span className="inline-flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-[#FF6747]" />
+              WOMEN-OWNED STUDIO
+            </span>
+            <span className="text-[#20231F]/25">•</span>
+            <span>UNISEX FITNESS FLOOR</span>
+            <span className="text-[#20231F]/25">•</span>
+            <span>PRIVATE SALON WING</span>
+          </div>
         </div>
-        <span className="font-medium text-[#20231F]/70">Google Plus Code: P9FM+6V Rahara</span>
+      </div>
+
+      {/* BOTTOM ARCHITECTURAL BAR + FLOATING 3D HARDWARE CONTROLLER */}
+      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-4 border-t border-[#20231F]/12 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+        {/* Left: Physical Telemetry & Google Plus Code */}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm text-[#20231F]/80 font-medium">
+          <span className="inline-flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
+            <MapPin className="w-3.5 h-3.5 text-[#174D3B]" />
+            Naskarhat Madhya Para, Rahara, Khardaha, Kolkata 700118
+          </span>
+          <span className="inline-flex items-center gap-1.5 font-mono text-xs text-[#20231F]/70">
+            <Clock className="w-3.5 h-3.5 text-[#FF6747]" />
+            Open Daily: 06:00 AM – 10:00 PM
+          </span>
+        </div>
+
+        {/* Right: Floating Hardware Spec Dock (Controls 3D Dumbbell State) */}
+        <div className="w-full xl:w-auto flex flex-wrap items-center justify-between xl:justify-end gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-[#20231F]/12 shadow-sculptural">
+          {/* Material Finish Selector Pills */}
+          <div className="flex items-center gap-1">
+            {(['signature', 'stealth', 'prestige'] as DumbbellFinish[]).map((item) => {
+              const isSelected = finish === item;
+              const spec = FINISH_SPECS[item];
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => {
+                    setViewMode('3d');
+                    setFinish(item);
+                  }}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    isSelected && viewMode === '3d'
+                      ? 'bg-[#20231F] text-[#F5F2EA] shadow-xs'
+                      : 'text-[#20231F]/70 hover:text-[#20231F] hover:bg-[#20231F]/5'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${spec.dot}`} />
+                  <span>{spec.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="h-4 w-px bg-[#20231F]/15 hidden sm:block" />
+
+          {/* Explode Bushing Spec & Wireframe Toggles */}
+          {viewMode === '3d' && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setExploded((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  exploded
+                    ? 'bg-[#FF6747] text-white'
+                    : 'bg-[#F5F2EA] text-[#20231F] hover:bg-[#20231F]/10'
+                }`}
+              >
+                <Layers className="w-3 h-3" />
+                <span>{exploded ? 'Collapse' : 'Explore Spec'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setWireframe((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  wireframe
+                    ? 'bg-[#8177FF] text-white'
+                    : 'bg-[#F5F2EA] text-[#20231F] hover:bg-[#20231F]/10'
+                }`}
+              >
+                <Eye className="w-3 h-3" />
+                <span>{wireframe ? 'Shaded' : 'Wireframe'}</span>
+              </button>
+            </div>
+          )}
+
+          <div className="h-4 w-px bg-[#20231F]/15 hidden sm:block" />
+
+          {/* 3D vs Loop Switcher */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setViewMode('3d')}
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase cursor-pointer transition-all ${
+                viewMode === '3d'
+                  ? 'bg-[#174D3B] text-white'
+                  : 'text-[#20231F]/65 hover:text-[#20231F]'
+              }`}
+            >
+              <Box className="w-3 h-3" />
+              <span>3D</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('loop')}
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase cursor-pointer transition-all ${
+                viewMode === 'loop'
+                  ? 'bg-[#174D3B] text-white'
+                  : 'text-[#20231F]/65 hover:text-[#20231F]'
+              }`}
+            >
+              <Play className="w-3 h-3" />
+              <span>LOOP</span>
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
 };
+
+export default HeroMaster;

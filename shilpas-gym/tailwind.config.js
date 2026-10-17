@@ -49,7 +49,8 @@ export default {
       fontFamily: {
         display: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
         sans: ['Plus Jakarta Sans', '-apple-system', 'sans-serif'],
-        mono: ['Space Mono', 'monospace'],
+        serif: ['Instrument Serif', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
         'persimmon-subtle': '0 10px 30px -10px rgba(255, 103, 71, 0.3)',

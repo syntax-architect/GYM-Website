@@ -18,22 +18,25 @@ export const MomentumFilm: React.FC = () => {
           </p>
         </div>
 
-        {/* Video Canvas Container */}
-        <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[2.4/1] rounded-sm overflow-hidden bg-[#20231F]">
-          <video
-            ref={videoRef}
-            src={PULSEFORM_ASSETS.V03.src}
-            poster={PULSEFORM_ASSETS.I04.src}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
+        {/* Video Canvas Container in Double-Bezel Enclosure */}
+        <div className="p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-3xl shadow-xl">
+          <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[2.4/1] rounded-[calc(1.5rem-0.25rem)] overflow-hidden bg-[#20231F]">
+            <video
+              ref={videoRef}
+              src={PULSEFORM_ASSETS.V03.src}
+              poster={PULSEFORM_ASSETS.I04.src}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
 
-          {/* Clean Film Footnote */}
-          <div className="absolute bottom-4 right-4 bg-black/60 px-4 py-2 rounded-xs text-sm text-white/90 font-medium">
-            Shilpa's Gym Training Floor · Rahara, Khardaha
+            {/* Clean Film Footnote Luxury Pill */}
+            <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-xs text-white/90 font-bold uppercase tracking-wider border border-white/10 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
+              <span>Shilpa's Gym Training Floor · Rahara, Khardaha</span>
+            </div>
           </div>
         </div>
       </div>

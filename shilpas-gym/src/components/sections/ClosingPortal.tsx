@@ -39,12 +39,17 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
         {/* Final Conversion CTA & Studio Location Deck */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#174D3B]/10 text-[#174D3B] text-xs font-extrabold uppercase tracking-widest mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747]" />
+              <span>Studio Location & Booking</span>
+            </div>
+
             <h2 className="text-4xl sm:text-6xl font-display font-extrabold uppercase tracking-tight text-[#20231F] leading-[0.98]">
               Visit Shilpa's Studio.
             </h2>
 
-            <p className="mt-6 text-base sm:text-lg text-[#3C403A] font-normal leading-relaxed max-w-xl">
-              Experience the best workout atmosphere in Khardaha and Rahara. Modern imported machinery, dedicated certified trainers, and full-service salon beauty care.
+            <p className="mt-5 text-sm sm:text-base lg:text-lg text-[#3C403A] font-normal leading-relaxed max-w-xl">
+              Experience the premier workout and salon atmosphere in Khardaha and Rahara. Calibrated biomechanical machines, certified trainers, and private salon care under one roof.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -61,50 +66,60 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
                 href="https://maps.google.com/?q=P9FM%2B6V+Rahara,+Kolkata,+West+Bengal"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-7 py-4 rounded-sm bg-white hover:bg-[#174D3B] hover:text-white text-sm font-bold uppercase text-[#20231F] transition-colors flex items-center gap-2 cursor-pointer"
+                className="group px-6 py-3.5 rounded-full bg-white hover:bg-[#174D3B] hover:text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#20231F] border-2 border-[#20231F]/15 hover:border-[#174D3B] shadow-xs hover:shadow-md transition-all duration-300 flex items-center gap-3 cursor-pointer min-h-[54px] active:scale-[0.97]"
               >
-                <MapPin className="w-4 h-4 text-[#FF6747]" />
+                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF6747]/15 group-hover:bg-white/20 flex items-center justify-center transition-colors">
+                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF6747] group-hover:text-white transition-colors" />
+                </span>
                 <span>OPEN IN GOOGLE MAPS</span>
               </a>
             </div>
           </div>
 
-          {/* Physical Location & Hours Card */}
-          <div className="lg:col-span-5 bg-white p-8 sm:p-10 rounded-sm">
-            <div className="flex items-center justify-between mb-6 pb-4 bg-[#FAF8F4] -mx-8 -mt-8 sm:-mx-10 sm:-mt-10 p-8 sm:p-10 rounded-t-sm">
-              <h3 className="font-display font-bold text-lg uppercase text-[#20231F]">
-                Studio Location
-              </h3>
-              <span className="text-sm text-[#174D3B] font-bold">
-                Rated 4.7 (355+ Reviews)
-              </span>
-            </div>
-
-            <div className="space-y-5 text-sm text-[#3C403A]">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-[#FF6747] flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-[#20231F] block">SHILPA'S GYM & BEAUTY SALON</span>
-                  <span className="text-sm leading-relaxed">
-                    Naskarhat Madhya Para, Cooperative Colony, Halder Bagan, Rahara, Kolkata, Khardaha, West Bengal 700118
-                  </span>
-                </div>
+          {/* Physical Location & Hours Card (Double-Bezel Agency Card) */}
+          <div className="lg:col-span-5 p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-3xl shadow-lg">
+            <div className="bg-white p-7 sm:p-9 rounded-[calc(1.5rem-0.25rem)] shadow-xs">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#20231F]/10">
+                <h3 className="font-display font-extrabold text-lg uppercase tracking-tight text-[#20231F]">
+                  Studio Location
+                </h3>
+                <span className="text-xs text-[#174D3B] font-extrabold bg-[#EDE9DF] px-3 py-1 rounded-full">
+                  Rated 4.7 (355+ Reviews)
+                </span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-[#174D3B] flex-shrink-0" />
-                <div>
-                  <span className="font-bold text-[#20231F]">Hours:</span> Open Daily 06:00 AM – 10:00 PM
+              <div className="space-y-5 text-xs sm:text-sm text-[#3C403A]">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#FF6747]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <MapPin className="w-4 h-4 text-[#FF6747]" />
+                  </div>
+                  <div>
+                    <span className="font-extrabold text-[#20231F] block uppercase tracking-tight">SHILPA'S GYM & BEAUTY SALON</span>
+                    <span className="text-xs sm:text-sm leading-relaxed text-[#5A6057]">
+                      Naskarhat Madhya Para, Halder Bagan, Rahara, Khardaha, Kolkata 700118
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-[#FF6747] flex-shrink-0" />
-                <div>
-                  <span className="font-bold text-[#20231F]">Phone:</span>{' '}
-                  <a href="tel:07439761994" className="hover:text-[#FF6747] font-semibold tabular-nums">
-                    074397 61994
-                  </a>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#174D3B]/10 flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 text-[#174D3B]" />
+                  </div>
+                  <div>
+                    <span className="font-extrabold text-[#20231F]">Hours:</span> Open Daily 06:00 AM – 10:00 PM
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#FF6747]/10 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4 text-[#FF6747]" />
+                  </div>
+                  <div>
+                    <span className="font-extrabold text-[#20231F]">Hotline:</span>{' '}
+                    <a href="tel:07439761994" className="hover:text-[#FF6747] font-extrabold tabular-nums underline decoration-[#FF6747]">
+                      074397 61994
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

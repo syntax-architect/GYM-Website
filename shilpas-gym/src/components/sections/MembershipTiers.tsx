@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import { SectionHeader } from '../ui/SectionHeader';
 import { Button } from '../ui/Button';
+import { Interactive3DCard } from '../ui/Interactive3DCard';
+import { ArrowUpRight } from 'lucide-react';
 
 export interface MembershipTiersProps {
   onSelectTier: (tierName: string) => void;
@@ -76,32 +77,38 @@ export const MembershipTiers: React.FC<MembershipTiersProps> = ({ onSelectTier }
     <section id="memberships" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#FAF8F4]">
       <div className="max-w-[1440px] mx-auto">
         <SectionHeader
-          title="Transparent Memberships."
+          tag="Transparent Pricing"
+          title="Direct Memberships."
           description="Straightforward pricing for gym access, personal coaching, and beauty salon care in Khardaha. No hidden admission surcharges, zero deceptive lock-ins."
         />
 
-        {/* Monthly vs Annual Cadence Toggle */}
+        {/* High-End Segmented Cadence Toggle Pill Dock */}
         <div className="flex justify-center mb-16">
-          <div className="bg-[#EDE9DF] p-1.5 rounded-sm flex items-center gap-1">
+          <div className="p-1.5 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-full inline-flex items-center gap-1.5 shadow-xs">
             <button
+              type="button"
               onClick={() => setBillingCycle('monthly')}
-              className={`px-6 py-2.5 rounded-xs text-sm font-bold uppercase transition-colors cursor-pointer ${
+              className={`px-6 sm:px-8 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-2 border ${
                 billingCycle === 'monthly'
-                  ? 'bg-[#20231F] text-[#F5F2EA]'
-                  : 'text-[#20231F]/70 hover:text-[#20231F]'
+                  ? 'bg-[#20231F] text-[#F5F2EA] shadow-md border-[#20231F]'
+                  : 'text-[#20231F]/70 hover:text-[#20231F] hover:bg-white/90 border-transparent hover:border-[#20231F]/15'
               }`}
             >
-              Monthly Billing
+              <span className={`w-1.5 h-1.5 rounded-full ${billingCycle === 'monthly' ? 'bg-[#FF6747] animate-pulse' : 'bg-[#20231F]/30'}`} />
+              <span>Monthly Pass</span>
             </button>
             <button
+              type="button"
               onClick={() => setBillingCycle('annual')}
-              className={`px-6 py-2.5 rounded-xs text-sm font-bold uppercase transition-colors cursor-pointer ${
+              className={`px-6 sm:px-8 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-2 border ${
                 billingCycle === 'annual'
-                  ? 'bg-[#FF6747] text-white'
-                  : 'text-[#20231F]/70 hover:text-[#20231F]'
+                  ? 'bg-[#FF6747] text-[#20231F] shadow-md border-[#FF6747]'
+                  : 'text-[#20231F]/70 hover:text-[#20231F] hover:bg-white/90 border-transparent hover:border-[#20231F]/15'
               }`}
             >
-              Annual Pass (Save 20%)
+              <span className={`w-1.5 h-1.5 rounded-full ${billingCycle === 'annual' ? 'bg-[#20231F]' : 'bg-[#20231F]/30'}`} />
+              <span>Annual Pass</span>
+              <span className="text-[10px] bg-black/15 px-2 py-0.5 rounded-full font-black">SAVE 20%</span>
             </button>
           </div>
         </div>
@@ -113,84 +120,91 @@ export const MembershipTiers: React.FC<MembershipTiersProps> = ({ onSelectTier }
             const isHighlighted = tier.highlighted;
 
             return (
-              <div
+              <Interactive3DCard
                 key={tier.id}
-                className={`rounded-sm p-8 sm:p-10 flex flex-col justify-between transition-colors duration-200 ${
-                  isHighlighted
-                    ? 'bg-[#174D3B] text-[#F5F2EA]'
-                    : 'bg-white text-[#20231F]'
-                }`}
+                maxTilt={6}
+                scale={1.02}
+                glowColor={isHighlighted ? 'rgba(255, 103, 71, 0.22)' : 'rgba(23, 77, 59, 0.12)'}
+                className="flex"
               >
-                <div>
-                  <div className="flex items-center justify-between gap-4 mb-2">
-                    <h3 className="text-2xl sm:text-3xl font-display font-extrabold uppercase tracking-tight">
-                      {tier.name}
-                    </h3>
-                    {isHighlighted && (
-                      <span className="bg-[#FF6747] text-white text-sm uppercase font-bold px-3 py-1 rounded-xs">
-                        Popular
-                      </span>
-                    )}
-                  </div>
-
-                  <p className={`text-sm mb-3 ${isHighlighted ? 'text-[#FF6747]' : 'text-[#174D3B]'} font-semibold`}>
-                    {tier.timing}
-                  </p>
-
-                  <p className={`text-sm mb-8 leading-relaxed ${
-                    isHighlighted ? 'text-[#DDE8F8]' : 'text-[#5A6057]'
-                  }`}>
-                    {tier.tagline}
-                  </p>
-
-                  {/* Price Block */}
-                  <div className="mb-8">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-xl font-bold">₹</span>
-                      <span className="text-4xl sm:text-5xl font-extrabold tracking-tight tabular-nums">
-                        {price.toLocaleString('en-IN')}
-                      </span>
-                      <span className={`text-sm ml-1 ${isHighlighted ? 'text-[#DDE8F8]/70' : 'text-[#20231F]/60'}`}>
-                        / month
-                      </span>
-                    </div>
-                    {billingCycle === 'annual' && (
-                      <span className={`text-sm block mt-1 ${isHighlighted ? 'text-[#FF6747]' : 'text-[#174D3B]'} font-semibold`}>
-                        Billed annually (Save 20%)
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Feature Inclusions */}
-                  <div className="space-y-3.5 mb-10">
-                    {tier.features.map((feat) => (
-                      <div key={feat} className="flex items-start gap-3">
-                        <span className={`text-base font-bold flex-shrink-0 leading-none mt-0.5 ${
-                          isHighlighted ? 'text-[#FF6747]' : 'text-[#174D3B]'
-                        }`}>
-                          +
+                <div
+                  className={`w-full rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 shadow-md hover:shadow-xl ${
+                    isHighlighted
+                      ? 'bg-[#174D3B] text-[#F5F2EA] border-2 border-[#FF6747]'
+                      : 'bg-white text-[#20231F] border-2 border-[#20231F]/10'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <h3 className="text-2xl sm:text-3xl font-display font-extrabold uppercase tracking-tight">
+                        {tier.name}
+                      </h3>
+                      {isHighlighted && (
+                        <span className="bg-[#FF6747] text-[#20231F] text-xs uppercase font-extrabold tracking-wider px-3 py-1 rounded-full shadow-xs">
+                          Popular
                         </span>
-                        <span className={`text-sm leading-snug ${
-                          isHighlighted ? 'text-[#F5F2EA]' : 'text-[#3E423C]'
-                        }`}>
-                          {feat}
+                      )}
+                    </div>
+
+                    <p className={`text-xs mb-3 uppercase tracking-wider ${isHighlighted ? 'text-[#FF6747]' : 'text-[#174D3B]'} font-extrabold`}>
+                      {tier.timing}
+                    </p>
+
+                    <p className={`text-xs sm:text-sm mb-8 leading-relaxed ${
+                      isHighlighted ? 'text-[#DDE8F8]' : 'text-[#5A6057]'
+                    }`}>
+                      {tier.tagline}
+                    </p>
+
+                    {/* Price Block */}
+                    <div className="mb-8">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xl font-bold">₹</span>
+                        <span className="text-4xl sm:text-5xl font-extrabold tracking-tight tabular-nums">
+                          {price.toLocaleString('en-IN')}
+                        </span>
+                        <span className={`text-xs ml-1 uppercase tracking-wider font-bold ${isHighlighted ? 'text-[#DDE8F8]/70' : 'text-[#20231F]/60'}`}>
+                          / month
                         </span>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      {billingCycle === 'annual' && (
+                        <span className={`text-xs block mt-1 ${isHighlighted ? 'text-[#FF6747]' : 'text-[#174D3B]'} font-extrabold uppercase tracking-wider`}>
+                          Billed annually · Save 20%
+                        </span>
+                      )}
+                    </div>
 
-                {/* Bottom-Aligned CTA */}
-                <Button
-                  variant={isHighlighted ? 'primary' : 'secondary'}
-                  size="md"
-                  className="w-full text-center justify-center"
-                  onClick={() => onSelectTier(tier.name)}
-                  icon={<ArrowUpRight className="w-4 h-4" />}
-                >
-                  SELECT {tier.name.toUpperCase()}
-                </Button>
-              </div>
+                    {/* Feature Inclusions */}
+                    <div className="space-y-3 mb-10">
+                      {tier.features.map((feat) => (
+                        <div key={feat} className="flex items-start gap-3">
+                          <span className={`text-base font-bold flex-shrink-0 leading-none mt-0.5 ${
+                            isHighlighted ? 'text-[#FF6747]' : 'text-[#174D3B]'
+                          }`}>
+                            +
+                          </span>
+                          <span className={`text-xs sm:text-sm leading-snug ${
+                            isHighlighted ? 'text-[#F5F2EA]' : 'text-[#3E423C]'
+                          }`}>
+                            {feat}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bottom-Aligned CTA */}
+                  <Button
+                    variant={isHighlighted ? 'primary' : 'secondary'}
+                    size="md"
+                    className="w-full text-center justify-center min-h-[50px]"
+                    onClick={() => onSelectTier(tier.name)}
+                    icon={<ArrowUpRight className="w-4 h-4" />}
+                  >
+                    SELECT {tier.name.toUpperCase()}
+                  </Button>
+                </div>
+              </Interactive3DCard>
             );
           })}
         </div>

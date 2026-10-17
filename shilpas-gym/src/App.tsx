@@ -3,12 +3,17 @@ import { SmoothScrollProvider } from './components/layout/SmoothScrollProvider';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { HeroMaster } from './components/sections/HeroMaster';
+import { KineticTicker } from './components/ui/KineticTicker';
+import { KineticCursor } from './components/ui/KineticCursor';
 import { MomentumFilm } from './components/sections/MomentumFilm';
 import { SignatureScroll } from './components/sections/SignatureScroll';
 import { DisciplinesMatrix } from './components/sections/DisciplinesMatrix';
+import { PlateBiomechanicsCalculator } from './components/sections/PlateBiomechanicsCalculator';
 import { TiltedGridHeroSection } from './components/sections/TiltedGridHeroSection';
+import { TransformationVisualizer } from './components/sections/TransformationVisualizer';
 import { ClassFinder } from './components/sections/ClassFinder';
 import { MembershipTiers } from './components/sections/MembershipTiers';
+import { StudioLiveTelemetry } from './components/sections/StudioLiveTelemetry';
 import { CoachingAction } from './components/sections/CoachingAction';
 import { TimetableBooking } from './components/sections/TimetableBooking';
 import { ClosingPortal } from './components/sections/ClosingPortal';
@@ -31,6 +36,9 @@ export function App() {
   return (
     <SmoothScrollProvider>
       <div className="min-h-[100svh] bg-[#F5F2EA] text-[#20231F] font-sans selection:bg-[#FF6747] selection:text-white flex flex-col antialiased">
+        {/* Kinetic Follower Cursor for Desktop */}
+        <KineticCursor />
+
         {/* Global Navigation Header */}
         <Header onOpenInquiry={() => handleOpenInquiry()} />
 
@@ -38,6 +46,9 @@ export function App() {
         <main className="flex-1 w-full">
           {/* Scene 01: Hero Master */}
           <HeroMaster onOpenInquiry={() => handleOpenInquiry()} />
+
+          {/* Kinetic Live Telemetry Ribbon */}
+          <KineticTicker />
 
           {/* Scene 02: Momentum Film */}
           <div id="momentum">
@@ -50,22 +61,33 @@ export function App() {
           {/* Scene 04: Training Modes (Four Editorial Pillars) */}
           <DisciplinesMatrix onOpenInquiry={(plan) => handleOpenInquiry(plan)} />
 
+          {/* Scene 05: Interactive Barbell Plate & 1RM Biomechanics Lab */}
+          <PlateBiomechanicsCalculator onOpenInquiry={(plan) => handleOpenInquiry(plan)} />
+
           {/* Perspective Cinema: 3D Tilted Grid Hero (Dual Sanctuary Stream) */}
           <TiltedGridHeroSection onOpenInquiry={(plan) => handleOpenInquiry(plan)} />
 
-          {/* Scene 05: Class Finder (Interactive 3-Question Decision Engine) */}
+          {/* Scene 06: Interactive Client Transformations (Split-Screen Comparison) */}
+          <TransformationVisualizer onOpenInquiry={(plan) => handleOpenInquiry(plan)} />
+
+          {/* Scene 07: Class Finder (Interactive 3-Question Decision Engine) */}
           <ClassFinder onSelectClass={(className) => handleOpenInquiry(className)} />
 
-          {/* Scene 06: Membership (Transparent Pricing & Terms) */}
+          {/* Scene 08: Membership (Transparent Pricing & Terms) */}
           <MembershipTiers onSelectTier={(tierName) => handleOpenInquiry(tierName)} />
 
-          {/* Scene 07: Coaches & Community */}
+          {/* Scene 09: Real-Time Studio Capacity & Hourly Rush Curve */}
+          <div id="live-telemetry">
+            <StudioLiveTelemetry onOpenInquiry={() => handleOpenInquiry()} />
+          </div>
+
+          {/* Scene 10: Coaches & Community */}
           <CoachingAction />
 
-          {/* Scene 08: Timetable & Booking */}
+          {/* Scene 11: Timetable & Booking */}
           <TimetableBooking onBookClass={handleBookClass} />
 
-          {/* Scene 09: Final Closing Portal */}
+          {/* Scene 12: Final Closing Portal */}
           <ClosingPortal onOpenInquiry={() => handleOpenInquiry()} />
         </main>
 

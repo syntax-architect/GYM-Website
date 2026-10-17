@@ -64,12 +64,12 @@ export const AudioExperienceController: React.FC<AudioExperienceControllerProps>
   };
 
   return (
-    <div className={`inline-flex items-center gap-1.5 rounded-sm bg-[#EDE9DF] p-1 ${className}`}>
+    <div className={`inline-flex items-center gap-1.5 rounded-full bg-white/80 backdrop-blur-md p-1 border-2 border-[#20231F]/15 shadow-xs ${className}`}>
       <button
         onClick={togglePlay}
-        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xs text-sm font-semibold uppercase transition-colors cursor-pointer ${
+        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 ${
           isPlaying
-            ? 'bg-[#FF6747] text-white'
+            ? 'bg-[#FF6747] text-[#20231F] shadow-xs'
             : 'text-[#20231F] hover:bg-black/5'
         }`}
         title={isPlaying ? 'Mute Studio Audio' : 'Enable Studio Audio'}
@@ -77,29 +77,29 @@ export const AudioExperienceController: React.FC<AudioExperienceControllerProps>
       >
         {isPlaying ? (
           <>
-            <Volume2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Audio</span>
+            <Volume2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Audio On</span>
             <span className="flex items-center gap-0.5 h-3 ml-0.5">
-              <span className="w-1 h-3 bg-white" />
-              <span className="w-1 h-2 bg-white" />
-              <span className="w-1 h-3.5 bg-white" />
+              <span className="w-0.5 h-3 bg-[#20231F] animate-pulse" />
+              <span className="w-0.5 h-2 bg-[#20231F] animate-pulse delay-75" />
+              <span className="w-0.5 h-3.5 bg-[#20231F] animate-pulse delay-150" />
             </span>
           </>
         ) : (
           <>
-            <VolumeX className="w-4 h-4 text-[#20231F]/70" />
+            <VolumeX className="w-3.5 h-3.5 text-[#20231F]/70" />
             <span className="hidden sm:inline text-[#20231F]/80">Audio Off</span>
           </>
         )}
       </button>
 
       {isPlaying && (
-        <div className="flex items-center gap-1 pr-1">
+        <div className="flex items-center gap-1 pr-1 border-l border-[#20231F]/10 pl-1.5">
           <button
             onClick={() => switchTrack('ambient')}
-            className={`px-2 py-1 rounded-xs text-sm font-medium uppercase transition-colors ${
+            className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider transition-colors cursor-pointer ${
               activeTrack === 'ambient'
-                ? 'bg-[#174D3B] text-white font-bold'
+                ? 'bg-[#174D3B] text-white shadow-xs'
                 : 'text-[#20231F]/70 hover:text-[#20231F]'
             }`}
           >
@@ -107,9 +107,9 @@ export const AudioExperienceController: React.FC<AudioExperienceControllerProps>
           </button>
           <button
             onClick={() => switchTrack('kinetic')}
-            className={`px-2 py-1 rounded-xs text-sm font-medium uppercase transition-colors ${
+            className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider transition-colors cursor-pointer ${
               activeTrack === 'kinetic'
-                ? 'bg-[#174D3B] text-white font-bold'
+                ? 'bg-[#174D3B] text-white shadow-xs'
                 : 'text-[#20231F]/70 hover:text-[#20231F]'
             }`}
           >

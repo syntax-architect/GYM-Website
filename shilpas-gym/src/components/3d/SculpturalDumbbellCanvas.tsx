@@ -1,28 +1,137 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 
+export type DumbbellFinish = 'signature' | 'stealth' | 'prestige';
+
 export interface SculpturalDumbbellCanvasProps {
-  scrollProgress?: number; // 0 to 1 for scroll-driven rotation
+  scrollProgress?: number;
   interactivePointer?: boolean;
   className?: string;
   autoRotateSpeed?: number;
+  finish?: DumbbellFinish;
+  exploded?: boolean;
+  wireframe?: boolean;
+  onTelemetryChange?: (data: { rotationY: number; finish: DumbbellFinish; isExploded: boolean }) => void;
 }
 
 export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> = ({
   scrollProgress = 0,
   interactivePointer = true,
   className = '',
-  autoRotateSpeed = 0.4,
+  autoRotateSpeed = 0.35,
+  finish = 'signature',
+  exploded = false,
+  wireframe = false,
+  onTelemetryChange,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const targetRotationRef = useRef<{ x: number; y: number; z: number }>({ x: 0.15, y: -0.4, z: 0.1 });
-  const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isReducedMotionRef = useRef<boolean>(false);
+  const onTelemetryChangeRef = useRef(onTelemetryChange);
+
+  useEffect(() => {
+    onTelemetryChangeRef.current = onTelemetryChange;
+  }, [onTelemetryChange]);
+
+  // Drag & Inertia state refs
+  const isDraggingRef = useRef<boolean>(false);
+  const pointerStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const velocityRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const rotationRef = useRef<{ x: number; y: number; z: number }>({ x: 0.18, y: -0.4, z: 0.08 });
+  const mouseHoverRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const explodeProgressRef = useRef<number>(0);
+
+  // References to materials & groups for live parameter updates
+  const materialsRef = useRef<{
+    persimmon: THREE.MeshPhysicalMaterial;
+    periwinkle: THREE.MeshPhysicalMaterial;
+    carbon: THREE.MeshStandardMaterial;
+    collar: THREE.MeshStandardMaterial;
+    internalBushing: THREE.MeshStandardMaterial;
+  } | null>(null);
+
+  const headsRef = useRef<{
+    leftHead: THREE.Group;
+    rightHead: THREE.Group;
+    leftBushing: THREE.Mesh;
+    rightBushing: THREE.Mesh;
+  } | null>(null);
+
+  const [cursorState, setCursorState] = useState<'grab' | 'grabbing'>('grab');
 
   useEffect(() => {
     isReducedMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }, []);
 
+  // Update materials when finish or wireframe changes
+  useEffect(() => {
+    const mats = materialsRef.current;
+    if (!mats) return;
+
+    mats.persimmon.wireframe = wireframe;
+    mats.periwinkle.wireframe = wireframe;
+    mats.carbon.wireframe = wireframe;
+    mats.collar.wireframe = wireframe;
+
+    if (finish === 'signature') {
+      mats.persimmon.color.set('#FF6747');
+      mats.persimmon.metalness = 0.24;
+      mats.persimmon.roughness = 0.35;
+      mats.persimmon.clearcoat = 0.45;
+
+      mats.periwinkle.color.set('#8177FF');
+      mats.periwinkle.metalness = 0.24;
+      mats.periwinkle.roughness = 0.35;
+      mats.periwinkle.clearcoat = 0.45;
+
+      mats.carbon.color.set('#20231F');
+      mats.carbon.metalness = 0.78;
+      mats.carbon.roughness = 0.5;
+
+      mats.collar.color.set('#3A3F39');
+      mats.collar.metalness = 0.88;
+      mats.collar.roughness = 0.25;
+    } else if (finish === 'stealth') {
+      // Matte Black Oxide & Gunmetal knurling
+      mats.persimmon.color.set('#1E201E');
+      mats.persimmon.metalness = 0.82;
+      mats.persimmon.roughness = 0.28;
+      mats.persimmon.clearcoat = 0.25;
+
+      mats.periwinkle.color.set('#141614');
+      mats.periwinkle.metalness = 0.85;
+      mats.periwinkle.roughness = 0.32;
+      mats.periwinkle.clearcoat = 0.25;
+
+      mats.carbon.color.set('#111311');
+      mats.carbon.metalness = 0.92;
+      mats.carbon.roughness = 0.38;
+
+      mats.collar.color.set('#30332E');
+      mats.collar.metalness = 0.94;
+      mats.collar.roughness = 0.18;
+    } else if (finish === 'prestige') {
+      // Luxury Polished Champagne Bronze & Ivory Gold
+      mats.persimmon.color.set('#CFA852');
+      mats.persimmon.metalness = 0.92;
+      mats.persimmon.roughness = 0.22;
+      mats.persimmon.clearcoat = 0.85;
+
+      mats.periwinkle.color.set('#B8933E');
+      mats.periwinkle.metalness = 0.94;
+      mats.periwinkle.roughness = 0.24;
+      mats.periwinkle.clearcoat = 0.85;
+
+      mats.carbon.color.set('#282520');
+      mats.carbon.metalness = 0.82;
+      mats.carbon.roughness = 0.32;
+
+      mats.collar.color.set('#E6CA7E');
+      mats.collar.metalness = 0.95;
+      mats.collar.roughness = 0.15;
+    }
+  }, [finish, wireframe]);
+
+  // Main Three.js Scene Setup
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
@@ -53,7 +162,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
 
     container.appendChild(renderer.domElement);
 
@@ -63,35 +172,50 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     // MATERIALS
     const persimmonMaterial = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color('#FF6747'),
-      metalness: 0.22,
-      roughness: 0.36,
-      clearcoat: 0.35,
+      metalness: 0.24,
+      roughness: 0.35,
+      clearcoat: 0.45,
       clearcoatRoughness: 0.18,
       reflectivity: 0.55,
     });
 
     const periwinkleMaterial = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color('#8177FF'),
-      metalness: 0.22,
-      roughness: 0.36,
-      clearcoat: 0.35,
+      metalness: 0.24,
+      roughness: 0.35,
+      clearcoat: 0.45,
       clearcoatRoughness: 0.18,
       reflectivity: 0.55,
     });
 
     const carbonMaterial = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#20231F'),
-      metalness: 0.75,
-      roughness: 0.55,
+      metalness: 0.78,
+      roughness: 0.5,
     });
 
     const collarMaterial = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#3A3F39'),
       metalness: 0.88,
-      roughness: 0.22,
+      roughness: 0.25,
     });
 
+    const internalBushingMaterial = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#D89745'),
+      metalness: 0.9,
+      roughness: 0.2,
+    });
+
+    materialsRef.current = {
+      persimmon: persimmonMaterial,
+      periwinkle: periwinkleMaterial,
+      carbon: carbonMaterial,
+      collar: collarMaterial,
+      internalBushing: internalBushingMaterial,
+    };
+
     // GEOMETRY
+    // Center knurled grip shaft
     const gripGeom = new THREE.CylinderGeometry(0.14, 0.14, 1.6, 32);
     const gripMesh = new THREE.Mesh(gripGeom, carbonMaterial);
     gripMesh.rotation.z = Math.PI / 2;
@@ -106,6 +230,19 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       ringMesh.rotation.y = Math.PI / 2;
       dumbbellGroup.add(ringMesh);
     }
+
+    // Inner sleeve core (visible when exploded)
+    const leftBushingGeom = new THREE.CylinderGeometry(0.12, 0.12, 0.8, 24);
+    const leftBushing = new THREE.Mesh(leftBushingGeom, internalBushingMaterial);
+    leftBushing.rotation.z = Math.PI / 2;
+    leftBushing.position.x = -1.1;
+    dumbbellGroup.add(leftBushing);
+
+    const rightBushingGeom = new THREE.CylinderGeometry(0.12, 0.12, 0.8, 24);
+    const rightBushing = new THREE.Mesh(rightBushingGeom, internalBushingMaterial);
+    rightBushing.rotation.z = Math.PI / 2;
+    rightBushing.position.x = 1.1;
+    dumbbellGroup.add(rightBushing);
 
     // Weight Head Helper
     const createWeightHead = (material: THREE.Material, sideMultiplier: number) => {
@@ -153,16 +290,23 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     const rightHead = createWeightHead(periwinkleMaterial, 1);
     dumbbellGroup.add(rightHead);
 
+    headsRef.current = {
+      leftHead,
+      rightHead,
+      leftBushing,
+      rightBushing,
+    };
+
     // Soft Contact Shadow Plane
-    const shadowGeom = new THREE.PlaneGeometry(3.5, 2.5);
-    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.14 });
+    const shadowGeom = new THREE.PlaneGeometry(3.6, 2.6);
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.15 });
     const shadowPlane = new THREE.Mesh(shadowGeom, shadowMat);
     shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -0.95;
+    shadowPlane.position.y = -0.98;
     shadowPlane.receiveShadow = true;
     scene.add(shadowPlane);
 
-    // Volumetric Studio Atmospheric Dust Specks (Kinetic Awwwards Polish)
+    // Volumetric Studio Atmospheric Dust Specks
     const particleCount = 140;
     const particleGeometry = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
@@ -173,20 +317,19 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     }
     particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     const particleMaterial = new THREE.PointsMaterial({
-      color: 0x8177FF,
-      size: 0.035,
+      color: new THREE.Color('#20231F'),
+      size: 0.022,
       transparent: true,
-      opacity: 0.45,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.18,
     });
     const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
 
-    // LIGHTING (PULSEFORM Bible spec)
-    const ambientLight = new THREE.AmbientLight('#FAF8F4', 1.3);
+    // LIGHTING (Studio Spec)
+    const ambientLight = new THREE.AmbientLight('#FAF8F4', 1.35);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight('#FFFFFF', 3.0);
+    const keyLight = new THREE.DirectionalLight('#FFFFFF', 3.2);
     keyLight.position.set(-3.5, 4.0, 3.5);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
@@ -194,7 +337,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     keyLight.shadow.bias = -0.001;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight('#DDE8F8', 1.5);
+    const fillLight = new THREE.DirectionalLight('#DDE8F8', 1.6);
     fillLight.position.set(3.5, 2.0, 2.0);
     scene.add(fillLight);
 
@@ -202,16 +345,17 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     bounceLight.position.set(0, -2.5, -1.0);
     scene.add(bounceLight);
 
-    const rimLight = new THREE.DirectionalLight('#FFFFFF', 1.2);
+    const rimLight = new THREE.DirectionalLight('#FFFFFF', 1.4);
     rimLight.position.set(0, 3.5, -3.0);
     scene.add(rimLight);
 
+    // Pointer hover listener for slight perspective tilt
     const handlePointerMove = (e: MouseEvent) => {
       if (!interactivePointer || isReducedMotionRef.current) return;
       const rect = container.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      mouseRef.current = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)) };
+      mouseHoverRef.current = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)) };
     };
 
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
@@ -227,32 +371,73 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
 
     window.addEventListener('resize', handleResize, { passive: true });
 
-    const clock = new THREE.Clock();
+    let lastTime = performance.now();
+    const startTime = performance.now();
     let animationFrameId: number;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const time = clock.getElapsedTime();
+      const now = performance.now();
+      const delta = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+      const time = (now - startTime) / 1000;
 
       // Atmospheric dust drift
-      particles.rotation.y = time * 0.03;
-      particles.rotation.x = Math.sin(time * 0.05) * 0.05;
+      particles.rotation.y = time * 0.025;
+      particles.rotation.x = Math.sin(time * 0.05) * 0.04;
 
       // Dumbbell natural physical float
-      dumbbellGroup.position.y = Math.sin(time * 1.3) * 0.045;
+      dumbbellGroup.position.y = Math.sin(time * 1.3) * 0.04;
 
-      const targetMouseX = mouseRef.current.x * 0.28;
-      const targetMouseY = mouseRef.current.y * 0.22;
+      // Smooth Explode Animation (lerp to target)
+      const targetExplode = exploded ? 0.6 : 0;
+      explodeProgressRef.current += (targetExplode - explodeProgressRef.current) * 0.1;
+      const curExplode = explodeProgressRef.current;
+
+      if (headsRef.current) {
+        headsRef.current.leftHead.position.x = -0.95 - curExplode;
+        headsRef.current.rightHead.position.x = 0.95 + curExplode;
+        headsRef.current.leftBushing.visible = curExplode > 0.05;
+        headsRef.current.rightBushing.visible = curExplode > 0.05;
+      }
 
       if (!isReducedMotionRef.current) {
-        const baseAngle = -0.4 + (scrollProgress * Math.PI * 1.5) + (time * autoRotateSpeed * 0.22);
-        targetRotationRef.current.y = baseAngle + targetMouseX;
-        targetRotationRef.current.x = 0.22 - targetMouseY;
-        targetRotationRef.current.z = 0.08 + Math.sin(time * 0.8) * 0.04;
+        // Inertia damping when not actively dragging
+        if (!isDraggingRef.current) {
+          velocityRef.current.x *= 0.93;
+          velocityRef.current.y *= 0.93;
 
-        dumbbellGroup.rotation.x += (targetRotationRef.current.x - dumbbellGroup.rotation.x) * 0.08;
-        dumbbellGroup.rotation.y += (targetRotationRef.current.y - dumbbellGroup.rotation.y) * 0.08;
-        dumbbellGroup.rotation.z += (targetRotationRef.current.z - dumbbellGroup.rotation.z) * 0.08;
+          // Continuous gentle auto-spin when released
+          const autoSpin = autoRotateSpeed * 0.35 * delta;
+          rotationRef.current.y += velocityRef.current.x + autoSpin;
+          rotationRef.current.x += velocityRef.current.y;
+        } else {
+          rotationRef.current.y += velocityRef.current.x;
+          rotationRef.current.x += velocityRef.current.y;
+          velocityRef.current = { x: 0, y: 0 };
+        }
+
+        // Clamp vertical pitch tilt so it doesn't flip upside down
+        rotationRef.current.x = Math.max(-0.65, Math.min(0.65, rotationRef.current.x));
+
+        // Subtle mouse parallax tilt addition
+        const hoverX = mouseHoverRef.current.x * 0.12;
+        const hoverY = mouseHoverRef.current.y * 0.1;
+
+        // Apply smooth target rotation
+        dumbbellGroup.rotation.y = rotationRef.current.y + (scrollProgress * Math.PI * 1.2);
+        dumbbellGroup.rotation.x = rotationRef.current.x - hoverY;
+        dumbbellGroup.rotation.z = 0.08 + hoverX;
+
+        // Broadcast telemetry to UI
+        if (onTelemetryChangeRef.current) {
+          const normDegrees = Math.round((((rotationRef.current.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) * (180 / Math.PI));
+          onTelemetryChangeRef.current({
+            rotationY: normDegrees,
+            finish,
+            isExploded: exploded,
+          });
+        }
       }
 
       renderer.render(scene, camera);
@@ -272,16 +457,56 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       periwinkleMaterial.dispose();
       carbonMaterial.dispose();
       collarMaterial.dispose();
+      internalBushingMaterial.dispose();
       particleGeometry.dispose();
       particleMaterial.dispose();
     };
-  }, [scrollProgress, interactivePointer, autoRotateSpeed]);
+  }, [scrollProgress, interactivePointer, autoRotateSpeed, exploded, finish]);
+
+  // Pointer drag event handlers for 360° tactile orbit
+  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    isDraggingRef.current = true;
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
+    velocityRef.current = { x: 0, y: 0 };
+    setCursorState('grabbing');
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    const deltaX = e.clientX - pointerStartRef.current.x;
+    const deltaY = e.clientY - pointerStartRef.current.y;
+
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
+
+    const sensitivity = 0.007;
+    velocityRef.current = {
+      x: deltaX * sensitivity,
+      y: deltaY * sensitivity,
+    };
+  }, []);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    isDraggingRef.current = false;
+    setCursorState('grab');
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignore if pointer capture already lost
+    }
+  }, []);
 
   return (
     <div
       ref={mountRef}
-      className={`relative w-full h-full min-h-[380px] sm:min-h-[460px] md:min-h-[520px] cursor-grab active:cursor-grabbing ${className}`}
-      aria-label="Interactive 3D Sculptural Training Object"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      className={`relative w-full h-full min-h-[380px] sm:min-h-[460px] md:min-h-[520px] select-none touch-none ${
+        cursorState === 'grabbing' ? 'cursor-grabbing' : 'cursor-grab'
+      } ${className}`}
+      aria-label="Interactive 3D Sculptural Training Object — Drag to rotate in 360 degrees"
     />
   );
 };

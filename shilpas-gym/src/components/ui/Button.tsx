@@ -37,8 +37,8 @@ export const Button: React.FC<ButtonProps> = ({
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    x.set((e.clientX - centerX) * 0.2);
-    y.set((e.clientY - centerY) * 0.2);
+    x.set((e.clientX - centerX) * 0.18);
+    y.set((e.clientY - centerY) * 0.18);
   };
 
   const handleMouseLeave = () => {
@@ -56,28 +56,38 @@ export const Button: React.FC<ButtonProps> = ({
     onClick?.(e);
   };
 
-  const baseStyles = "group relative inline-flex items-center justify-center font-sans font-bold tracking-wide transition-colors transition-transform duration-200 rounded-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6747] focus-visible:ring-offset-2 select-none";
+  // Agency-grade button foundation: rounded pill, distinct tactile border, inner bevel highlight
+  const baseStyles = "group relative inline-flex items-center justify-center font-sans font-extrabold tracking-wider transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] rounded-full cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6747] focus-visible:ring-offset-2 select-none active:scale-[0.97]";
 
   const sizeStyles = {
-    sm: "text-sm min-h-[44px] px-5 py-2.5 gap-2 uppercase tracking-wider",
-    md: "text-sm min-h-[48px] px-7 py-3.5 gap-2.5 uppercase tracking-wider",
-    lg: "text-base min-h-[54px] px-9 py-4 gap-3 uppercase tracking-wider",
+    sm: "text-xs min-h-[42px] px-5 py-2 gap-2.5 uppercase",
+    md: "text-xs sm:text-sm min-h-[48px] px-6 py-2.5 sm:py-3 gap-3 uppercase",
+    lg: "text-sm sm:text-base min-h-[54px] px-8 py-3.5 gap-3.5 uppercase",
   };
 
   const variantStyles = {
-    primary: "bg-[#FF6747] text-white hover:bg-[#E04E2F] active:bg-[#C84326]",
-    secondary: "bg-[#20231F] text-[#F5F2EA] hover:bg-[#174D3B] active:bg-[#0D2B21]",
-    botanical: "bg-[#174D3B] text-[#F5F2EA] hover:bg-[#20231F] active:bg-[#0E3024]",
-    outline: "bg-transparent text-[#20231F] hover:bg-[#20231F]/5 active:bg-[#20231F]/10",
-    ghost: "bg-transparent text-[#20231F] hover:bg-[#20231F]/5 active:bg-[#20231F]/10",
+    primary: "bg-[#FF6747] text-[#20231F] border border-white/30 shadow-[0_4px_16px_rgba(255,103,71,0.28),inset_0_1px_0_rgba(255,255,255,0.4)] hover:bg-[#20231F] hover:text-[#F5F2EA] hover:border-black/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]",
+    secondary: "bg-[#20231F] text-[#F5F2EA] border border-white/10 shadow-[0_4px_14px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] hover:bg-[#174D3B] hover:border-white/20 hover:shadow-[0_8px_20px_rgba(23,77,59,0.3)]",
+    botanical: "bg-[#174D3B] text-[#F5F2EA] border border-white/10 shadow-[0_4px_14px_rgba(23,77,59,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-[#20231F] hover:border-[#FF6747]/40 hover:shadow-[0_8px_22px_rgba(0,0,0,0.25)]",
+    outline: "bg-white/80 backdrop-blur-xs text-[#20231F] border-2 border-[#20231F]/20 hover:border-[#20231F] hover:bg-white shadow-xs hover:shadow-md",
+    ghost: "bg-transparent text-[#20231F] border border-transparent hover:border-[#20231F]/20 hover:bg-white/60",
+  };
+
+  // High-End Agency "Button-in-Button" trailing icon capsule styling
+  const iconCapsuleStyles = {
+    primary: "bg-[#20231F]/10 text-[#20231F] group-hover:bg-white/20 group-hover:text-white",
+    secondary: "bg-white/10 text-white group-hover:bg-[#FF6747] group-hover:text-[#20231F]",
+    botanical: "bg-white/10 text-white group-hover:bg-[#FF6747] group-hover:text-[#20231F]",
+    outline: "bg-[#20231F]/10 text-[#20231F] group-hover:bg-[#20231F] group-hover:text-white",
+    ghost: "bg-[#20231F]/10 text-[#20231F] group-hover:bg-[#FF6747] group-hover:text-white",
   };
 
   return (
     <motion.button
       ref={ref}
       style={{ x: springX, y: springY }}
-      whileHover={{ scale: 1.015 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.97 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={handleMouseEnter}
@@ -86,12 +96,17 @@ export const Button: React.FC<ButtonProps> = ({
       {...(props as unknown as React.ComponentProps<typeof motion.button>)}
     >
       {icon && iconPosition === 'left' && (
-        <span className="transition-transform group-hover:-translate-x-0.5 duration-150">{icon}</span>
+        <span className={`w-7 h-7 sm:w-8 sm:h-8 -ml-1 rounded-full flex items-center justify-center transition-all duration-300 ease-out group-hover:-translate-x-0.5 group-hover:scale-105 flex-shrink-0 ${iconCapsuleStyles[variant]}`}>
+          {icon}
+        </span>
       )}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 font-bold">{children}</span>
       {icon && iconPosition === 'right' && (
-        <span className="transition-transform group-hover:translate-x-0.5 duration-150">{icon}</span>
+        <span className={`w-7 h-7 sm:w-8 sm:h-8 -mr-1.5 rounded-full flex items-center justify-center transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-0.5 group-hover:scale-110 flex-shrink-0 ${iconCapsuleStyles[variant]}`}>
+          {icon}
+        </span>
       )}
     </motion.button>
   );
 };
+

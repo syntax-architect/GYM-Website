@@ -44,15 +44,16 @@ export const PulseformIntroLoader: React.FC<PulseformIntroLoaderProps> = ({ onCo
       style={{ opacity: progress === 100 ? 0 : 1 }}
     >
       <div className="flex justify-between items-center font-mono text-xs text-[#20231F]/60">
-        <span className="tracking-widest">PULSEFORM // SYSTEM READY</span>
+        <span className="tracking-widest">SHILPA'S // SYSTEM INITIALIZED</span>
         <button
+          type="button"
           onClick={() => {
             setVisible(false);
             onComplete?.();
           }}
-          className="text-xs uppercase hover:text-[#FF6747] font-bold tracking-wider cursor-pointer"
+          className="px-4 py-1.5 rounded-full border border-[#20231F]/20 hover:border-[#FF6747] hover:bg-[#FF6747] hover:text-white transition-all text-xs uppercase font-extrabold tracking-wider cursor-pointer active:scale-95 shadow-xs"
         >
-          [SKIP INTRO]
+          SKIP INTRO →
         </button>
       </div>
 

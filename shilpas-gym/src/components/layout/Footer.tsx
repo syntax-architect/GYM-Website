@@ -11,53 +11,56 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
   return (
     <footer className="relative bg-[#174D3B] text-[#F5F2EA] pt-20 pb-12 overflow-hidden">
       <Container>
-        {/* Pre-Footer Conversion Callout */}
-        <div className="relative z-10 bg-[#0E3327] rounded-sm p-8 sm:p-12 mb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-8 space-y-4">
-              <span className="text-sm font-bold text-[#FF6747] block">
-                Rated 4.7 across 355+ Google reviews · Rahara & Khardaha
-              </span>
+        {/* Pre-Footer Conversion Callout in Double-Bezel Frame */}
+        <div className="relative z-10 p-2 bg-black/15 ring-1 ring-white/10 rounded-3xl mb-16 shadow-2xl">
+          <div className="bg-[#0E3327] rounded-[calc(1.5rem-0.25rem)] p-8 sm:p-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-8 space-y-4">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#FF6747]/15 text-[#FF6747] border border-[#FF6747]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747] animate-pulse" />
+                  Rated 4.7 across 355+ Google reviews · Rahara & Khardaha
+                </span>
 
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight text-[#F5F2EA] leading-[1.05]">
-                Where Fitness Meets Glamour.
-              </h2>
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight text-[#F5F2EA] leading-[1.05]">
+                  Where Fitness Meets Glamour.
+                </h2>
 
-              <p className="text-[#DDE8F8] text-base sm:text-lg max-w-2xl font-sans font-normal leading-relaxed">
-                শিল্পা'জ জিম এন বিউটি সালোঁ — Imported workout equipment, certified personal trainers, 
-                and a private luxury salon for keratin hair smoothing and bridal makeup. All under one roof.
-              </p>
-            </div>
+                <p className="text-[#DDE8F8] text-base sm:text-lg max-w-2xl font-sans font-normal leading-relaxed">
+                  শিল্পা'জ জিম এন বিউটি সালোঁ — Imported workout equipment, certified personal trainers, 
+                  and a private luxury salon for keratin hair smoothing and bridal makeup. All under one roof.
+                </p>
+              </div>
 
-            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col items-stretch lg:items-end justify-center gap-3.5">
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={onOpenInquiry}
-                icon={<ArrowUpRight className="w-4 h-4" />}
-                className="w-full sm:w-auto text-center justify-center font-bold tracking-wider"
-              >
-                BOOK FREE VISIT / TRIAL
-              </Button>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <a
-                  href="tel:07439761994"
-                  className="flex-1 sm:flex-none px-5 py-3 rounded-xs bg-white/10 hover:bg-white/20 text-sm font-bold text-white transition-colors flex items-center justify-center gap-2"
+              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col items-stretch lg:items-end justify-center gap-3.5">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={onOpenInquiry}
+                  icon={<ArrowUpRight className="w-4 h-4" />}
+                  className="w-full sm:w-auto text-center justify-center font-bold tracking-wider min-h-[52px]"
                 >
-                  <Phone className="w-3.5 h-3.5 text-[#FF6747]" />
-                  <span className="tabular-nums">074397 61994</span>
-                </a>
+                  BOOK FREE VISIT / TRIAL
+                </Button>
 
-                <a
-                  href="https://wa.me/917439761994"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none px-5 py-3 rounded-xs bg-[#25D366] hover:bg-[#1EBE5D] text-sm font-bold text-white transition-colors flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>WHATSAPP</span>
-                </a>
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                  <a
+                    href="tel:07439761994"
+                    className="flex-1 sm:flex-none px-5 py-3 rounded-full bg-white/10 hover:bg-white text-sm font-extrabold text-white hover:text-[#20231F] border border-white/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 shadow-xs"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#FF6747]" />
+                    <span className="tabular-nums">074397 61994</span>
+                  </a>
+
+                  <a
+                    href="https://wa.me/917439761994"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 sm:flex-none px-5 py-3 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] text-sm font-extrabold text-white border border-[#25D366]/40 transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 shadow-md shadow-[#25D366]/20"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>WHATSAPP</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -81,12 +84,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
               Women-owned, LGBTQ+ welcoming, and dedicated to progressive training.
             </p>
 
-            <div className="flex items-center gap-4 text-sm text-[#DDE8F8]">
-              <span className="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xs">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[#DDE8F8] font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-2 bg-white/10 border border-white/15 px-4 py-2 rounded-full shadow-xs">
                 <Heart className="w-3.5 h-3.5 text-[#FF6747]" /> Women-Owned
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xs">
-                Verified 4.7 Google Rating
+              <span className="inline-flex items-center gap-2 bg-white/10 border border-white/15 px-4 py-2 rounded-full shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
+                4.7 Google Rating (355+ Reviews)
               </span>
             </div>
           </div>

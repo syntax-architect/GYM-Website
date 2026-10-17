@@ -21,10 +21,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
 
   const navLinks = [
     { label: 'Gym & Fitness', href: '#disciplines' },
-    { label: 'Beauty & Salon', href: '#disciplines' },
     { label: '3D Equipment', href: '#signature' },
+    { label: 'Barbell Lab', href: '#biomechanics-lab' },
+    { label: 'Transformations', href: '#transformations' },
     { label: 'Memberships', href: '#memberships' },
-    { label: 'Reviews', href: '#reviews' },
     { label: 'Timetable', href: '#timetable' },
     { label: 'Location', href: '#location' },
   ];
@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
         {/* Brand Lockup */}
         <a href="#" className="flex items-center gap-3 group cursor-pointer" aria-label="Shilpa's Gym & Beauty Salon Home">
-          <div className="w-10 h-10 rounded-sm bg-[#20231F] text-[#F5F2EA] flex items-center justify-center font-display font-black text-xl group-hover:bg-[#FF6747] transition-colors">
+          <div className="w-10 h-10 rounded-xl bg-[#20231F] text-[#F5F2EA] flex items-center justify-center font-display font-black text-xl group-hover:bg-[#FF6747] transition-all shadow-sm">
             S
           </div>
           <div>
@@ -73,9 +73,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
         <div className="hidden sm:flex items-center gap-3">
           <a
             href="tel:07439761994"
-            className="hidden xl:inline-flex items-center gap-2 px-4 py-2 rounded-sm bg-[#EDE9DF] text-sm font-bold text-[#20231F] hover:bg-[#FF6747] hover:text-white transition-colors"
+            className="group hidden xl:inline-flex items-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-full bg-white/70 hover:bg-[#20231F] hover:text-[#F5F2EA] text-xs font-extrabold uppercase tracking-wider text-[#20231F] border-2 border-[#20231F]/15 hover:border-[#20231F] shadow-xs hover:shadow-md transition-all duration-300"
           >
-            <Phone className="w-3.5 h-3.5" />
+            <span className="w-6 h-6 rounded-full bg-[#FF6747]/15 group-hover:bg-[#FF6747] flex items-center justify-center transition-colors">
+              <Phone className="w-3 h-3 text-[#FF6747] group-hover:text-white transition-colors" />
+            </span>
             <span className="tabular-nums">074397 61994</span>
           </a>
 
@@ -97,11 +99,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 text-[#20231F] bg-[#EDE9DF] rounded-sm transition-colors cursor-pointer"
+            className="p-2.5 text-[#20231F] bg-white/90 border-2 border-[#20231F]/15 rounded-full transition-all cursor-pointer hover:bg-[#20231F] hover:text-white active:scale-95 shadow-xs"
             aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -124,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
             <div className="pt-4 flex flex-col gap-3">
               <a
                 href="tel:07439761994"
-                className="flex items-center justify-center gap-2 py-3 bg-[#EDE9DF] rounded-sm text-sm font-bold text-[#20231F]"
+                className="flex items-center justify-center gap-2 py-3 px-5 bg-white border-2 border-[#20231F]/15 rounded-full text-xs font-extrabold uppercase tracking-wider text-[#20231F] hover:bg-[#20231F] hover:text-white transition-all shadow-xs active:scale-95"
               >
                 <Phone className="w-4 h-4 text-[#FF6747]" />
                 <span className="tabular-nums">CALL 074397 61994</span>
@@ -133,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
               <Button
                 variant="primary"
                 size="md"
-                className="w-full"
+                className="w-full text-center justify-center"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenInquiry();

@@ -21,8 +21,6 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
       return;
     }
 
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
     // Calibrate Lenis for high-performance fluid scroll on both desktop & mobile
     const lenis = new Lenis({
       duration: 1.15,
@@ -31,9 +29,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: 1.0, // 1:1 tactile touch response so mobile fingers never slip
-      syncTouch: true, // Smooth touch sync with momentum
-      syncTouchLerp: isTouchDevice ? 0.075 : 0.1,
+      touchMultiplier: 1.0,
       autoResize: true,
     });
 
@@ -46,9 +42,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
     (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
 
     // Connect Lenis to GSAP ScrollTrigger
-    lenis.on('scroll', () => {
-      ScrollTrigger.update();
-    });
+    lenis.on('scroll', ScrollTrigger.update);
 
     // Synchronize requestAnimationFrame with GSAP ticker
     const updateTicker = (time: number) => {

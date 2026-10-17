@@ -80,36 +80,42 @@ export const TiltedGridHeroSection: React.FC<TiltedGridHeroSectionProps> = () =>
             </p>
           </div>
 
-          {/* Filter Chips */}
-          <div className="flex flex-wrap items-center gap-2 bg-white/10 p-1.5 rounded-sm">
+          {/* High-End Segmented Filter Pill Dock */}
+          <div className="p-1.5 bg-white/10 ring-1 ring-white/15 rounded-full inline-flex items-center gap-1.5 shadow-inner backdrop-blur-md">
             <button
+              type="button"
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-xs text-sm font-bold uppercase transition-colors cursor-pointer ${
+              className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-2 border-2 ${
                 filter === 'all'
-                  ? 'bg-[#FF6747] text-white'
-                  : 'text-white/80 hover:text-white'
+                  ? 'bg-[#FF6747] text-[#20231F] border-[#FF6747] shadow-lg shadow-[#FF6747]/20'
+                  : 'bg-white/5 text-white/80 border-transparent hover:border-white/20 hover:text-white hover:bg-white/10'
               }`}
             >
+              <span className={`w-1.5 h-1.5 rounded-full ${filter === 'all' ? 'bg-[#20231F]' : 'bg-white/30'}`} />
               All Spaces
             </button>
             <button
+              type="button"
               onClick={() => setFilter('gym')}
-              className={`px-4 py-2 rounded-xs text-sm font-bold uppercase transition-colors cursor-pointer ${
+              className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-2 border-2 ${
                 filter === 'gym'
-                  ? 'bg-[#FF6747] text-white'
-                  : 'text-white/80 hover:text-white'
+                  ? 'bg-[#FF6747] text-[#20231F] border-[#FF6747] shadow-lg shadow-[#FF6747]/20'
+                  : 'bg-white/5 text-white/80 border-transparent hover:border-white/20 hover:text-white hover:bg-white/10'
               }`}
             >
+              <span className={`w-1.5 h-1.5 rounded-full ${filter === 'gym' ? 'bg-[#20231F]' : 'bg-white/30'}`} />
               Gym Floor
             </button>
             <button
+              type="button"
               onClick={() => setFilter('salon')}
-              className={`px-4 py-2 rounded-xs text-sm font-bold uppercase transition-colors cursor-pointer ${
+              className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-2 border-2 ${
                 filter === 'salon'
-                  ? 'bg-[#FF6747] text-white'
-                  : 'text-white/80 hover:text-white'
+                  ? 'bg-[#FF6747] text-[#20231F] border-[#FF6747] shadow-lg shadow-[#FF6747]/20'
+                  : 'bg-white/5 text-white/80 border-transparent hover:border-white/20 hover:text-white hover:bg-white/10'
               }`}
             >
+              <span className={`w-1.5 h-1.5 rounded-full ${filter === 'salon' ? 'bg-[#20231F]' : 'bg-white/30'}`} />
               Beauty Studio
             </button>
           </div>

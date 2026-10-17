@@ -80,9 +80,12 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
         </div>
       ) : (
         <form onSubmit={handleSubmit} data-ui="form" className="space-y-5">
-          {/* Studio Hotline Strip */}
-          <div className="p-3 bg-[#FAF8F4] rounded-xs flex items-center justify-between text-sm">
-            <a href="tel:07439761994" className="flex items-center gap-1.5 text-[#20231F] hover:text-[#FF6747] transition-colors font-bold">
+          {/* Studio Hotline Strip as Tactile Pill Actions */}
+          <div className="p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-2xl flex items-center justify-between gap-2 text-xs">
+            <a
+              href="tel:07439761994"
+              className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-[#20231F] hover:text-[#F5F2EA] text-[#20231F] border border-[#20231F]/15 flex items-center justify-center gap-1.5 font-extrabold uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-xs"
+            >
               <Phone className="w-3.5 h-3.5 text-[#FF6747]" />
               <span className="tabular-nums">074397 61994</span>
             </a>
@@ -90,21 +93,21 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
               href="https://wa.me/917439761994"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#25D366] font-bold hover:underline"
+              className="flex-1 py-2 px-3 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-1.5 font-extrabold uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-xs"
             >
-              WhatsApp Us Direct
+              <span>WhatsApp Direct</span>
             </a>
           </div>
 
           {/* Service / Tier Selector */}
           <div>
-            <label className="block text-sm font-bold text-[#20231F] mb-1.5">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
               Selected Service / Plan
             </label>
             <select
               value={activePlan}
               onChange={(e) => setCustomPlan(e.target.value)}
-              className="w-full px-4 py-3 bg-[#FAF8F4] rounded-xs text-sm text-[#20231F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#FF6747]"
+              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm font-medium text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all cursor-pointer"
             >
               <option value="Unisex Gym Access (₹1,499/mo)">Unisex Gym Access (₹1,499/mo)</option>
               <option value="PT Transformation (₹3,499/mo)">PT Transformation (₹3,499/mo)</option>
@@ -117,7 +120,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
 
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-bold text-[#20231F] mb-1.5">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
               Full Name *
             </label>
             <input
@@ -126,13 +129,13 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
               placeholder="e.g. Sourav Mukherjee"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] rounded-xs text-sm text-[#20231F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#FF6747]"
+              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all"
             />
           </div>
 
           {/* Phone Number */}
           <div>
-            <label className="block text-sm font-bold text-[#20231F] mb-1.5">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
               Phone Number (WhatsApp Preferred) *
             </label>
             <input
@@ -141,13 +144,13 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
               placeholder="+91 98300 00000"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] rounded-xs text-sm text-[#20231F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#FF6747] tabular-nums"
+              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all tabular-nums"
             />
           </div>
 
           {/* Email Address */}
           <div>
-            <label className="block text-sm font-bold text-[#20231F] mb-1.5">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
               Email Address
             </label>
             <input
@@ -155,19 +158,19 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
               placeholder="name@example.com"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] rounded-xs text-sm text-[#20231F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#FF6747]"
+              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all"
             />
           </div>
 
           {/* Preferred Time Window */}
           <div>
-            <label className="block text-sm font-bold text-[#20231F] mb-1.5">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
               Preferred Time Window
             </label>
             <select
               value={formData.preferredTime}
               onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] rounded-xs text-sm text-[#20231F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#FF6747]"
+              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm font-medium text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all cursor-pointer"
             >
               <option value="Morning (06:00 – 10:00 AM)">Morning (06:00 – 10:00 AM)</option>
               <option value="Midday (11:00 AM – 04:00 PM)">Midday (11:00 AM – 04:00 PM)</option>
@@ -177,7 +180,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
 
           {/* Special Requests */}
           <div>
-            <label className="block text-sm font-bold text-[#20231F] mb-1.5">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
               Specific Goals / Notes
             </label>
             <textarea
@@ -185,7 +188,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
               placeholder="e.g. Interested in fat loss personal training, or inquiry about bridal party booking dates..."
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] rounded-xs text-sm text-[#20231F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#FF6747] resize-none"
+              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all resize-none"
             />
           </div>
 
@@ -195,7 +198,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full text-center justify-center"
+              className="w-full text-center justify-center min-h-[52px]"
             >
               CONFIRM APPOINTMENT REQUEST
             </Button>

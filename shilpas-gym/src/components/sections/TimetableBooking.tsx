@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SectionHeader } from '../ui/SectionHeader';
 import { Button } from '../ui/Button';
-import { User } from 'lucide-react';
+import { User, ArrowUpRight } from 'lucide-react';
 
 export interface TimetableBookingProps {
   onBookClass: (sessionTitle: string, time: string, coach: string) => void;
@@ -78,28 +78,35 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
     <section id="timetable" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#EDE9DF]">
       <div className="max-w-[1440px] mx-auto">
         <SectionHeader
-          title="Weekly Studio Schedule."
-          description="Open daily from 06:00 AM to 10:00 PM. Reserve training time on the gym floor or book private salon treatments in Rahara, Khardaha."
+          tag="Weekly Timetable"
+          title="Daily Studio Schedule."
+          description="Open daily from 06:00 AM to 10:00 PM. Reserve your training slot on the gym floor or book private salon treatments in Rahara, Khardaha."
         />
 
-        {/* Day Selector Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6">
-          {DAYS.map((day) => (
-            <button
-              key={day}
-              onClick={() => setSelectedDay(day)}
-              className={`px-6 py-3 rounded-xs text-sm font-bold uppercase transition-colors cursor-pointer whitespace-nowrap ${
-                selectedDay === day
-                  ? 'bg-[#20231F] text-[#F5F2EA]'
-                  : 'bg-white text-[#20231F]/80 hover:bg-white/80'
-              }`}
-            >
-              {day}
-            </button>
-          ))}
+        {/* High-End Segmented Day Dock */}
+        <div className="mb-6 flex items-center overflow-x-auto pb-2">
+          <div className="p-1.5 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-full inline-flex items-center gap-1.5 shadow-xs">
+            {DAYS.map((day) => {
+              const isActive = selectedDay === day;
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => setSelectedDay(day)}
+                  className={`px-5 sm:px-7 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap active:scale-95 ${
+                    isActive
+                      ? 'bg-[#20231F] text-[#F5F2EA] shadow-md border border-[#20231F]'
+                      : 'text-[#20231F]/70 hover:text-[#20231F] hover:bg-white/80'
+                  }`}
+                >
+                  {day}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Discipline Filters */}
+        {/* Tactile Discipline Filter Pills */}
         <div className="flex flex-wrap items-center gap-2 mb-8">
           {[
             { id: 'all', label: 'All Sessions' },
@@ -107,51 +114,59 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
             { id: 'conditioning', label: 'Fat Loss & Cardio' },
             { id: 'mobility', label: 'Keratin & Hair Spa' },
             { id: 'private', label: 'Personal Coaching & Bridal' },
-          ].map((flt) => (
-            <button
-              key={flt.id}
-              onClick={() => setDisciplineFilter(flt.id)}
-              className={`px-4 py-2 rounded-xs text-sm font-semibold uppercase transition-colors cursor-pointer ${
-                disciplineFilter === flt.id
-                  ? 'bg-[#FF6747] text-white'
-                  : 'bg-white/70 text-[#20231F]/70 hover:bg-white'
-              }`}
-            >
-              {flt.label}
-            </button>
-          ))}
+          ].map((flt) => {
+            const isActive = disciplineFilter === flt.id;
+            return (
+              <button
+                key={flt.id}
+                type="button"
+                onClick={() => setDisciplineFilter(flt.id)}
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer border active:scale-95 flex items-center gap-2 ${
+                  isActive
+                    ? 'bg-[#FF6747] text-[#20231F] border-[#FF6747] shadow-xs'
+                    : 'bg-white/90 text-[#20231F]/75 border-[#20231F]/15 hover:border-[#FF6747]/60 hover:text-[#20231F]'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#20231F]' : 'bg-[#FF6747]'}`} />
+                <span>{flt.label}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Schedule List */}
-        <div className="space-y-3">
+        {/* Schedule List with Prominent Button Affordances */}
+        <div className="space-y-3.5">
           {sessions.map((session) => (
             <div
               key={session.id}
-              className="bg-white p-6 sm:p-7 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-5 transition-colors duration-200"
+              className="bg-white p-6 sm:p-7 rounded-2xl border-2 border-[#20231F]/10 hover:border-[#FF6747]/40 shadow-xs hover:shadow-md flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all duration-300"
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-                <div className="w-40 flex-shrink-0">
-                  <span className="text-base font-extrabold text-[#20231F] tabular-nums block">
+                <div className="w-44 flex-shrink-0">
+                  <span className="text-base font-extrabold text-[#20231F] tabular-nums block tracking-tight">
                     {session.time}
                   </span>
-                  <span className="text-sm text-[#174D3B] font-semibold">
+                  <span className="text-xs text-[#174D3B] font-bold uppercase tracking-wider">
                     {session.duration}
                   </span>
                 </div>
 
                 <div>
-                  <h4 className="text-lg font-display font-bold text-[#20231F] mb-1">
+                  <h4 className="text-base sm:text-lg font-display font-extrabold text-[#20231F] uppercase tracking-tight mb-1">
                     {session.title}
                   </h4>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-[#4E534B]">
-                    <span className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-[#4E534B]">
+                    <span className="flex items-center gap-1.5 font-medium">
                       <User className="w-3.5 h-3.5 text-[#FF6747]" />
                       <span>{session.coach}</span>
                     </span>
                     <span>·</span>
                     <span>{session.bay}</span>
                     <span>·</span>
-                    <span className="text-[#174D3B] font-semibold">{session.spotsLeft} slots left</span>
+                    <span className="inline-flex items-center gap-1 text-[#174D3B] font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#174D3B]" />
+                      <span>{session.spotsLeft} slots left</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -161,6 +176,7 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
                   variant="primary"
                   size="sm"
                   onClick={() => onBookClass(session.title, session.time, session.coach)}
+                  icon={<ArrowUpRight className="w-3.5 h-3.5" />}
                 >
                   RESERVE SLOT
                 </Button>

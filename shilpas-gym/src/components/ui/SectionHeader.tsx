@@ -12,6 +12,7 @@ export interface SectionHeaderProps {
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
+  tag,
   title,
   accentTitle,
   description,
@@ -24,6 +25,17 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   return (
     <div className={`mb-12 md:mb-16 ${isCentered ? 'text-center max-w-3xl mx-auto' : 'max-w-3xl'} ${className}`}>
+      {tag && (
+        <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-[0.2em] mb-4 ${
+          isContrast
+            ? 'bg-white/10 text-[#FF6747] border border-white/15'
+            : 'bg-[#174D3B]/10 text-[#174D3B] border border-[#174D3B]/15'
+        }`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747]" />
+          <span>{tag}</span>
+        </div>
+      )}
+
       <h2 className={`text-3xl sm:text-4xl md:text-5xl font-display font-extrabold uppercase tracking-tight leading-[1.05] ${
         isContrast ? 'text-[#F5F2EA]' : 'text-[#20231F]'
       }`}>

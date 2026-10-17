@@ -83,7 +83,7 @@ export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInqu
   const activeMode = MODES.find((m) => m.id === selectedId) || MODES[0];
 
   return (
-    <section id="disciplines" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#EDE9DF]">
+    <section id="disciplines" className="relative z-20 w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#EDE9DF] shadow-[0_-24px_50px_rgba(0,0,0,0.06)]">
       <div className="max-w-[1440px] mx-auto">
         <SectionHeader
           tag="Curated Disciplines"
@@ -93,69 +93,85 @@ export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInqu
 
         {/* Asymmetric Studio Split Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-          {/* Left Column: Interactive Selector List (Unmistakable Buttons) */}
+          {/* Left Column: Interactive Selector List (Double-Bezel Architecture) */}
           <div className="lg:col-span-5 flex flex-col justify-between gap-3">
             {MODES.map((mode, idx) => {
               const isSelected = mode.id === selectedId;
               const formattedIndex = `0${idx + 1}`;
               return (
-                <button
+                <div
                   key={mode.id}
-                  type="button"
-                  onClick={() => setSelectedId(mode.id)}
-                  className={`w-full p-5 sm:p-6 rounded-2xl border-2 text-left transition-all duration-300 cursor-pointer flex items-center justify-between group active:scale-[0.98] ${
+                  className={`p-1.5 rounded-[1.75rem] transition-all duration-300 ${
                     isSelected
-                      ? 'bg-[#20231F] text-[#F5F2EA] border-[#FF6747] shadow-xl'
-                      : 'bg-white text-[#20231F] border-[#20231F]/10 hover:border-[#FF6747]/40 hover:shadow-md'
+                      ? 'bg-[#D9381E]/20 ring-1 ring-[#D9381E]/60 shadow-lg'
+                      : 'bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/8 hover:ring-[#0D0D0E]/15'
                   }`}
                 >
-                  <div className="flex items-start gap-4">
-                    {/* Index Capsule */}
-                    <div className={`w-8 h-8 rounded-full font-mono text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
+                  <button
+                    type="button"
+                    onClick={() => setSelectedId(mode.id)}
+                    className={`w-full p-4 sm:p-5 rounded-[calc(1.75rem-0.375rem)] text-left transition-all duration-300 cursor-pointer flex items-center justify-between group active:scale-[0.98] ${
                       isSelected
-                        ? 'bg-[#FF6747] text-[#20231F]'
-                        : 'bg-[#EDE9DF] text-[#20231F]/70 group-hover:bg-[#FF6747]/20 group-hover:text-[#FF6747]'
-                    }`}>
-                      {formattedIndex}
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-extrabold uppercase tracking-wider ${
-                          isSelected ? 'text-[#FF6747]' : 'text-[#174D3B]'
-                        }`}>
-                          {mode.category}
-                        </span>
-                        {isSelected && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747] animate-pulse" />
-                        )}
+                        ? 'bg-[#0D0D0E] text-[#F5F2EA] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]'
+                        : 'bg-white text-[#0D0D0E] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)] hover:bg-[#FAF8F4]'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3.5">
+                      {/* Index Capsule */}
+                      <div
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full font-mono text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
+                          isSelected
+                            ? 'bg-[#D9381E] text-[#0D0D0E]'
+                            : 'bg-[#EDE9DF] text-[#0D0D0E]/70 group-hover:bg-[#D9381E]/20 group-hover:text-[#D9381E]'
+                        }`}
+                      >
+                        {formattedIndex}
                       </div>
-                      <h3 className="text-lg sm:text-xl font-display font-extrabold uppercase tracking-tight mb-1">
-                        {mode.title}
-                      </h3>
-                      <p className={`text-xs leading-relaxed ${
-                        isSelected ? 'text-[#F5F2EA]/80' : 'text-[#50554E]'
-                      }`}>
-                        {mode.tagline}
-                      </p>
-                    </div>
-                  </div>
 
-                  {/* Trailing Interactive Arrow Capsule */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ml-3 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5 ${
-                    isSelected
-                      ? 'bg-white/10 text-[#FF6747]'
-                      : 'bg-[#EDE9DF] text-[#20231F]/50 group-hover:bg-[#FF6747] group-hover:text-white'
-                  }`}>
-                    <ArrowUpRight className="w-4 h-4" />
-                  </div>
-                </button>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className={`text-[11px] sm:text-xs font-extrabold uppercase tracking-wider ${
+                              isSelected ? 'text-[#D9381E]' : 'text-[#141311]'
+                            }`}
+                          >
+                            {mode.category}
+                          </span>
+                          {isSelected && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E] animate-pulse" />
+                          )}
+                        </div>
+                        <h3 className="text-base sm:text-lg font-display font-extrabold uppercase tracking-tight mb-0.5">
+                          {mode.title}
+                        </h3>
+                        <p
+                          className={`text-xs leading-relaxed ${
+                            isSelected ? 'text-[#F5F2EA]/80' : 'text-[#50554E]'
+                          }`}
+                        >
+                          {mode.tagline}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Trailing Interactive Arrow Capsule */}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5 ${
+                        isSelected
+                          ? 'bg-white/10 text-[#D9381E]'
+                          : 'bg-[#EDE9DF] text-[#0D0D0E]/50 group-hover:bg-[#D9381E] group-hover:text-white'
+                      }`}
+                    >
+                      <ArrowUpRight className="w-4 h-4" />
+                    </div>
+                  </button>
+                </div>
               );
             })}
           </div>
 
           {/* Right Column: Double-Bezel Visual Showcase & Specifications */}
-          <div className="lg:col-span-7 p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-3xl shadow-lg">
+          <div className="lg:col-span-7 p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-3xl shadow-lg">
             <div className="bg-white rounded-[calc(1.5rem-0.25rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-xs">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -167,7 +183,7 @@ export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInqu
                   className="space-y-6"
                 >
                   {/* Visual Media Frame */}
-                  <div className="relative w-full aspect-[16/10] bg-[#20231F] rounded-2xl overflow-hidden shadow-inner">
+                  <div className="relative w-full aspect-[16/10] bg-[#0D0D0E] rounded-2xl overflow-hidden shadow-inner">
                     {activeMode.videoSrc ? (
                       <video
                         src={activeMode.videoSrc}
@@ -185,14 +201,14 @@ export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInqu
                         className="w-full h-full object-cover"
                       />
                     )}
-                    <div className="absolute top-4 left-4 bg-[#20231F]/90 backdrop-blur-md text-[#F5F2EA] px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-white/10">
+                    <div className="absolute top-4 left-4 bg-[#0D0D0E]/90 backdrop-blur-md text-[#F5F2EA] px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-white/10">
                       {activeMode.category}
                     </div>
                   </div>
 
                   {/* Information & Details */}
                   <div>
-                    <h4 className="text-2xl sm:text-3xl font-display font-extrabold uppercase tracking-tight text-[#20231F] mb-2">
+                    <h4 className="text-2xl sm:text-3xl font-display font-extrabold uppercase tracking-tight text-[#0D0D0E] mb-2">
                       {activeMode.title}
                     </h4>
                     <p className="text-sm sm:text-base text-[#3E423C] leading-relaxed">
@@ -203,11 +219,11 @@ export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInqu
                   {/* Specifications Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                     {activeMode.specs.map((spec) => (
-                      <div key={spec.label} className="bg-[#FAF8F4] p-4 rounded-xl border border-[#20231F]/5">
-                        <span className="block text-xs uppercase font-extrabold text-[#174D3B] tracking-wider mb-1">
+                      <div key={spec.label} className="bg-[#FAF8F4] p-4 rounded-xl border border-[#0D0D0E]/5">
+                        <span className="block text-xs uppercase font-extrabold text-[#141311] tracking-wider mb-1">
                           {spec.label}
                         </span>
-                        <span className="text-sm font-bold text-[#20231F]">
+                        <span className="text-sm font-bold text-[#0D0D0E]">
                           {spec.value}
                         </span>
                       </div>

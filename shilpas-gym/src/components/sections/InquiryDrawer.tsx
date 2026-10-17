@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { Drawer } from '../ui/Drawer';
-import { Button } from '../ui/Button';
-import { CheckCircle2, Phone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Phone, MessageCircle, ArrowUpRight, Check } from 'lucide-react';
 
 export interface InquiryDrawerProps {
   isOpen: boolean;
@@ -9,202 +7,278 @@ export interface InquiryDrawerProps {
   selectedPlan?: string;
 }
 
+const CONTRACT_INTERESTS = [
+  'Unisex Gym Access (₹1,499/mo)',
+  'PT Transformation (₹3,499/mo)',
+  'All-Access: Gym + Salon (₹4,999/mo)',
+  'Keratin & Hair Spa Suite',
+  'Bridal & HD Makeup Consultation',
+  '1-Day Free Trial Pass',
+];
+
+const TIME_WINDOWS = [
+  'Morning (06:00 – 10:00 AM)',
+  'Midday (11:00 AM – 04:00 PM)',
+  'Evening Peak (05:00 – 10:00 PM)',
+];
+
 export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
   isOpen,
   onClose,
   selectedPlan,
 }) => {
-  const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    tierOrDiscipline: 'Unisex Gym Access (₹1,499/mo)',
-    preferredTime: 'Morning (06:00 – 10:00 AM)',
-    leadCoach: 'Coach Rajesh Sen (Head Biomechanics)',
-    notes: '',
-  });
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [interest, setInterest] = useState(CONTRACT_INTERESTS[0]);
+  const [timeWindow, setTimeWindow] = useState(TIME_WINDOWS[0]);
+  const [notes, setNotes] = useState('');
+  const [committed, setCommitted] = useState(true);
 
-  const [customPlan, setCustomPlan] = useState<string | null>(null);
-  const activePlan = customPlan ?? selectedPlan ?? 'Unisex Gym Access (₹1,499/mo)';
+  useEffect(() => {
+    if (selectedPlan) {
+      setInterest(selectedPlan);
+    }
+  }, [selectedPlan]);
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-  };
+    const message = [
+      `*SHILPA'S GYM & SALON — CONTRACT DOSSIER #2026*`,
+      ``,
+      `*Member Name:* ${name}`,
+      `*Phone / WhatsApp:* ${phone}`,
+      email ? `*Email:* ${email}` : null,
+      `*Selected Track:* ${interest}`,
+      `*Preferred Slot:* ${timeWindow}`,
+      notes ? `*Playbook Notes:* ${notes}` : null,
+      ``,
+      `Please confirm my studio visit at Rahara, Khardaha.`,
+    ]
+      .filter(Boolean)
+      .join('\n');
 
-  const handleReset = () => {
-    setSubmitted(false);
+    const whatsappUrl = `https://wa.me/917439761994?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     onClose();
   };
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      onClose={onClose}
-      title="BOOK APPOINTMENT / TRIAL"
-      subtitle="Shilpa's Gym & Beauty Salon · Khardaha, Kolkata"
+    <div
+      className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm transition-opacity"
+      onClick={onClose}
     >
-      {submitted ? (
-        <div className="py-12 flex flex-col items-center text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-[#174D3B]/10 flex items-center justify-center text-[#174D3B]">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
-          <span className="text-sm text-[#FF6747] font-bold uppercase">
-            Request Received
-          </span>
-          <h4 className="font-display text-2xl font-bold uppercase text-[#20231F]">
-            Appointment Confirmed
-          </h4>
-          <p className="text-sm text-[#4E534B] max-w-xs font-sans leading-relaxed">
-            Our team will call or WhatsApp you at {formData.phone} within 2 hours to confirm your gym trial slot or salon appointment.
-          </p>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        data-lenis-prevent
+        className="relative w-full max-w-xl h-full bg-[#F5F2EA] text-[#0D0D0E] shadow-2xl border-l-2 border-[#0D0D0E] overflow-y-auto p-6 sm:p-10 flex flex-col justify-between"
+      >
+        {/* Top Contract Header (Oddball 00:18 + Valmora 00:24 Motif) */}
+        <div>
+          <div className="flex items-center justify-between pb-5 border-b border-[#0D0D0E]/15">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D9381E]" />
+              <span className="font-mono text-xs font-extrabold uppercase tracking-[0.18em] text-[#0D0D0E]">
+                SHILPA&apos;S · ATHLETE & SALON CONTRACT
+              </span>
+            </div>
 
-          <div className="p-5 bg-[#FAF8F4] rounded-xs w-full text-sm text-[#20231F] text-left space-y-1">
-            <div className="text-[#FF6747] font-bold mb-1">INTAKE SUMMARY</div>
-            <div><span className="font-semibold">Client:</span> {formData.name}</div>
-            <div><span className="font-semibold">Service:</span> {activePlan}</div>
-            <div><span className="font-semibold">Window:</span> {formData.preferredTime}</div>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-md bg-[#0D0D0E] text-[#F5F2EA] font-mono text-[11px] font-bold">
+                NO. 2026
+              </span>
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-2 rounded-full bg-white border border-[#0D0D0E]/15 text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-white transition-colors cursor-pointer"
+                aria-label="Close Booking Contract"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          <div className="pt-4 w-full">
-            <Button
-              variant="secondary"
-              size="md"
-              className="w-full"
-              onClick={handleReset}
-            >
-              CLOSE WINDOW
-            </Button>
+          <div className="my-6">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-none mb-2">
+              THE BALL&apos;S IN{' '}
+              <span className="font-serif italic font-normal capitalize text-[#D9381E]">
+                Your Court.
+              </span>
+            </h2>
+            <p className="font-sans text-sm text-[#4C514A]">
+              Reserve your trial session on the strength floor or book a private consultation in
+              our luxury beauty wing in Khardaha.
+            </p>
           </div>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} data-ui="form" className="space-y-5">
-          {/* Studio Hotline Strip as Tactile Pill Actions */}
-          <div className="p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-2xl flex items-center justify-between gap-2 text-xs">
+
+          {/* Direct Instant Hotline Bar */}
+          <div className="grid grid-cols-2 gap-3 mb-7">
             <a
               href="tel:07439761994"
-              className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-[#20231F] hover:text-[#F5F2EA] text-[#20231F] border border-[#20231F]/15 flex items-center justify-center gap-1.5 font-extrabold uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-xs"
+              className="py-3 px-4 rounded-2xl bg-white border border-[#0D0D0E]/15 font-mono text-xs font-bold text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-white transition-all flex items-center justify-center gap-2 shadow-xs"
             >
-              <Phone className="w-3.5 h-3.5 text-[#FF6747]" />
+              <Phone className="w-3.5 h-3.5 text-[#D9381E]" />
               <span className="tabular-nums">074397 61994</span>
             </a>
             <a
               href="https://wa.me/917439761994"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 py-2 px-3 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-1.5 font-extrabold uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-xs"
+              className="py-3 px-4 rounded-2xl bg-[#25D366] hover:bg-[#1EBE5D] font-mono text-xs font-bold text-white transition-all flex items-center justify-center gap-2 shadow-sm"
             >
-              <span>WhatsApp Direct</span>
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>WHATSAPP DIRECT</span>
             </a>
           </div>
 
-          {/* Service / Tier Selector */}
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
-              Selected Service / Plan
-            </label>
-            <select
-              value={activePlan}
-              onChange={(e) => setCustomPlan(e.target.value)}
-              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm font-medium text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all cursor-pointer"
-            >
-              <option value="Unisex Gym Access (₹1,499/mo)">Unisex Gym Access (₹1,499/mo)</option>
-              <option value="PT Transformation (₹3,499/mo)">PT Transformation (₹3,499/mo)</option>
-              <option value="VIP Dual Pass: Gym + Salon (₹4,999/mo)">VIP Dual Pass: Gym + Salon (₹4,999/mo)</option>
-              <option value="Keratin Smoothing & Hair Spa">Keratin Smoothing & Hair Spa</option>
-              <option value="Bridal & Celebration Glamour">Bridal & Celebration Glamour</option>
-              <option value="Free Day Pass / Consultation">Free Day Pass / Consultation</option>
-            </select>
-          </div>
+          {/* Contract Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Valmora-Style Interest Pill Selector */}
+            <div>
+              <label className="block font-mono text-[11px] font-bold uppercase tracking-widest text-[#0D0D0E]/65 mb-2.5">
+                01 · SELECT TRACK / SERVICE
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {CONTRACT_INTERESTS.map((item) => {
+                  const isSelected = interest === item;
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => setInterest(item)}
+                      className={`px-3.5 py-2 rounded-full font-mono text-[11px] font-bold transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#0D0D0E] text-[#F5F2EA] shadow-sm'
+                          : 'bg-white text-[#0D0D0E]/75 border border-[#0D0D0E]/15 hover:border-[#0D0D0E]'
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-          {/* Full Name */}
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Sourav Mukherjee"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all"
-            />
-          </div>
+            {/* Name & Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-widest text-[#0D0D0E]/65 mb-1.5">
+                  WHO&apos;S SIGNING? (FULL NAME) *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Sourav Mukherjee"
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                />
+              </div>
 
-          {/* Phone Number */}
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
-              Phone Number (WhatsApp Preferred) *
-            </label>
-            <input
-              type="tel"
-              required
-              placeholder="+91 98300 00000"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all tabular-nums"
-            />
-          </div>
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-widest text-[#0D0D0E]/65 mb-1.5">
+                  PHONE / WHATSAPP *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98300 00000"
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-mono text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                />
+              </div>
+            </div>
 
-          {/* Email Address */}
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
-              Email Address
-            </label>
-            <input
-              type="email"
-              placeholder="name@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all"
-            />
-          </div>
+            {/* Preferred Window & Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-widest text-[#0D0D0E]/65 mb-1.5">
+                  PREFERRED WINDOW
+                </label>
+                <select
+                  value={timeWindow}
+                  onChange={(e) => setTimeWindow(e.target.value)}
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                >
+                  {TIME_WINDOWS.map((win) => (
+                    <option key={win} value={win}>
+                      {win}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* Preferred Time Window */}
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
-              Preferred Time Window
-            </label>
-            <select
-              value={formData.preferredTime}
-              onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm font-medium text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all cursor-pointer"
-            >
-              <option value="Morning (06:00 – 10:00 AM)">Morning (06:00 – 10:00 AM)</option>
-              <option value="Midday (11:00 AM – 04:00 PM)">Midday (11:00 AM – 04:00 PM)</option>
-              <option value="Evening Peak (05:00 – 10:00 PM)">Evening Peak (05:00 – 10:00 PM)</option>
-            </select>
-          </div>
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-widest text-[#0D0D0E]/65 mb-1.5">
+                  EMAIL (OPTIONAL)
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@domain.com"
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                />
+              </div>
+            </div>
 
-          {/* Special Requests */}
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-[#20231F] mb-1.5">
-              Specific Goals / Notes
-            </label>
-            <textarea
-              rows={3}
-              placeholder="e.g. Interested in fat loss personal training, or inquiry about bridal party booking dates..."
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-3 bg-[#FAF8F4] border-2 border-[#20231F]/10 rounded-xl text-sm text-[#20231F] focus:bg-white focus:outline-none focus:border-[#FF6747] transition-all resize-none"
-            />
-          </div>
+            {/* Notes */}
+            <div>
+              <label className="block font-mono text-[11px] font-bold uppercase tracking-widest text-[#0D0D0E]/65 mb-1.5">
+                WHAT&apos;S THE PLAY? (GOALS OR SALON DATES)
+              </label>
+              <textarea
+                rows={2}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Tell us a date that suits, target weight/physique goal, or bridal booking inquiry..."
+                className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E] resize-none"
+              />
+            </div>
 
-          {/* Submit Button */}
-          <div className="pt-2">
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full text-center justify-center min-h-[52px]"
-            >
-              CONFIRM APPOINTMENT REQUEST
-            </Button>
-          </div>
-        </form>
-      )}
-    </Drawer>
+            {/* Oddball Contract Signature Line & Submit CTA */}
+            <div className="pt-4 border-t border-[#0D0D0E]/15 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+              <button
+                type="button"
+                onClick={() => setCommitted((prev) => !prev)}
+                className="flex items-center gap-2.5 text-left font-mono text-xs text-[#0D0D0E]/75 cursor-pointer"
+              >
+                <span
+                  className={`w-5 h-5 rounded-md flex items-center justify-center border ${
+                    committed
+                      ? 'bg-[#141311] border-[#141311] text-white'
+                      : 'bg-white border-[#0D0D0E]/30'
+                  }`}
+                >
+                  {committed && <Check className="w-3.5 h-3.5" />}
+                </span>
+                <span className="border-b border-dashed border-[#0D0D0E]/40 pb-0.5">
+                  X _{name ? name.toUpperCase() : '_________'}_ signature
+                </span>
+              </button>
+
+              <button
+                type="submit"
+                className="px-7 py-4 rounded-full bg-[#D9381E] hover:bg-[#B82B14] text-white font-mono text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer active:scale-95"
+              >
+                <span>TAKE THE SHOT</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Bottom Studio Guarantee */}
+        <div className="pt-6 mt-6 border-t border-[#0D0D0E]/10 flex items-center justify-between font-mono text-[11px] text-[#0D0D0E]/55">
+          <span>NASKARHAT MADHYA PARA · RAHARA</span>
+          <span>ZERO LOCK-IN FEES</span>
+        </div>
+      </div>
+    </div>
   );
 };
+
+export default InquiryDrawer;

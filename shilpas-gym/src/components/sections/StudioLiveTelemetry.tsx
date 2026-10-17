@@ -61,14 +61,14 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
   return (
     <section className="relative w-full py-20 px-4 sm:px-6 lg:px-12 bg-[#161815] text-[#F5F2EA] overflow-hidden">
       {/* Background Subtle Radial Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#FF6747]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#174D3B]/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#D9381E]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#141311]/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-[1440px] mx-auto">
         {/* Top Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-extrabold uppercase tracking-widest text-[#FF6747] mb-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-extrabold uppercase tracking-widest text-[#D9381E] mb-3">
               <Clock className="w-3.5 h-3.5 animate-spin" />
               <span>Real-Time Studio Telemetry</span>
             </div>
@@ -95,15 +95,15 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
 
         {/* 3-Column Telemetry Dashboard in Double-Bezel Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Column 1: Current Capacity Gauge */}
-          <div className="lg:col-span-4 p-2 bg-white/5 ring-1 ring-white/10 rounded-3xl shadow-xl">
-            <div className="bg-[#1C1F1B] rounded-[calc(1.5rem-0.25rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-inner">
+          {/* Column 1: Current Capacity Gauge in Double-Bezel Card */}
+          <div className="lg:col-span-4 p-2 sm:p-2.5 bg-white/5 ring-1 ring-white/10 rounded-[2.5rem] shadow-xl">
+            <div className="bg-[#1C1F1B] rounded-[calc(2.5rem-0.625rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-inner">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs uppercase font-extrabold text-white/70 tracking-wider">
                     Selected Window
                   </span>
-                  <span className="text-xs font-mono font-extrabold text-[#FF6747] bg-[#FF6747]/10 px-2.5 py-1 rounded-full border border-[#FF6747]/20">
+                  <span className="text-xs font-mono font-extrabold text-[#D9381E] bg-[#D9381E]/10 px-2.5 py-1 rounded-full border border-[#D9381E]/20">
                     {currentData.label}
                   </span>
                 </div>
@@ -121,10 +121,10 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
                     style={{ width: `${currentData.occupancy}%` }}
                     className={`h-full transition-all duration-500 rounded-full ${
                       currentData.occupancy > 75
-                        ? 'bg-gradient-to-r from-[#FF6747] to-[#DC2626]'
+                        ? 'bg-gradient-to-r from-[#D9381E] to-[#DC2626]'
                         : currentData.occupancy > 40
-                        ? 'bg-gradient-to-r from-[#8177FF] to-[#FF6747]'
-                        : 'bg-gradient-to-r from-[#22C55E] to-[#174D3B]'
+                        ? 'bg-gradient-to-r from-[#C5A059] to-[#D9381E]'
+                        : 'bg-gradient-to-r from-[#22C55E] to-[#141311]'
                     }`}
                   />
                 </div>
@@ -132,7 +132,7 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
                 <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <span className="text-white/70">Atmosphere Rating:</span>
-                    <span className="text-[#FF6747] font-extrabold uppercase tracking-wider">{currentData.status}</span>
+                    <span className="text-[#D9381E] font-extrabold uppercase tracking-wider">{currentData.status}</span>
                   </div>
                   <p className="text-xs text-white/60 leading-relaxed font-normal">
                     {currentData.occupancy < 35
@@ -149,7 +149,7 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
                   variant="primary"
                   size="md"
                   onClick={onOpenInquiry}
-                  className="w-full justify-center shadow-lg shadow-[#FF6747]/20"
+                  className="w-full justify-center shadow-lg shadow-[#D9381E]/20"
                   icon={<ArrowUpRight className="w-4 h-4" />}
                 >
                   RESERVE FLOOR PASS
@@ -158,9 +158,9 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
             </div>
           </div>
 
-          {/* Column 2: Interactive 16-Hour Rush Curve Bar Chart */}
-          <div className="lg:col-span-8 p-2 bg-white/5 ring-1 ring-white/10 rounded-3xl shadow-xl">
-            <div className="bg-[#1C1F1B] rounded-[calc(1.5rem-0.25rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-inner">
+          {/* Column 2: Interactive 16-Hour Rush Curve Bar Chart in Double-Bezel Card */}
+          <div className="lg:col-span-8 p-2 sm:p-2.5 bg-white/5 ring-1 ring-white/10 rounded-[2.5rem] shadow-xl">
+            <div className="bg-[#1C1F1B] rounded-[calc(2.5rem-0.625rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-inner">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div>
@@ -178,11 +178,11 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
                     <span className="text-white/70">Quiet (&lt;35%)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#8177FF]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#C5A059]" />
                     <span className="text-white/70">Optimal</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF6747]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#D9381E]" />
                     <span className="text-white/70">Peak (&gt;75%)</span>
                   </div>
                 </div>
@@ -199,26 +199,26 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
                       key={item.hour}
                       onClick={() => setSelectedHour(item.hour)}
                       title={`${item.label}: ${item.occupancy}% Occupancy (${item.status})`}
-                      className="group flex flex-col items-center h-full justify-end cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-[#FF6747]"
+                      className="group flex flex-col items-center h-full justify-end cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-[#D9381E]"
                     >
                       <div className="w-full relative flex items-end justify-center">
                         <div
                           style={{ height: `${item.occupancy * 1.3}px` }}
                           className={`w-full max-w-[24px] rounded-t-sm transition-all duration-300 ${
                             isSelected
-                              ? 'bg-[#FF6747] shadow-[0_0_12px_#FF6747]'
+                              ? 'bg-[#D9381E] shadow-[0_0_12px_#D9381E]'
                               : isCurrentNow
                               ? 'bg-white shadow-[0_0_8px_white]'
                               : item.occupancy > 75
-                              ? 'bg-[#FF6747]/80 group-hover:bg-[#FF6747]'
+                              ? 'bg-[#D9381E]/80 group-hover:bg-[#D9381E]'
                               : item.occupancy > 40
-                              ? 'bg-[#8177FF]/80 group-hover:bg-[#8177FF]'
+                              ? 'bg-[#C5A059]/80 group-hover:bg-[#C5A059]'
                               : 'bg-[#22C55E]/70 group-hover:bg-[#22C55E]'
                           }`}
                         />
                       </div>
                       <span className={`text-[10px] mt-2 font-mono tabular-nums leading-none ${
-                        isSelected ? 'font-bold text-[#FF6747]' : isCurrentNow ? 'font-bold text-white' : 'text-white/50'
+                        isSelected ? 'font-bold text-[#D9381E]' : isCurrentNow ? 'font-bold text-white' : 'text-white/50'
                       }`}>
                         {item.hour.toString().padStart(2, '0')}
                       </span>
@@ -231,7 +231,7 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
             {/* Live Studio Hygiene & Environment Diagnostics */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-2">
               <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2.5">
-                <Thermometer className="w-4 h-4 text-[#8177FF] flex-shrink-0" />
+                <Thermometer className="w-4 h-4 text-[#C5A059] flex-shrink-0" />
                 <div>
                   <span className="block text-xs font-bold text-white">21°C Climate</span>
                   <span className="text-[10px] text-white/60">Air-Conditioned</span>
@@ -247,7 +247,7 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
               </div>
 
               <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2.5">
-                <Sparkles className="w-4 h-4 text-[#FF6747] flex-shrink-0" />
+                <Sparkles className="w-4 h-4 text-[#D9381E] flex-shrink-0" />
                 <div>
                   <span className="block text-xs font-bold text-white">Salon Stylists</span>
                   <span className="text-[10px] text-white/60">On-Floor Active</span>
@@ -255,7 +255,7 @@ export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpen
               </div>
 
               <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2.5">
-                <Users className="w-4 h-4 text-[#DDE8F8] flex-shrink-0" />
+                <Users className="w-4 h-4 text-[#E6DEC8] flex-shrink-0" />
                 <div>
                   <span className="block text-xs font-bold text-white">Floor Trainers</span>
                   <span className="text-[10px] text-white/60">Attentive Form Guard</span>

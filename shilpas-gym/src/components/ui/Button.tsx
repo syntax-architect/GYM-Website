@@ -57,7 +57,7 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   // Agency-grade button foundation: rounded pill, distinct tactile border, inner bevel highlight
-  const baseStyles = "group relative inline-flex items-center justify-center font-sans font-extrabold tracking-wider transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] rounded-full cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6747] focus-visible:ring-offset-2 select-none active:scale-[0.97]";
+  const baseStyles = "group relative inline-flex items-center justify-center font-sans font-extrabold tracking-wider transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] rounded-full cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9381E] focus-visible:ring-offset-2 select-none active:scale-[0.97]";
 
   const sizeStyles = {
     sm: "text-xs min-h-[42px] px-5 py-2 gap-2.5 uppercase",
@@ -66,20 +66,20 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const variantStyles = {
-    primary: "bg-[#FF6747] text-[#20231F] border border-white/30 shadow-[0_4px_16px_rgba(255,103,71,0.28),inset_0_1px_0_rgba(255,255,255,0.4)] hover:bg-[#20231F] hover:text-[#F5F2EA] hover:border-black/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]",
-    secondary: "bg-[#20231F] text-[#F5F2EA] border border-white/10 shadow-[0_4px_14px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] hover:bg-[#174D3B] hover:border-white/20 hover:shadow-[0_8px_20px_rgba(23,77,59,0.3)]",
-    botanical: "bg-[#174D3B] text-[#F5F2EA] border border-white/10 shadow-[0_4px_14px_rgba(23,77,59,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-[#20231F] hover:border-[#FF6747]/40 hover:shadow-[0_8px_22px_rgba(0,0,0,0.25)]",
-    outline: "bg-white/80 backdrop-blur-xs text-[#20231F] border-2 border-[#20231F]/20 hover:border-[#20231F] hover:bg-white shadow-xs hover:shadow-md",
-    ghost: "bg-transparent text-[#20231F] border border-transparent hover:border-[#20231F]/20 hover:bg-white/60",
+    primary: "bg-[#D9381E] text-[#0D0D0E] border border-white/30 shadow-[0_4px_16px_rgba(217, 56, 30,0.28),inset_0_1px_0_rgba(255,255,255,0.4)] hover:bg-[#0D0D0E] hover:text-[#F5F2EA] hover:border-black/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)]",
+    secondary: "bg-[#0D0D0E] text-[#F5F2EA] border border-white/10 shadow-[0_4px_14px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] hover:bg-[#141311] hover:border-white/20 hover:shadow-[0_8px_20px_rgba(20, 19, 17,0.3)]",
+    botanical: "bg-[#141311] text-[#F5F2EA] border border-white/10 shadow-[0_4px_14px_rgba(20, 19, 17,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-[#0D0D0E] hover:border-[#D9381E]/40 hover:shadow-[0_8px_22px_rgba(0,0,0,0.25)]",
+    outline: "bg-white/80 backdrop-blur-xs text-[#0D0D0E] border-2 border-[#0D0D0E]/20 hover:border-[#0D0D0E] hover:bg-white shadow-xs hover:shadow-md",
+    ghost: "bg-transparent text-[#0D0D0E] border border-transparent hover:border-[#0D0D0E]/20 hover:bg-white/60",
   };
 
   // High-End Agency "Button-in-Button" trailing icon capsule styling
   const iconCapsuleStyles = {
-    primary: "bg-[#20231F]/10 text-[#20231F] group-hover:bg-white/20 group-hover:text-white",
-    secondary: "bg-white/10 text-white group-hover:bg-[#FF6747] group-hover:text-[#20231F]",
-    botanical: "bg-white/10 text-white group-hover:bg-[#FF6747] group-hover:text-[#20231F]",
-    outline: "bg-[#20231F]/10 text-[#20231F] group-hover:bg-[#20231F] group-hover:text-white",
-    ghost: "bg-[#20231F]/10 text-[#20231F] group-hover:bg-[#FF6747] group-hover:text-white",
+    primary: "bg-[#0D0D0E]/10 text-[#0D0D0E] group-hover:bg-white/20 group-hover:text-white",
+    secondary: "bg-white/10 text-white group-hover:bg-[#D9381E] group-hover:text-[#0D0D0E]",
+    botanical: "bg-white/10 text-white group-hover:bg-[#D9381E] group-hover:text-[#0D0D0E]",
+    outline: "bg-[#0D0D0E]/10 text-[#0D0D0E] group-hover:bg-[#0D0D0E] group-hover:text-white",
+    ghost: "bg-[#0D0D0E]/10 text-[#0D0D0E] group-hover:bg-[#D9381E] group-hover:text-white",
   };
 
   return (

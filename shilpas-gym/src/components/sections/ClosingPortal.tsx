@@ -12,7 +12,7 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
     <section id="location" className="relative w-full py-28 lg:py-36 px-4 sm:px-6 lg:px-12 bg-[#F5F2EA] overflow-hidden">
       <div className="max-w-[1440px] mx-auto relative z-20">
         {/* Architectural Portal Video Frame */}
-        <div className="relative w-full rounded-sm overflow-hidden bg-[#20231F] mb-16">
+        <div className="relative w-full rounded-sm overflow-hidden bg-[#0D0D0E] mb-16">
           <div className="aspect-[16/9] lg:aspect-[2.2/1] w-full overflow-hidden">
             <video
               src={PULSEFORM_ASSETS.V09.src}
@@ -39,12 +39,12 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
         {/* Final Conversion CTA & Studio Location Deck */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#174D3B]/10 text-[#174D3B] text-xs font-extrabold uppercase tracking-widest mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#141311]/10 text-[#141311] text-xs font-extrabold uppercase tracking-widest mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E]" />
               <span>Studio Location & Booking</span>
             </div>
 
-            <h2 className="text-4xl sm:text-6xl font-display font-extrabold uppercase tracking-tight text-[#20231F] leading-[0.98]">
+            <h2 className="text-4xl sm:text-6xl font-display font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-[0.98]">
               Visit Shilpa's Studio.
             </h2>
 
@@ -66,10 +66,10 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
                 href="https://maps.google.com/?q=P9FM%2B6V+Rahara,+Kolkata,+West+Bengal"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group px-6 py-3.5 rounded-full bg-white hover:bg-[#174D3B] hover:text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#20231F] border-2 border-[#20231F]/15 hover:border-[#174D3B] shadow-xs hover:shadow-md transition-all duration-300 flex items-center gap-3 cursor-pointer min-h-[54px] active:scale-[0.97]"
+                className="group px-6 py-3.5 rounded-full bg-white hover:bg-[#141311] hover:text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#0D0D0E] border-2 border-[#0D0D0E]/15 hover:border-[#141311] shadow-xs hover:shadow-md transition-all duration-300 flex items-center gap-3 cursor-pointer min-h-[54px] active:scale-[0.97]"
               >
-                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF6747]/15 group-hover:bg-white/20 flex items-center justify-center transition-colors">
-                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF6747] group-hover:text-white transition-colors" />
+                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D9381E]/15 group-hover:bg-white/20 flex items-center justify-center transition-colors">
+                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D9381E] group-hover:text-white transition-colors" />
                 </span>
                 <span>OPEN IN GOOGLE MAPS</span>
               </a>
@@ -77,24 +77,24 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
           </div>
 
           {/* Physical Location & Hours Card (Double-Bezel Agency Card) */}
-          <div className="lg:col-span-5 p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-3xl shadow-lg">
+          <div className="lg:col-span-5 p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-3xl shadow-lg">
             <div className="bg-white p-7 sm:p-9 rounded-[calc(1.5rem-0.25rem)] shadow-xs">
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#20231F]/10">
-                <h3 className="font-display font-extrabold text-lg uppercase tracking-tight text-[#20231F]">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#0D0D0E]/10">
+                <h3 className="font-display font-extrabold text-lg uppercase tracking-tight text-[#0D0D0E]">
                   Studio Location
                 </h3>
-                <span className="text-xs text-[#174D3B] font-extrabold bg-[#EDE9DF] px-3 py-1 rounded-full">
+                <span className="text-xs text-[#141311] font-extrabold bg-[#EDE9DF] px-3 py-1 rounded-full">
                   Rated 4.7 (355+ Reviews)
                 </span>
               </div>
 
               <div className="space-y-5 text-xs sm:text-sm text-[#3C403A]">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#FF6747]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <MapPin className="w-4 h-4 text-[#FF6747]" />
+                  <div className="w-8 h-8 rounded-full bg-[#D9381E]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <MapPin className="w-4 h-4 text-[#D9381E]" />
                   </div>
                   <div>
-                    <span className="font-extrabold text-[#20231F] block uppercase tracking-tight">SHILPA'S GYM & BEAUTY SALON</span>
+                    <span className="font-extrabold text-[#0D0D0E] block uppercase tracking-tight">SHILPA'S GYM & BEAUTY SALON</span>
                     <span className="text-xs sm:text-sm leading-relaxed text-[#5A6057]">
                       Naskarhat Madhya Para, Halder Bagan, Rahara, Khardaha, Kolkata 700118
                     </span>
@@ -102,21 +102,21 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#174D3B]/10 flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-4 h-4 text-[#174D3B]" />
+                  <div className="w-8 h-8 rounded-full bg-[#141311]/10 flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 text-[#141311]" />
                   </div>
                   <div>
-                    <span className="font-extrabold text-[#20231F]">Hours:</span> Open Daily 06:00 AM – 10:00 PM
+                    <span className="font-extrabold text-[#0D0D0E]">Hours:</span> Open Daily 06:00 AM – 10:00 PM
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#FF6747]/10 flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-4 h-4 text-[#FF6747]" />
+                  <div className="w-8 h-8 rounded-full bg-[#D9381E]/10 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4 text-[#D9381E]" />
                   </div>
                   <div>
-                    <span className="font-extrabold text-[#20231F]">Hotline:</span>{' '}
-                    <a href="tel:07439761994" className="hover:text-[#FF6747] font-extrabold tabular-nums underline decoration-[#FF6747]">
+                    <span className="font-extrabold text-[#0D0D0E]">Hotline:</span>{' '}
+                    <a href="tel:07439761994" className="hover:text-[#D9381E] font-extrabold tabular-nums underline decoration-[#D9381E]">
                       074397 61994
                     </a>
                   </div>

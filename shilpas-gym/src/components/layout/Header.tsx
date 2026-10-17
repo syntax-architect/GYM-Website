@@ -30,39 +30,39 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
   ];
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-200 ${
-        isScrolled
-          ? 'bg-[#F5F2EA]/98 py-3.5'
-          : 'bg-transparent py-5'
-      }`}
-    >
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
+    <header className="fixed top-3 sm:top-5 left-0 right-0 z-50 px-3 sm:px-6 pointer-events-none transition-all duration-300">
+      <div
+        className={`max-w-[1320px] mx-auto pointer-events-auto rounded-full transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          isScrolled
+            ? 'bg-[#F5F2EA]/85 backdrop-blur-2xl border border-[#0D0D0E]/12 shadow-[0_12px_40px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] py-2 sm:py-2.5 px-4 sm:px-6'
+            : 'bg-[#F5F2EA]/65 backdrop-blur-xl border border-[#0D0D0E]/8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] py-3 sm:py-3.5 px-5 sm:px-7'
+        } flex items-center justify-between`}
+      >
         {/* Brand Lockup */}
         <a href="#" className="flex items-center gap-3 group cursor-pointer" aria-label="Shilpa's Gym & Beauty Salon Home">
-          <div className="w-10 h-10 rounded-xl bg-[#20231F] text-[#F5F2EA] flex items-center justify-center font-display font-black text-xl group-hover:bg-[#FF6747] transition-all shadow-sm">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0D0D0E] text-[#F5F2EA] flex items-center justify-center font-display font-black text-lg sm:text-xl group-hover:bg-[#D9381E] transition-all shadow-xs ring-1 ring-white/20">
             S
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-display font-extrabold text-xl tracking-tight text-[#20231F] uppercase group-hover:text-[#FF6747] transition-colors">
+              <span className="font-display font-extrabold text-base sm:text-lg tracking-tight text-[#0D0D0E] uppercase group-hover:text-[#D9381E] transition-colors leading-none">
                 SHILPA'S
               </span>
-              <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E]" />
             </div>
-            <span className="block text-sm text-[#20231F]/70 font-medium">
-              Gym & Salon · Khardaha, Kolkata
+            <span className="block text-[11px] sm:text-xs text-[#0D0D0E]/70 font-medium leading-none mt-1">
+              Gym & Salon · Khardaha
             </span>
           </div>
         </a>
 
-        {/* Clean Luxury Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-7 xl:gap-9" aria-label="Main Navigation">
+        {/* Floating Segmented Desktop Navigation Pills */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-2 bg-[#0D0D0E]/5 p-1 rounded-full border border-[#0D0D0E]/5" aria-label="Main Navigation">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-sans font-semibold text-[#20231F]/80 hover:text-[#FF6747] transition-colors py-1"
+              className="text-xs font-sans font-bold text-[#0D0D0E]/80 hover:text-[#0D0D0E] hover:bg-white/90 rounded-full px-3.5 py-1.5 transition-all duration-200"
             >
               {link.label}
             </a>
@@ -73,10 +73,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
         <div className="hidden sm:flex items-center gap-3">
           <a
             href="tel:07439761994"
-            className="group hidden xl:inline-flex items-center gap-2.5 px-4 sm:px-5 py-2.5 rounded-full bg-white/70 hover:bg-[#20231F] hover:text-[#F5F2EA] text-xs font-extrabold uppercase tracking-wider text-[#20231F] border-2 border-[#20231F]/15 hover:border-[#20231F] shadow-xs hover:shadow-md transition-all duration-300"
+            className="group hidden xl:inline-flex items-center gap-2 pl-3.5 pr-4 py-1.5 rounded-full bg-white/70 hover:bg-[#0D0D0E] hover:text-[#F5F2EA] text-[11px] font-extrabold uppercase tracking-wider text-[#0D0D0E] border border-[#0D0D0E]/10 hover:border-[#0D0D0E] shadow-xs hover:shadow-md transition-all duration-300"
           >
-            <span className="w-6 h-6 rounded-full bg-[#FF6747]/15 group-hover:bg-[#FF6747] flex items-center justify-center transition-colors">
-              <Phone className="w-3 h-3 text-[#FF6747] group-hover:text-white transition-colors" />
+            <span className="w-5 h-5 rounded-full bg-[#D9381E]/15 group-hover:bg-[#D9381E] flex items-center justify-center transition-colors">
+              <Phone className="w-2.5 h-2.5 text-[#D9381E] group-hover:text-white transition-colors" />
             </span>
             <span className="tabular-nums">074397 61994</span>
           </a>
@@ -87,65 +87,68 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
             variant="primary"
             size="sm"
             onClick={onOpenInquiry}
-            icon={<ArrowUpRight className="w-4 h-4" />}
+            icon={<ArrowUpRight className="w-3.5 h-3.5" />}
           >
             BOOK VISIT
           </Button>
         </div>
 
         {/* Mobile Hamburger Button */}
-        <div className="flex items-center gap-3 lg:hidden">
+        <div className="flex items-center gap-2.5 lg:hidden">
           <AudioExperienceController className="scale-90" />
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 text-[#20231F] bg-white/90 border-2 border-[#20231F]/15 rounded-full transition-all cursor-pointer hover:bg-[#20231F] hover:text-white active:scale-95 shadow-xs"
+            className="p-2 text-[#0D0D0E] bg-white/90 border border-[#0D0D0E]/15 rounded-full transition-all cursor-pointer hover:bg-[#0D0D0E] hover:text-white active:scale-95 shadow-xs"
             aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation Dropdown */}
+      {/* Mobile Navigation Glass Drawer Modal */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#F5F2EA] px-6 py-8">
-          <nav className="flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2.5 text-base font-display font-bold uppercase tracking-wide text-[#20231F] hover:text-[#FF6747] transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
+        <div className="lg:hidden fixed inset-x-4 top-20 z-50 pointer-events-auto">
+          <div className="bg-[#F5F2EA]/95 backdrop-blur-2xl border border-[#0D0D0E]/15 rounded-3xl p-6 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+            <nav className="flex flex-col gap-2">
+              {navLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-3 rounded-2xl text-sm font-display font-extrabold uppercase tracking-wider text-[#0D0D0E] hover:bg-[#0D0D0E]/5 hover:text-[#D9381E] transition-all flex items-center justify-between"
+                >
+                  <span>{link.label}</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-40" />
+                </a>
+              ))}
 
-            <div className="pt-4 flex flex-col gap-3">
-              <a
-                href="tel:07439761994"
-                className="flex items-center justify-center gap-2 py-3 px-5 bg-white border-2 border-[#20231F]/15 rounded-full text-xs font-extrabold uppercase tracking-wider text-[#20231F] hover:bg-[#20231F] hover:text-white transition-all shadow-xs active:scale-95"
-              >
-                <Phone className="w-4 h-4 text-[#FF6747]" />
-                <span className="tabular-nums">CALL 074397 61994</span>
-              </a>
+              <div className="pt-4 border-t border-[#0D0D0E]/10 flex flex-col gap-3">
+                <a
+                  href="tel:07439761994"
+                  className="flex items-center justify-center gap-2.5 py-3 px-5 bg-white border border-[#0D0D0E]/15 rounded-full text-xs font-extrabold uppercase tracking-wider text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-white transition-all shadow-xs active:scale-95"
+                >
+                  <Phone className="w-4 h-4 text-[#D9381E]" />
+                  <span className="tabular-nums">CALL 074397 61994</span>
+                </a>
 
-              <Button
-                variant="primary"
-                size="md"
-                className="w-full text-center justify-center"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenInquiry();
-                }}
-                icon={<ArrowUpRight className="w-4 h-4" />}
-              >
-                BOOK GYM / SALON VISIT
-              </Button>
-            </div>
-          </nav>
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="w-full text-center justify-center"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenInquiry();
+                  }}
+                  icon={<ArrowUpRight className="w-4 h-4" />}
+                >
+                  BOOK GYM / SALON VISIT
+                </Button>
+              </div>
+            </nav>
+          </div>
         </div>
       )}
     </header>

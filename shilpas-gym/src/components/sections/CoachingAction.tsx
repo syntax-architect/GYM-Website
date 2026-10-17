@@ -1,259 +1,441 @@
-import React from 'react';
-import { SectionHeader } from '../ui/SectionHeader';
-import { Sparkles } from 'lucide-react';
-import { TestimonialCarousel, type Testimonial } from '@/components/ui/testimonial';
+import React, { useState } from 'react';
+import { Star, RotateCw, ArrowUpRight, ShieldCheck, Sparkles } from 'lucide-react';
 
-interface GoogleReview {
-  name: string;
-  role: string;
-  rating: string;
-  comment: string;
-  highlight: string;
+export interface CoachingActionProps {
+  onOpenInquiry?: (plan?: string) => void;
 }
 
-const FEATURED_REVIEW: GoogleReview = {
-  name: 'Shukdeb Ghosh',
-  role: 'Local Guide · 68 reviews · 368 photos',
-  rating: '5.0 / 5.0',
-  comment: 'Exceptional facility available here. They have all latest imported equipment for gym workouts. Trainers are very helpful and experienced. Also they have a separate unisex salon section.',
-  highlight: 'Modern facility & separate salon',
-};
+interface RosterMember {
+  id: string;
+  number: string;
+  positionCode: string;
+  name: string;
+  role: string;
+  specialtyTag: string;
+  experience: string;
+  image: string;
+  quote: string;
+  accentColor: string;
+  stats: {
+    label: string;
+    value: number;
+  }[];
+}
 
-const SECONDARY_REVIEWS: GoogleReview[] = [
+const ROSTER: RosterMember[] = [
   {
-    name: 'Sanket Jaiswal',
-    role: 'Local Guide · 5 reviews · 2 photos',
-    rating: '5.0 / 5.0',
-    comment: 'A great place to workout with good ambience. Trainers are supportive and helpful with lifting form and discipline.',
-    highlight: 'Good ambience & supportive trainers',
-  },
-  {
-    name: 'Avramouli S.',
-    role: 'Local Guide · 17 reviews · 45 photos',
-    rating: '5.0 / 5.0',
-    comment: 'Ambience is very nice. Staff behaviour was polite and professional. The salon services I took were top quality. Thank you.',
-    highlight: 'Polite staff & quality salon care',
-  },
-];
-
-const TRAINERS = [
-  {
-    name: 'Coach Rajesh Sen',
-    role: 'Head Biomechanics & Strength',
-    avatar: '/assets/showcase/shilpas_gym_strength.jpg',
+    id: 'rajesh-sen',
+    number: '01',
+    positionCode: 'HC',
+    name: 'COACH RAJESH SEN',
+    role: 'HEAD BIOMECHANICS & STRENGTH',
+    specialtyTag: 'BIOMECHANICS & CALIBRATED RACKS',
     experience: '8+ Years Experience',
-    specialty: 'Biomechanics & Calibrated Racks',
+    image: '/assets/images/i08-coach-portrait.webp',
+    quote:
+      'Calibrated form over ego. We guide every member on precision posture, joint safety, and progressive overload.',
+    accentColor: '#D9381E',
+    stats: [
+      { label: 'BIOMECHANICS', value: 99 },
+      { label: 'STRENGTH PROGRAMMING', value: 97 },
+      { label: 'JOINT REHAB & SAFETY', value: 96 },
+    ],
   },
   {
-    name: 'Coach Priya Mukherjee',
-    role: "Senior Women's Fitness & Posture",
-    avatar: '/assets/showcase/shilpas_gym_athlete.jpg',
+    id: 'priya-mukherjee',
+    number: '02',
+    positionCode: 'SF',
+    name: 'COACH PRIYA MUKHERJEE',
+    role: 'SENIOR WOMEN’S FITNESS & POSTURE',
+    specialtyTag: 'PROGRESSIVE OVERLOAD & NUTRITION',
     experience: '6+ Years Experience',
-    specialty: 'Progressive Overload & Nutrition',
+    image: '/assets/images/i07-coaching-still.webp',
+    quote:
+      'A welcoming, supportive environment where everyone feels confident lifting weights and hitting their target body composition.',
+    accentColor: '#D9381E',
+    stats: [
+      { label: 'BODY RECOMPOSITION', value: 98 },
+      { label: 'POSTURE ALIGNMENT', value: 97 },
+      { label: 'CUSTOM MACRO DESIGN', value: 95 },
+    ],
   },
   {
-    name: 'Shilpa Roy',
-    role: 'Founder & Master Aesthetician',
-    avatar: '/assets/showcase/shilpas_salon_glamour.jpg',
+    id: 'shilpa-roy',
+    number: '03',
+    positionCode: 'MA',
+    name: 'SHILPA ROY',
+    role: 'FOUNDER & MASTER AESTHETICIAN',
+    specialtyTag: 'HD BRIDAL MAKEOVERS & STYLING',
     experience: '10+ Years Experience',
-    specialty: 'HD Bridal Makeovers & Styling',
+    image: '/assets/library/A11_female_coach.jpeg',
+    quote:
+      'Strength on the training floor paired with rejuvenating salon care. Total physical wellness and self-confidence under one roof.',
+    accentColor: '#C5A059',
+    stats: [
+      { label: 'HD BRIDAL ARTISTRY', value: 99 },
+      { label: 'SKIN LUMINESCENCE', value: 98 },
+      { label: 'STUDIO DIRECTION', value: 99 },
+    ],
   },
   {
-    name: 'Tania Roy',
-    role: 'Senior Hair Spa & Keratin Specialist',
-    avatar: '/assets/showcase/shilpas_salon_hair_spa.jpg',
+    id: 'tania-roy',
+    number: '04',
+    positionCode: 'KS',
+    name: 'TANIA ROY',
+    role: 'SENIOR HAIR SPA & KERATIN SPECIALIST',
+    specialtyTag: 'FORMALDEHYDE-FREE HAIR BOTOX & SPA',
     experience: '7+ Years Experience',
-    specialty: 'Formaldehyde-Free Hair Botox & Spa',
+    image: '/assets/library/A13_female_coaching_interaction.jpeg',
+    quote:
+      'Premium treatments, hygienic suites, and restorative self-care designed to revitalize you after intense workouts.',
+    accentColor: '#C5A059',
+    stats: [
+      { label: 'KERATIN SMOOTHING', value: 99 },
+      { label: 'PROTEIN HAIR BOTOX', value: 97 },
+      { label: 'FRIZZ ELIMINATION', value: 98 },
+    ],
   },
 ];
 
-const TRAINER_TESTIMONIALS: Testimonial[] = [
+const VERIFIED_REVIEWS = [
   {
-    id: 1,
-    name: 'Coach Rajesh Sen',
-    role: 'Head Biomechanics & Strength',
-    avatar: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=400&q=80',
-    description: 'Calibrated form over ego. We guide every member on precision posture, joint safety, and progressive overload.',
+    badge: 'FEATURED REVIEW',
+    headline:
+      '“Exceptional facility available here. They have all latest imported equipment for gym workouts. Trainers are very helpful and experienced. Also they have a separate unisex salon section.”',
+    subNote: 'Imported biomechanical lines paired with dedicated salon privacy in Rahara.',
+    author: 'Shukdeb Ghosh',
+    meta: 'Local Guide · 68 reviews · 368 photos · Verified Google Review',
+    featured: true,
   },
   {
-    id: 2,
-    name: 'Coach Priya Mukherjee',
-    role: "Senior Women's Fitness & Posture",
-    avatar: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=400&q=80',
-    description: 'A welcoming, supportive environment where everyone feels confident lifting weights and hitting their target body composition.',
+    badge: 'GOOD AMBIENCE & SUPPORTIVE TRAINERS',
+    headline:
+      '“A great place to workout with good ambience. Trainers are supportive and helpful with lifting form and discipline.”',
+    author: 'Sanket Jaiswal',
+    meta: 'Local Guide · 15 reviews · 2 photos',
+    featured: false,
   },
   {
-    id: 3,
-    name: 'Shilpa Roy',
-    role: 'Founder & Master Aesthetician',
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
-    description: 'Strength on the training floor paired with rejuvenating salon care. Total physical wellness and self-confidence under one roof.',
-  },
-  {
-    id: 4,
-    name: 'Tania Roy',
-    role: 'Senior Hair Spa & Keratin Specialist',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-    description: 'Premium treatments, hygienic suites, and restorative self-care designed to revitalize you after intense workouts.',
+    badge: 'POLITE STAFF & QUALITY SALON CARE',
+    headline:
+      '“Ambience is very nice. Staff behaviour was polite and professional. The salon services I took were top quality. Thank you.”',
+    author: 'Avramouli S.',
+    meta: 'Local Guide · 17 reviews · 45 photos',
+    featured: false,
   },
 ];
 
-export const CoachingAction: React.FC = () => {
+export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry }) => {
+  const [flippedIds, setFlippedIds] = useState<Record<string, boolean>>({});
+
+  const toggleCardFlip = (id: string) => {
+    setFlippedIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleDraftSpecialist = (member: RosterMember, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onOpenInquiry) {
+      onOpenInquiry(`Session with ${member.name} (${member.role})`);
+    } else {
+      const timetableEl = document.querySelector('#timetable');
+      timetableEl?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section id="reviews" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#F5F2EA]">
-      <div className="max-w-[1440px] mx-auto">
-        <SectionHeader
-          tag="Verified Member Proof"
-          title="Google Verified Community."
-          description="Rated 4.7 out of 5 across 355+ Google reviews. Members consistently praise our motivating floor atmosphere, calibrated machinery, and private salon suite in Rahara, Khardaha."
-        />
-
-        {/* Asymmetric Editorial Reviews Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 items-stretch">
-          {/* Featured Large Testimony */}
-          <div className="lg:col-span-5 p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-3xl shadow-md">
-            <div className="bg-white p-7 sm:p-9 rounded-[calc(1.5rem-0.25rem)] flex flex-col justify-between h-full shadow-xs">
-              <div>
-                <div className="flex items-center justify-between gap-4 mb-6">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF6747]/10 text-xs font-bold text-[#FF6747] uppercase tracking-wider">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747]" />
-                    <span>Featured Review</span>
-                  </div>
-                  <span className="text-xs font-extrabold text-[#174D3B] bg-[#EDE9DF] px-3 py-1 rounded-full">
-                    {FEATURED_REVIEW.rating} Rating
-                  </span>
-                </div>
-
-                <blockquote className="text-xl sm:text-2xl font-display font-extrabold text-[#20231F] leading-snug mb-5">
-                  "{FEATURED_REVIEW.comment}"
-                </blockquote>
-
-                <p className="text-xs sm:text-sm text-[#4E534B] leading-relaxed mb-8">
-                  Imported biomechanical lines paired with dedicated salon privacy in Rahara.
-                </p>
+    <section className="w-full py-24 sm:py-32 px-4 sm:px-8 lg:px-12 bg-[#F5F2EA] text-[#0D0D0E] overflow-hidden">
+      <div className="max-w-[1440px] mx-auto space-y-28">
+        {/* PART 1: GOOGLE VERIFIED COMMUNITY PROOF (Preserves #reviews anchor) */}
+        <div id="reviews">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-[#141311] font-semibold">
+                <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
+                <span>VERIFIED MEMBER PROOF</span>
               </div>
-
-              <div className="pt-5 bg-[#FAF8F4] -mx-7 sm:-mx-9 -mb-7 sm:-mb-9 p-6 sm:p-7 rounded-b-[calc(1.5rem-0.25rem)] border-t border-[#20231F]/5">
-                <span className="block text-base font-extrabold text-[#20231F]">
-                  {FEATURED_REVIEW.name}
+              <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.96]">
+                GOOGLE VERIFIED{' '}
+                <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
+                  Community.
                 </span>
-                <span className="block text-xs text-[#4E534B] mt-0.5 font-medium">
-                  {FEATURED_REVIEW.role} · Verified Google Review
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Secondary Stacked Reviews */}
-          <div className="lg:col-span-7 flex flex-col justify-between gap-6">
-            {SECONDARY_REVIEWS.map((rev) => (
-              <div
-                key={rev.name}
-                className="bg-white p-7 sm:p-8 rounded-2xl border-2 border-[#20231F]/10 hover:border-[#FF6747]/40 shadow-xs hover:shadow-md flex-1 flex flex-col justify-between transition-all duration-300"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-4 mb-3">
-                    <span className="text-sm font-extrabold text-[#20231F] uppercase tracking-tight">
-                      "{rev.highlight}"
-                    </span>
-                    <span className="text-xs font-bold text-[#174D3B] bg-[#EDE9DF] px-3 py-1 rounded-full">
-                      {rev.rating} Verified
-                    </span>
-                  </div>
-
-                  <p className="text-sm sm:text-base text-[#4E534B] leading-relaxed mb-6">
-                    {rev.comment}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-[#20231F]/5 flex items-center justify-between">
-                  <div>
-                    <span className="block text-sm font-bold text-[#20231F]">
-                      {rev.name}
-                    </span>
-                    <span className="block text-xs text-[#4E534B]">
-                      {rev.role}
-                    </span>
-                  </div>
-                  <span className="text-xs font-bold text-[#FF6747] uppercase tracking-wider">
-                    Google Review
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Interactive Trainer & Coach Profile Deck */}
-        <div className="mb-20 bg-white border-2 border-[#20231F]/10 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-[#20231F]/10 pb-6">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF6747]/10 text-[#FF6747] font-mono text-[10px] font-bold uppercase tracking-wider mb-2">
-                <Sparkles className="w-3 h-3" />
-                <span>INTERACTIVE TRAINER & STYLIST STACK</span>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-display font-extrabold uppercase text-[#20231F] tracking-tight">
-                MEET YOUR ON-FLOOR COACHES & EXPERTS
-              </h3>
-              <p className="text-xs sm:text-sm text-[#4C514A] max-w-xl mt-1">
-                Drag, swipe, or use arrows to discover individual coach specializations, philosophy quotes, and on-floor guidance at Shilpa's Gym & Salon.
+              </h2>
+              <p className="font-sans text-base sm:text-lg text-[#4C514A]">
+                Rated 4.7 out of 5 across 355+ Google reviews. Members consistently praise our
+                motivating floor atmosphere, calibrated machinery, and private salon suite in
+                Rahara, Khardaha.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 font-mono text-xs text-[#20231F]/70 bg-[#FAF8F4] px-4 py-2 rounded-full border border-[#20231F]/10">
-              <span className="w-2 h-2 rounded-full bg-[#174D3B]" />
-              <span>Certified Unisex Trainers & Senior Aestheticians</span>
+            <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white border border-[#0D0D0E]/12 shadow-xs self-start lg:self-end">
+              <div className="flex items-center gap-0.5 text-[#D9381E]">
+                {[...Array(5)].map((_, i) => (
+                  <Star className="w-3.5 h-3.5 fill-current" key={i} />
+                ))}
+              </div>
+              <span className="font-mono text-xs font-bold text-[#0D0D0E]">
+                4.7 / 5.0 · 355+ GOOGLE REVIEWS
+              </span>
             </div>
           </div>
 
-          <TestimonialCarousel
-            testimonials={TRAINER_TESTIMONIALS}
-            showArrows={true}
-            showDots={true}
-            className="py-6"
-          />
-        </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            {/* Left Featured Review in Double-Bezel Card */}
+            <div className="lg:col-span-6 p-2 sm:p-2.5 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-[2.5rem] shadow-xl">
+              <div className="bg-white p-8 sm:p-10 rounded-[calc(2.5rem-0.625rem)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)] flex flex-col justify-between h-full">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D9381E]/15 text-[#D9381E] font-mono text-[11px] font-bold uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E]" />
+                      {VERIFIED_REVIEWS[0].badge}
+                    </span>
+                    <span className="font-mono text-xs font-bold text-[#141311] bg-[#141311]/10 px-3 py-1 rounded-full">
+                      5.0 / 5.0 Rating
+                    </span>
+                  </div>
 
-        {/* Lead Instructors & Aestheticians */}
-        <div>
-          <div className="max-w-2xl mb-10">
-            <h3 className="text-2xl sm:text-3xl font-display font-extrabold uppercase text-[#20231F] tracking-tight">
-              Floor Coaches & Master Aestheticians
-            </h3>
-            <p className="mt-2 text-sm sm:text-base text-[#4E534B]">
-              Direct floor coaching and certified salon care from experienced instructors.
-            </p>
-          </div>
+                  <blockquote className="font-display text-xl sm:text-2xl font-extrabold text-[#0D0D0E] leading-snug tracking-tight">
+                    {VERIFIED_REVIEWS[0].headline}
+                  </blockquote>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {TRAINERS.map((trainer) => (
-              <div key={trainer.name} className="bg-white rounded-2xl border-2 border-[#20231F]/10 hover:border-[#FF6747]/40 shadow-xs hover:shadow-md overflow-hidden flex flex-col justify-between transition-all duration-300">
-                <div className="aspect-[4/3] w-full bg-[#20231F] overflow-hidden">
-                  <img
-                    src={trainer.avatar}
-                    alt={trainer.name}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  />
-                </div>
-                <div className="p-6">
-                  <span className="text-xs uppercase font-extrabold text-[#FF6747] tracking-wider block mb-1">
-                    {trainer.specialty}
-                  </span>
-                  <h4 className="text-lg font-display font-extrabold text-[#20231F] uppercase tracking-tight">
-                    {trainer.name}
-                  </h4>
-                  <p className="text-xs text-[#4E534B] mt-1">
-                    {trainer.role}
+                  <p className="font-sans text-sm text-[#4C514A]">
+                    {VERIFIED_REVIEWS[0].subNote}
                   </p>
-                  <span className="inline-block mt-4 text-xs bg-[#EDE9DF] px-3 py-1 rounded-full font-bold text-[#20231F]">
-                    {trainer.experience}
-                  </span>
+                </div>
+
+                <div className="pt-6 mt-6 border-t border-[#0D0D0E]/10 flex items-center justify-between">
+                  <div>
+                    <span className="block font-display text-sm font-extrabold text-[#0D0D0E]">
+                      {VERIFIED_REVIEWS[0].author}
+                    </span>
+                    <span className="font-mono text-[11px] text-[#0D0D0E]/55">
+                      {VERIFIED_REVIEWS[0].meta}
+                    </span>
+                  </div>
+                  <ShieldCheck className="w-5 h-5 text-[#141311]" />
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Right Stacked Reviews in Double-Bezel Cards */}
+            <div className="lg:col-span-6 flex flex-col justify-between gap-6">
+              {VERIFIED_REVIEWS.slice(1).map((rev, idx) => (
+                <div
+                  key={idx}
+                  className="p-1.5 sm:p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-[2rem] shadow-xs flex-1 flex flex-col"
+                >
+                  <div className="bg-white p-6 sm:p-8 rounded-[calc(2rem-0.375rem)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)] flex flex-col justify-between h-full flex-1">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#141311]">
+                          {rev.badge}
+                        </span>
+                        <span className="font-mono text-[11px] font-bold text-[#141311] bg-[#141311]/10 px-2.5 py-0.5 rounded-full">
+                          5.0 / 5.0 Verified
+                        </span>
+                      </div>
+                      <p className="font-sans text-sm sm:text-base text-[#0D0D0E] font-medium leading-relaxed">
+                        {rev.headline}
+                      </p>
+                    </div>
+
+                    <div className="pt-4 mt-4 border-t border-[#0D0D0E]/10 flex items-center justify-between">
+                      <div>
+                        <span className="block font-display text-xs sm:text-sm font-bold text-[#0D0D0E]">
+                          {rev.author}
+                        </span>
+                        <span className="font-mono text-[10px] text-[#0D0D0E]/55">{rev.meta}</span>
+                      </div>
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#D9381E]">
+                        GOOGLE REVIEW
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* PART 2: ODDBALL-INSPIRED 3D FLIP STARTING ROSTER CARDS */}
+        <div id="coaches">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-[#141311] font-semibold">
+                <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
+                <span>ACT V // THE STARTING LINEUP</span>
+              </div>
+
+              <h2 className="font-display text-4xl sm:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
+                THE FLOOR{' '}
+                <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
+                  Roster.
+                </span>
+              </h2>
+
+              <p className="font-sans text-base sm:text-lg text-[#4C514A]">
+                Four positions. One dual-sanctuary team. Hover or tap any specialist card to flip and
+                inspect their biomechanical & aesthetic telemetry ratings.
+              </p>
+            </div>
+
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0D0D0E] text-[#F5F2EA] font-mono text-xs uppercase tracking-wider self-start lg:self-end">
+              <RotateCw className="w-3.5 h-3.5 text-[#D9381E]" />
+              <span>TAP OR HOVER A CARD TO FLIP IT</span>
+            </div>
+          </div>
+
+          {/* 4-Card 3D Collectible Roster Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {ROSTER.map((member) => {
+              const isFlipped = !!flippedIds[member.id];
+              return (
+                <div
+                  key={member.id}
+                  onClick={() => toggleCardFlip(member.id)}
+                  onMouseEnter={() => setFlippedIds((prev) => ({ ...prev, [member.id]: true }))}
+                  onMouseLeave={() => setFlippedIds((prev) => ({ ...prev, [member.id]: false }))}
+                  className="group relative h-[490px] w-full cursor-pointer select-none"
+                  style={{ perspective: '1200px' }}
+                >
+                  <div
+                    className="relative w-full h-full transition-transform duration-500 ease-out"
+                    style={{
+                      transformStyle: 'preserve-3d',
+                      transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                    }}
+                  >
+                    {/* FRONT OF COLLECTIBLE CARD */}
+                    <div
+                      className="absolute inset-0 w-full h-full rounded-3xl overflow-hidden bg-[#161815] text-[#F5F2EA] border-2 border-[#0D0D0E]/15 shadow-xl flex flex-col justify-between"
+                      style={{ backfaceVisibility: 'hidden' }}
+                    >
+                      {/* Full-Bleed Portrait with Dark Gradient Scrim */}
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src =
+                            '/assets/images/i08-coach-portrait.webp';
+                        }}
+                        className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 opacity-90"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0D0F0E] via-[#0D0F0E]/35 to-black/30" />
+
+                      {/* Top Jersey Number & Position Badge (Oddball 00:12 Motif) */}
+                      <div className="relative z-10 p-5 flex items-start justify-between">
+                        <span
+                          className="font-display text-5xl font-black leading-none tracking-tighter drop-shadow-md"
+                          style={{
+                            WebkitTextStroke: '1.5px rgba(245,242,234,0.85)',
+                            color: 'transparent',
+                          }}
+                        >
+                          {member.number}
+                        </span>
+
+                        <span
+                          style={{ backgroundColor: member.accentColor }}
+                          className="px-2.5 py-1 rounded-md font-mono text-xs font-extrabold text-white uppercase tracking-wider shadow-md"
+                        >
+                          {member.positionCode}
+                        </span>
+                      </div>
+
+                      {/* Bottom Specialist Identity */}
+                      <div className="relative z-10 p-6 space-y-2.5">
+                        <span className="inline-block font-mono text-[10px] font-bold uppercase tracking-widest text-[#D9381E]">
+                          {member.specialtyTag}
+                        </span>
+
+                        <h3 className="font-display text-2xl font-extrabold uppercase tracking-tight text-white leading-tight">
+                          {member.name}
+                        </h3>
+
+                        <p className="font-sans text-xs text-white/75 font-medium">
+                          {member.role}
+                        </p>
+
+                        <div className="pt-3 border-t border-white/15 flex items-center justify-between font-mono text-[11px] text-white/80">
+                          <span>{member.experience}</span>
+                          <span className="inline-flex items-center gap-1 text-[#D9381E] font-bold">
+                            <RotateCw className="w-3 h-3" />
+                            STATS
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BACK OF COLLECTIBLE CARD (Oddball RPG Stat Bars & Contract CTA) */}
+                    <div
+                      className="absolute inset-0 w-full h-full rounded-3xl overflow-hidden bg-[#141614] text-[#F5F2EA] border-2 border-[#D9381E] p-6 flex flex-col justify-between shadow-2xl"
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'rotateY(180deg)',
+                      }}
+                    >
+                      {/* Top Header */}
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#D9381E]">
+                            #{member.number} · {member.positionCode} SPEC
+                          </span>
+                          <Sparkles className="w-4 h-4 text-[#D9381E]" />
+                        </div>
+
+                        <h3 className="font-display text-xl font-extrabold uppercase tracking-tight text-white mb-1">
+                          {member.name}
+                        </h3>
+                        <p className="font-mono text-[11px] text-white/55 uppercase tracking-wider mb-5">
+                          {member.role}
+                        </p>
+
+                        {/* Philosophy Quote */}
+                        <blockquote className="p-4 rounded-2xl bg-white/5 border border-white/10 font-serif italic text-base sm:text-lg text-[#E6DEC8] leading-snug mb-6">
+                          “{member.quote}”
+                        </blockquote>
+                      </div>
+
+                      {/* Oddball RPG Stat Bars */}
+                      <div className="space-y-3.5 my-auto">
+                        {member.stats.map((st) => (
+                          <div key={st.label}>
+                            <div className="flex items-center justify-between font-mono text-[11px] mb-1">
+                              <span className="text-white/75 uppercase tracking-wider">
+                                {st.label}
+                              </span>
+                              <span className="text-[#D9381E] font-bold tabular-nums text-sm">
+                                {st.value}
+                              </span>
+                            </div>
+                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-[#D9381E] rounded-full transition-all duration-700"
+                                style={{ width: `${st.value}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Bottom Action Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => handleDraftSpecialist(member, e)}
+                        className="w-full mt-4 py-3.5 px-4 rounded-full bg-[#D9381E] hover:bg-[#B82B14] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg active:scale-95"
+                      >
+                        <span>DRAFT THIS SPECIALIST</span>
+                        <ArrowUpRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
     </section>
   );
 };
+
+export default CoachingAction;

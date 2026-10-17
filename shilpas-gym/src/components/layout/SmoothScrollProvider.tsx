@@ -63,7 +63,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
         if (targetElement) {
           e.preventDefault();
           lenis.scrollTo(href, {
-            offset: -75,
+            offset: -95,
             duration: 1.2,
           });
         }
@@ -85,7 +85,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
   const scrollTo = useCallback((target: string | number | HTMLElement, options?: ScrollToOptions) => {
     if (lenisRef.current) {
       lenisRef.current.scrollTo(target, {
-        offset: options?.offset ?? -75,
+        offset: options?.offset ?? -95,
         duration: options?.duration ?? 1.2,
         immediate: options?.immediate ?? false,
         easing: options?.easing,

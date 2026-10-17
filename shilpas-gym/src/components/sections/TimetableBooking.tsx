@@ -85,7 +85,7 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
 
         {/* High-End Segmented Day Dock */}
         <div className="mb-6 flex items-center overflow-x-auto pb-2">
-          <div className="p-1.5 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-full inline-flex items-center gap-1.5 shadow-xs">
+          <div className="p-1.5 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-full inline-flex items-center gap-1.5 shadow-xs">
             {DAYS.map((day) => {
               const isActive = selectedDay === day;
               return (
@@ -95,8 +95,8 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
                   onClick={() => setSelectedDay(day)}
                   className={`px-5 sm:px-7 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap active:scale-95 ${
                     isActive
-                      ? 'bg-[#20231F] text-[#F5F2EA] shadow-md border border-[#20231F]'
-                      : 'text-[#20231F]/70 hover:text-[#20231F] hover:bg-white/80'
+                      ? 'bg-[#0D0D0E] text-[#F5F2EA] shadow-md border border-[#0D0D0E]'
+                      : 'text-[#0D0D0E]/70 hover:text-[#0D0D0E] hover:bg-white/80'
                   }`}
                 >
                   {day}
@@ -123,63 +123,65 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
                 onClick={() => setDisciplineFilter(flt.id)}
                 className={`px-4 sm:px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer border active:scale-95 flex items-center gap-2 ${
                   isActive
-                    ? 'bg-[#FF6747] text-[#20231F] border-[#FF6747] shadow-xs'
-                    : 'bg-white/90 text-[#20231F]/75 border-[#20231F]/15 hover:border-[#FF6747]/60 hover:text-[#20231F]'
+                    ? 'bg-[#D9381E] text-[#0D0D0E] border-[#D9381E] shadow-xs'
+                    : 'bg-white/90 text-[#0D0D0E]/75 border-[#0D0D0E]/15 hover:border-[#D9381E]/60 hover:text-[#0D0D0E]'
                 }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#20231F]' : 'bg-[#FF6747]'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#0D0D0E]' : 'bg-[#D9381E]'}`} />
                 <span>{flt.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Schedule List with Prominent Button Affordances */}
+        {/* Schedule List with Double-Bezel Framing */}
         <div className="space-y-3.5">
           {sessions.map((session) => (
             <div
               key={session.id}
-              className="bg-white p-6 sm:p-7 rounded-2xl border-2 border-[#20231F]/10 hover:border-[#FF6747]/40 shadow-xs hover:shadow-md flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all duration-300"
+              className="p-1.5 sm:p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-[2rem] shadow-xs hover:shadow-md transition-all duration-300"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-                <div className="w-44 flex-shrink-0">
-                  <span className="text-base font-extrabold text-[#20231F] tabular-nums block tracking-tight">
-                    {session.time}
-                  </span>
-                  <span className="text-xs text-[#174D3B] font-bold uppercase tracking-wider">
-                    {session.duration}
-                  </span>
-                </div>
-
-                <div>
-                  <h4 className="text-base sm:text-lg font-display font-extrabold text-[#20231F] uppercase tracking-tight mb-1">
-                    {session.title}
-                  </h4>
-                  <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-[#4E534B]">
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <User className="w-3.5 h-3.5 text-[#FF6747]" />
-                      <span>{session.coach}</span>
+              <div className="bg-white p-5 sm:p-6 rounded-[calc(2rem-0.375rem)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)] flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+                  <div className="w-44 flex-shrink-0">
+                    <span className="text-base font-extrabold text-[#0D0D0E] tabular-nums block tracking-tight">
+                      {session.time}
                     </span>
-                    <span>·</span>
-                    <span>{session.bay}</span>
-                    <span>·</span>
-                    <span className="inline-flex items-center gap-1 text-[#174D3B] font-bold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#174D3B]" />
-                      <span>{session.spotsLeft} slots left</span>
+                    <span className="text-xs text-[#141311] font-bold uppercase tracking-wider">
+                      {session.duration}
                     </span>
                   </div>
-                </div>
-              </div>
 
-              <div className="flex items-center justify-end">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => onBookClass(session.title, session.time, session.coach)}
-                  icon={<ArrowUpRight className="w-3.5 h-3.5" />}
-                >
-                  RESERVE SLOT
-                </Button>
+                  <div>
+                    <h4 className="text-base sm:text-lg font-display font-extrabold text-[#0D0D0E] uppercase tracking-tight mb-1">
+                      {session.title}
+                    </h4>
+                    <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-[#4E534B]">
+                      <span className="flex items-center gap-1.5 font-medium">
+                        <User className="w-3.5 h-3.5 text-[#D9381E]" />
+                        <span>{session.coach}</span>
+                      </span>
+                      <span>·</span>
+                      <span>{session.bay}</span>
+                      <span>·</span>
+                      <span className="inline-flex items-center gap-1 text-[#141311] font-bold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#141311]" />
+                        <span>{session.spotsLeft} slots left</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => onBookClass(session.title, session.time, session.coach)}
+                    icon={<ArrowUpRight className="w-3.5 h-3.5" />}
+                  >
+                    RESERVE SLOT
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

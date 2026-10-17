@@ -19,18 +19,18 @@ export const Badge: React.FC<BadgeProps> = ({
   };
 
   const variantStyles = {
-    persimmon: 'bg-[#FF6747] text-white',
-    periwinkle: 'bg-[#8177FF] text-white',
-    botanical: 'bg-[#174D3B] text-[#F5F2EA]',
-    mineral: 'bg-[#EDE9DF] text-[#20231F]',
-    carbon: 'bg-[#20231F] text-[#F5F2EA]',
-    live: 'bg-[#174D3B] text-[#F5F2EA] inline-flex items-center gap-2 font-semibold',
+    persimmon: 'bg-[#D9381E] text-white',
+    periwinkle: 'bg-[#C5A059] text-white',
+    botanical: 'bg-[#141311] text-[#F5F2EA]',
+    mineral: 'bg-[#EDE9DF] text-[#0D0D0E]',
+    carbon: 'bg-[#0D0D0E] text-[#F5F2EA]',
+    live: 'bg-[#141311] text-[#F5F2EA] inline-flex items-center gap-2 font-semibold',
   };
 
   return (
     <span className={`inline-flex items-center rounded-sm transition-colors ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}>
       {variant === 'live' && (
-        <span className="w-2 h-2 rounded-full bg-[#FF6747] inline-block" />
+        <span className="w-2 h-2 rounded-full bg-[#D9381E] inline-block" />
       )}
       {children}
     </span>

@@ -5,7 +5,7 @@ export interface Interactive3DCardProps {
   className?: string;
   maxTilt?: number; // max tilt degrees (default: 8)
   scale?: number; // scale on hover (default: 1.02)
-  glowColor?: string; // radial glow color (default: 'rgba(255, 103, 71, 0.12)')
+  glowColor?: string; // radial glow color (default: 'rgba(217, 56, 30, 0.12)')
 }
 
 export const Interactive3DCard: React.FC<Interactive3DCardProps> = ({
@@ -13,7 +13,7 @@ export const Interactive3DCard: React.FC<Interactive3DCardProps> = ({
   className = '',
   maxTilt = 8,
   scale = 1.02,
-  glowColor = 'rgba(255, 103, 71, 0.12)',
+  glowColor = 'rgba(217, 56, 30, 0.12)',
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({});

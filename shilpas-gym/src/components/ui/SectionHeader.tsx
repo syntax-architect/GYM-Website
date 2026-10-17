@@ -28,26 +28,26 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {tag && (
         <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-[0.2em] mb-4 ${
           isContrast
-            ? 'bg-white/10 text-[#FF6747] border border-white/15'
-            : 'bg-[#174D3B]/10 text-[#174D3B] border border-[#174D3B]/15'
+            ? 'bg-white/10 text-[#D9381E] border border-white/15'
+            : 'bg-[#141311]/10 text-[#141311] border border-[#141311]/15'
         }`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E]" />
           <span>{tag}</span>
         </div>
       )}
 
       <h2 className={`text-3xl sm:text-4xl md:text-5xl font-display font-extrabold uppercase tracking-tight leading-[1.05] ${
-        isContrast ? 'text-[#F5F2EA]' : 'text-[#20231F]'
+        isContrast ? 'text-[#F5F2EA]' : 'text-[#0D0D0E]'
       }`}>
         {title}{' '}
         {accentTitle && (
-          <span className="text-[#FF6747] block sm:inline">{accentTitle}</span>
+          <span className="text-[#D9381E] block sm:inline">{accentTitle}</span>
         )}
       </h2>
 
       {description && (
         <p className={`mt-4 sm:mt-5 text-base sm:text-lg font-normal leading-relaxed font-sans ${
-          isContrast ? 'text-[#DDE8F8]' : 'text-[#3E423C]'
+          isContrast ? 'text-[#E6DEC8]' : 'text-[#3E423C]'
         }`}>
           {description}
         </p>

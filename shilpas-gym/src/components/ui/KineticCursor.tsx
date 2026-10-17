@@ -69,7 +69,7 @@ export const KineticCursor: React.FC = () => {
     <>
       {/* Precision Core Dot */}
       <motion.div
-        className="fixed top-0 left-0 w-2.5 h-2.5 bg-[#FF6747] rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 w-2.5 h-2.5 bg-[#D9381E] rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2"
         style={{
           x: mouseX,
           y: mouseY,
@@ -87,24 +87,24 @@ export const KineticCursor: React.FC = () => {
         animate={{
           width: cursorType === 'pointer' ? 48 : cursorType === '3d' || cursorType === 'play' || cursorType === 'view' ? 64 : 32,
           height: cursorType === 'pointer' ? 48 : cursorType === '3d' || cursorType === 'play' || cursorType === 'view' ? 64 : 32,
-          borderColor: cursorType === '3d' ? '#8177FF' : cursorType === 'pointer' ? '#FF6747' : 'rgba(32, 35, 31, 0.25)',
-          backgroundColor: cursorType === '3d' ? 'rgba(129, 119, 255, 0.12)' : cursorType === 'play' ? 'rgba(255, 103, 71, 0.15)' : cursorType === 'pointer' ? 'rgba(255, 103, 71, 0.08)' : 'rgba(245, 242, 234, 0.02)',
+          borderColor: cursorType === '3d' ? '#C5A059' : cursorType === 'pointer' ? '#D9381E' : 'rgba(13, 13, 14, 0.25)',
+          backgroundColor: cursorType === '3d' ? 'rgba(197, 160, 89, 0.12)' : cursorType === 'play' ? 'rgba(217, 56, 30, 0.15)' : cursorType === 'pointer' ? 'rgba(217, 56, 30, 0.08)' : 'rgba(245, 242, 234, 0.02)',
         }}
         transition={{ type: 'spring', damping: 22, stiffness: 300 }}
       >
         <div className="w-full h-full rounded-full border border-inherit flex items-center justify-center">
           {cursorType === '3d' && (
-            <span className="font-mono text-[9px] font-bold text-[#8177FF] uppercase tracking-wider select-none">
+            <span className="font-mono text-[9px] font-bold text-[#C5A059] uppercase tracking-wider select-none">
               ORBIT
             </span>
           )}
           {cursorType === 'play' && (
-            <span className="font-mono text-[9px] font-bold text-[#FF6747] uppercase tracking-wider select-none">
+            <span className="font-mono text-[9px] font-bold text-[#D9381E] uppercase tracking-wider select-none">
               PLAY
             </span>
           )}
           {cursorType === 'view' && (
-            <span className="font-mono text-[9px] font-bold text-[#20231F] uppercase tracking-wider select-none">
+            <span className="font-mono text-[9px] font-bold text-[#0D0D0E] uppercase tracking-wider select-none">
               VIEW
             </span>
           )}

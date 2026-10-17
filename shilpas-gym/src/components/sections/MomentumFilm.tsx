@@ -102,32 +102,32 @@ export const MomentumFilm: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-24 sm:py-32 bg-[#F5F2EA] text-[#20231F] overflow-hidden"
+      className="relative w-full py-24 sm:py-32 bg-[#F5F2EA] text-[#0D0D0E] overflow-hidden"
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
         {/* Top Editorial Header & Telemetry Row */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14">
           <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.2em] text-[#174D3B] font-semibold">
-              <span className="w-2 h-2 rounded-full bg-[#FF6747]" />
+            <div className="inline-flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.2em] text-[#141311] font-semibold">
+              <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
               <span>ACT II // KINETIC MANIFESTO</span>
             </div>
 
-            <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold uppercase tracking-[-0.03em] text-[#20231F] leading-[0.95]">
+            <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
               MOMENTUM IS{' '}
-              <span className="font-serif italic font-normal capitalize tracking-normal text-[#FF6747]">
+              <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
                 Engineered.
               </span>
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 self-start lg:self-end px-4 py-2 rounded-full bg-[#20231F] text-[#F5F2EA] font-mono text-xs tracking-wider">
-            <Activity className="w-3.5 h-3.5 text-[#FF6747]" />
+          <div className="flex items-center gap-3 self-start lg:self-end px-4 py-2 rounded-full bg-[#0D0D0E] text-[#F5F2EA] font-mono text-xs tracking-wider">
+            <Activity className="w-3.5 h-3.5 text-[#D9381E]" />
             <span ref={progressReadoutRef} className="tabular-nums">
               REEL 02 // 000%
             </span>
             <span className="text-white/30">·</span>
-            <span className="text-[#DDE8F8]">24 FPS RAW</span>
+            <span className="text-[#E6DEC8]">24 FPS RAW</span>
           </div>
         </div>
 
@@ -135,15 +135,15 @@ export const MomentumFilm: React.FC = () => {
         <div className="max-w-5xl mb-14 sm:mb-20">
           <p
             ref={wordsContainerRef}
-            className="font-display text-2xl sm:text-4xl lg:text-[2.75rem] font-extrabold uppercase tracking-[-0.02em] leading-[1.18] text-[#20231F] flex flex-wrap gap-x-3 gap-y-2"
+            className="font-display text-2xl sm:text-4xl lg:text-[2.75rem] font-extrabold uppercase tracking-[-0.02em] leading-[1.18] text-[#0D0D0E] flex flex-wrap gap-x-3 gap-y-2"
           >
             {MANIFESTO_WORDS.map((item, idx) => (
               <span
                 key={idx}
                 className={`manifesto-word inline-block transition-colors duration-150 ${
                   item.accent
-                    ? 'font-serif italic font-normal capitalize tracking-normal text-[#FF6747] text-3xl sm:text-5xl lg:text-[3.1rem]'
-                    : 'text-[#20231F]'
+                    ? 'font-serif italic font-normal capitalize tracking-normal text-[#D9381E] text-3xl sm:text-5xl lg:text-[3.1rem]'
+                    : 'text-[#0D0D0E]'
                 }`}
               >
                 {item.text}
@@ -155,7 +155,7 @@ export const MomentumFilm: React.FC = () => {
         {/* Full-Bleed Expanding Cinema Stage */}
         <div
           ref={videoFrameRef}
-          className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/9] bg-[#161815] overflow-hidden shadow-2xl ring-1 ring-[#20231F]/15 will-change-transform"
+          className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/9] bg-[#161815] overflow-hidden shadow-2xl ring-1 ring-[#0D0D0E]/15 will-change-transform"
         >
           <video
             src="/assets/videos/v03-momentum.mp4"
@@ -172,18 +172,18 @@ export const MomentumFilm: React.FC = () => {
 
           {/* Top-Left Camera Telemetry */}
           <div className="pointer-events-none absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white font-mono text-[11px] uppercase tracking-widest">
-            <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-ping" />
+            <span className="w-2 h-2 rounded-full bg-[#D9381E] animate-ping" />
             <span>OPTICAL TRACKING // 28MM COMPETITION KNURL</span>
           </div>
 
           {/* Bottom-Left & Bottom-Right HUD Callouts */}
           <div className="pointer-events-none absolute bottom-4 inset-x-4 sm:bottom-6 sm:inset-x-6 flex flex-wrap items-center justify-between gap-4">
             <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-[#F5F2EA] font-mono text-xs uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-[#FF6747]" />
+              <Sparkles className="w-3.5 h-3.5 text-[#D9381E]" />
               <span>SHILPA&apos;S GYM TRAINING FLOOR · RAHARA, KHARDAHA</span>
             </div>
 
-            <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-full bg-white/90 text-[#20231F] font-mono text-xs font-bold uppercase tracking-wider">
+            <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-full bg-white/90 text-[#0D0D0E] font-mono text-xs font-bold uppercase tracking-wider">
               <span>TENSILE RATING: 216,000 PSI</span>
             </div>
           </div>

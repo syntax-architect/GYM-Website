@@ -35,20 +35,20 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
   }[aspectRatio];
 
   return (
-    <div className={`relative overflow-hidden bg-[#FAF8F4] border border-[#20231F]/10 group rounded-sm shadow-xs ${aspectClass} ${className}`}>
+    <div className={`relative overflow-hidden bg-[#FAF8F4] border border-[#0D0D0E]/10 group rounded-sm shadow-xs ${aspectClass} ${className}`}>
       {/* Precision reticle corner markers */}
       {reticle && (
         <>
-          <div className="absolute top-2.5 left-2.5 z-20 font-mono text-[10px] text-[#20231F]/30 pointer-events-none select-none">
+          <div className="absolute top-2.5 left-2.5 z-20 font-mono text-[10px] text-[#0D0D0E]/30 pointer-events-none select-none">
             +
           </div>
-          <div className="absolute top-2.5 right-2.5 z-20 font-mono text-[10px] text-[#20231F]/30 pointer-events-none select-none">
+          <div className="absolute top-2.5 right-2.5 z-20 font-mono text-[10px] text-[#0D0D0E]/30 pointer-events-none select-none">
             +
           </div>
-          <div className="absolute bottom-2.5 left-2.5 z-20 font-mono text-[10px] text-[#20231F]/30 pointer-events-none select-none">
+          <div className="absolute bottom-2.5 left-2.5 z-20 font-mono text-[10px] text-[#0D0D0E]/30 pointer-events-none select-none">
             +
           </div>
-          <div className="absolute bottom-2.5 right-2.5 z-20 font-mono text-[10px] text-[#20231F]/30 pointer-events-none select-none">
+          <div className="absolute bottom-2.5 right-2.5 z-20 font-mono text-[10px] text-[#0D0D0E]/30 pointer-events-none select-none">
             +
           </div>
         </>
@@ -81,8 +81,8 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
 
       {/* Subtle bottom shadow gradient for legibility */}
       {showOverlay && (
-        <div className="absolute bottom-0 inset-x-0 p-5 z-20 bg-gradient-to-t from-[#20231F]/90 via-[#20231F]/40 to-transparent">
-          <p className="font-mono text-[10px] text-[#FF6747] uppercase tracking-widest mb-1 font-semibold">
+        <div className="absolute bottom-0 inset-x-0 p-5 z-20 bg-gradient-to-t from-[#0D0D0E]/90 via-[#0D0D0E]/40 to-transparent">
+          <p className="font-mono text-[10px] text-[#D9381E] uppercase tracking-widest mb-1 font-semibold">
             {asset.id} // {asset.category}
           </p>
           <p className="font-display text-base font-bold text-white uppercase tracking-tight">

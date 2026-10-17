@@ -54,8 +54,8 @@ export function TiltedGridHeroDemo() {
     >
       <div className="relative z-10 flex h-full flex-col items-center justify-between py-12 px-4 text-center">
         {/* Floating pill badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-medium tracking-widest text-[#FF6747] uppercase">
-          <Sparkles className="w-3.5 h-3.5 text-[#FF6747]" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-medium tracking-widest text-[#D9381E] uppercase">
+          <Sparkles className="w-3.5 h-3.5 text-[#D9381E]" />
           <span>Curved Perspective • 3D Cylindrical Hero</span>
         </div>
 
@@ -64,7 +64,7 @@ export function TiltedGridHeroDemo() {
           <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-white drop-shadow-md">
             Every discipline,
             <br />
-            <span className="bg-gradient-to-r from-[#FF6747] via-[#FF8A65] to-[#E3E879] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#D9381E] via-[#FF8A65] to-[#E3E879] bg-clip-text text-transparent">
               curved into focus.
             </span>
           </h1>
@@ -77,14 +77,14 @@ export function TiltedGridHeroDemo() {
         {/* Bottom Details & CTAs */}
         <div className="flex flex-wrap items-center justify-center gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 text-xs text-white/90">
-            <Dumbbell className="w-4 h-4 text-[#FF6747]" />
+            <Dumbbell className="w-4 h-4 text-[#D9381E]" />
             <span>Unisex Training Studio</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 text-xs text-white/90">
             <Scissors className="w-4 h-4 text-[#E3E879]" />
             <span>Luxury Beauty Salon</span>
           </div>
-          <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FF6747] hover:bg-[#e05638] text-white text-xs font-medium transition-colors shadow-lg shadow-[#FF6747]/20">
+          <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D9381E] hover:bg-[#e05638] text-white text-xs font-medium transition-colors shadow-lg shadow-[#D9381E]/20">
             <span>Explore Experience</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </div>

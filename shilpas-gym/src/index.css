@@ -22,15 +22,15 @@ html.lenis body {
 
 @layer base {
   :root {
-    --canvas: #F5F2EA;
-    --mineral: #F5F2EA;
+    --canvas: #F4F1EA;
+    --mineral: #F4F1EA;
     --mineral-card: #FFFFFF;
-    --mineral-surface: #EDE9DF;
-    --persimmon: #FF6747;
-    --periwinkle: #8177FF;
-    --botanical: #174D3B;
-    --carbon: #20231F;
-    --cloud: #DDE8F8;
+    --mineral-surface: #EAE4D7;
+    --persimmon: #D9381E;
+    --periwinkle: #C5A059;
+    --botanical: #141311;
+    --carbon: #0D0D0E;
+    --cloud: #E6DEC8;
   }
 
   body {
@@ -56,13 +56,13 @@ html.lenis body {
   [data-ui] input,
   [data-ui] textarea,
   [data-ui] select {
-    border: 1px solid rgba(32, 35, 31, 0.15);
+    border: 1px solid rgba(13, 13, 14, 0.15);
   }
 }
 
 /* Surfaces defined by tone steps instead of thin divider lines */
 .bg-mineral-soft {
-  background-color: #EDE9DF;
+  background-color: #EAE4D7;
 }
 
 .bg-mineral-card {
@@ -70,18 +70,18 @@ html.lenis body {
 }
 
 .bg-botanical-contrast {
-  background-color: #174D3B;
-  color: #F5F2EA;
+  background-color: #141311;
+  color: #F4F1EA;
 }
 
 .bg-carbon-contrast {
-  background-color: #161815;
-  color: #F5F2EA;
+  background-color: #0D0D0E;
+  color: #F4F1EA;
 }
 
 /* Subtle focus indicators for keyboard navigation */
 :focus-visible {
-  outline: 2px solid #FF6747;
+  outline: 2px solid #D9381E;
   outline-offset: 2px;
 }
 
@@ -91,16 +91,16 @@ html.lenis body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #EAE6DC;
+  background: #E8E2D5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C4BEB0;
+  background: #C2B6A1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A39B8B;
+  background: #A69880;
 }
 
 /* Reduced motion compliance */

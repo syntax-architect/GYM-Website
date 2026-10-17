@@ -212,10 +212,10 @@ export const SignatureScroll: React.FC = () => {
     <section
       id="signature"
       ref={containerRef}
-      className="relative w-full h-[280vh] bg-[#E8E4DC] text-[#20231F] select-none"
+      className="relative w-full h-[280vh] bg-[#E8E4DC] text-[#0D0D0E] select-none z-10"
     >
       {/* Sticky Full-Viewport Stage */}
-      <div className="sticky top-0 left-0 w-full h-screen overflow-hidden flex flex-col justify-between py-20 sm:py-24">
+      <div className="sticky top-0 left-0 w-full h-[100dvh] max-h-screen overflow-hidden flex flex-col justify-between pt-20 pb-5 sm:pt-24 sm:pb-6">
         {/* Radial Studio Backlight */}
         <div
           aria-hidden="true"
@@ -247,7 +247,7 @@ export const SignatureScroll: React.FC = () => {
             y1="520"
             x2={activeSpec.targetX}
             y2={activeSpec.targetY}
-            stroke="#20231F"
+            stroke="#0D0D0E"
             strokeWidth="1.2"
             strokeDasharray="3 3"
             opacity="0.45"
@@ -257,27 +257,27 @@ export const SignatureScroll: React.FC = () => {
             y1="520"
             x2={activeSpec.targetX}
             y2={activeSpec.targetY}
-            stroke="#FF6747"
+            stroke="#D9381E"
             strokeWidth="1.5"
             opacity="0.85"
           />
 
           {/* Anchor Node on Spec Card Edge */}
-          <circle cx="365" cy="520" r="3.5" fill="#FF6747" />
+          <circle cx="365" cy="520" r="3.5" fill="#D9381E" />
 
           {/* Target Reticle on 3D Sculpture */}
           <circle
             cx={activeSpec.targetX}
             cy={activeSpec.targetY}
             r="5"
-            fill="#FF6747"
+            fill="#D9381E"
           />
           <circle
             cx={activeSpec.targetX}
             cy={activeSpec.targetY}
             r="14"
             fill="none"
-            stroke="#FF6747"
+            stroke="#D9381E"
             strokeWidth="1.2"
             opacity="0.6"
           />
@@ -286,7 +286,7 @@ export const SignatureScroll: React.FC = () => {
             cy={activeSpec.targetY}
             r="22"
             fill="none"
-            stroke="#20231F"
+            stroke="#0D0D0E"
             strokeWidth="0.8"
             strokeDasharray="2 4"
             opacity="0.35"
@@ -294,65 +294,67 @@ export const SignatureScroll: React.FC = () => {
         </svg>
 
         {/* TOP TELEMETRY HUD BAR */}
-        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-4">
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-[#20231F]/12 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#20231F]">
+        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-[#D9381E] animate-pulse" />
+            <span className="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#0D0D0E]">
               360° PRECISION BIOMECHANICS SEQUENCE
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-3 sm:gap-4 px-5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-[#20231F]/12 shadow-xs font-mono text-xs font-bold text-[#20231F]">
+          <div className="inline-flex items-center gap-2.5 sm:gap-4 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs font-mono text-[11px] sm:text-xs font-bold text-[#0D0D0E]">
             <span className="tabular-nums">Turn: {turnDegrees}°</span>
-            <span className="text-[#20231F]/25">|</span>
-            <span className="tabular-nums text-[#20231F]/70">
+            <span className="text-[#0D0D0E]/25">|</span>
+            <span className="tabular-nums text-[#0D0D0E]/70">
               FRAME {paddedFrame} / {paddedTotal}
             </span>
-            <span className="text-[#20231F]/25 hidden sm:inline">|</span>
-            <span className="text-[#FF6747] uppercase tracking-wider hidden sm:inline">
+            <span className="text-[#0D0D0E]/25 hidden sm:inline">|</span>
+            <span className="text-[#D9381E] uppercase tracking-wider hidden sm:inline">
               {activeSpec.tag}
             </span>
           </div>
         </div>
 
         {/* CENTER INTERACTIVE CALLOUT STAGE (Left Macro Spec Card + Right Quick Switcher) */}
-        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-          {/* Left: Valmora-Style Macro Specification Card */}
-          <div className="w-full max-w-md bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#20231F]/12 shadow-sculptural transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#FF6747]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747]" />
-                {activeSpec.tag}
-              </span>
-              <span className="font-serif italic text-2xl sm:text-3xl text-[#20231F]/45">
-                {activeSpec.indexLabel}
-              </span>
-            </div>
-
-            <h3 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#20231F] leading-[1.02] mb-3">
-              {activeSpec.title}{' '}
-              <span className="font-serif italic font-normal capitalize text-[#FF6747]">
-                {activeSpec.serifAccent}
-              </span>
-            </h3>
-
-            <p className="font-sans text-sm sm:text-base text-[#4C514A] leading-relaxed mb-6">
-              {activeSpec.description}
-            </p>
-
-            <div className="pt-4 border-t border-[#20231F]/10 flex items-center justify-between gap-3">
-              <div>
-                <span className="block font-mono text-[10px] uppercase tracking-widest text-[#20231F]/50">
-                  {activeSpec.metaLeftLabel}
+        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 sm:gap-8">
+          {/* Left: Valmora-Style Double-Bezel Specification Card */}
+          <div className="w-full max-w-md p-1.5 sm:p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-[2rem] shadow-sculptural transition-all duration-300">
+            <div className="bg-white/95 backdrop-blur-xl p-5 sm:p-7 rounded-[calc(2rem-0.375rem)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)]">
+              <div className="flex items-center justify-between mb-3">
+                <span className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#D9381E]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E]" />
+                  {activeSpec.tag}
                 </span>
-                <span className="font-sans text-xs sm:text-sm font-bold text-[#20231F]">
-                  {activeSpec.metaLeftValue}
+                <span className="font-serif italic text-xl sm:text-2xl text-[#0D0D0E]/45">
+                  {activeSpec.indexLabel}
                 </span>
               </div>
 
-              <span className="px-3 py-1 rounded-full bg-[#174D3B]/10 text-[#174D3B] font-mono text-[10px] font-bold uppercase tracking-widest">
-                {activeSpec.badge}
-              </span>
+              <h3 className="font-display text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-[1.05] mb-2.5">
+                {activeSpec.title}{' '}
+                <span className="font-serif italic font-normal capitalize text-[#D9381E]">
+                  {activeSpec.serifAccent}
+                </span>
+              </h3>
+
+              <p className="font-sans text-xs sm:text-sm text-[#4C514A] leading-relaxed mb-4">
+                {activeSpec.description}
+              </p>
+
+              <div className="pt-3 border-t border-[#0D0D0E]/10 flex items-center justify-between gap-3">
+                <div>
+                  <span className="block font-mono text-[10px] uppercase tracking-widest text-[#0D0D0E]/50">
+                    {activeSpec.metaLeftLabel}
+                  </span>
+                  <span className="font-sans text-xs sm:text-sm font-bold text-[#0D0D0E]">
+                    {activeSpec.metaLeftValue}
+                  </span>
+                </div>
+
+                <span className="px-2.5 py-1 rounded-full bg-[#141311]/10 text-[#141311] font-mono text-[10px] font-bold uppercase tracking-widest">
+                  {activeSpec.badge}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -367,14 +369,14 @@ export const SignatureScroll: React.FC = () => {
                   onClick={() => handleSelectPrinciple(idx)}
                   className={`flex-1 lg:flex-none px-4 py-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'bg-[#20231F] text-[#F5F2EA] border-[#20231F] shadow-lg'
-                      : 'bg-white/85 text-[#20231F] border-[#20231F]/12 hover:bg-white'
+                      ? 'bg-[#0D0D0E] text-[#F5F2EA] border-[#0D0D0E] shadow-lg'
+                      : 'bg-white/85 text-[#0D0D0E] border-[#0D0D0E]/12 hover:bg-white'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        isSelected ? 'bg-[#FF6747]' : 'bg-[#20231F]/30'
+                        isSelected ? 'bg-[#D9381E]' : 'bg-[#0D0D0E]/30'
                       }`}
                     />
                     <span className="font-mono text-xs font-bold uppercase tracking-wider whitespace-nowrap">
@@ -385,7 +387,7 @@ export const SignatureScroll: React.FC = () => {
                     className={`font-mono text-[11px] px-2 py-0.5 rounded-md ${
                       isSelected
                         ? 'bg-white/15 text-white'
-                        : 'bg-[#20231F]/8 text-[#20231F]/70'
+                        : 'bg-[#0D0D0E]/8 text-[#0D0D0E]/70'
                     }`}
                   >
                     #{item.id}
@@ -398,7 +400,7 @@ export const SignatureScroll: React.FC = () => {
 
         {/* BOTTOM TIMELINE SCRUBBER BAR (Valmora 01 - 02 - 03 Progress Line) */}
         <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-3 gap-4 pt-3 border-t border-[#20231F]/15">
+          <div className="grid grid-cols-3 gap-4 pt-3 border-t border-[#0D0D0E]/15">
             {PRINCIPLES.map((item, idx) => {
               const isSelected = idx === activeIndex;
               return (
@@ -408,10 +410,10 @@ export const SignatureScroll: React.FC = () => {
                   onClick={() => handleSelectPrinciple(idx)}
                   className="text-left group cursor-pointer"
                 >
-                  <div className="h-1 w-full bg-[#20231F]/12 rounded-full overflow-hidden mb-2">
+                  <div className="h-1 w-full bg-[#0D0D0E]/12 rounded-full overflow-hidden mb-2">
                     <div
                       className={`h-full transition-all duration-300 ${
-                        isSelected ? 'w-full bg-[#FF6747]' : 'w-0 bg-transparent'
+                        isSelected ? 'w-full bg-[#D9381E]' : 'w-0 bg-transparent'
                       }`}
                     />
                   </div>
@@ -419,13 +421,13 @@ export const SignatureScroll: React.FC = () => {
                     <span
                       className={
                         isSelected
-                          ? 'font-bold text-[#20231F]'
-                          : 'text-[#20231F]/50 group-hover:text-[#20231F]'
+                          ? 'font-bold text-[#0D0D0E]'
+                          : 'text-[#0D0D0E]/50 group-hover:text-[#0D0D0E]'
                       }
                     >
                       0{item.id} · {item.tag}
                     </span>
-                    <span className="text-[#20231F]/40 hidden sm:inline">
+                    <span className="text-[#0D0D0E]/40 hidden sm:inline">
                       F{String(item.frameRange[0]).padStart(3, '0')}–
                       {String(item.frameRange[1]).padStart(3, '0')}
                     </span>

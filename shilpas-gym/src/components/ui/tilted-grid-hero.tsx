@@ -130,11 +130,11 @@ export type TiltedGridHeroProps = {
 
 export function TiltedGridHero({
   images,
-  speed = 4,
-  tileHeight = 26,
+  speed = 1.8,
+  tileHeight = 36,
   aspectRatio = 16 / 9,
   gap = 6,
-  axis = 56,
+  axis = 50,
   curve = 80,
   fade = 12,
   slices,

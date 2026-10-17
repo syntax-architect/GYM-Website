@@ -79,7 +79,7 @@ const TestimonialCarousel = React.forwardRef<
                 key={testimonial.id}
                 className={cn(
                   "absolute inset-0 rounded-2xl cursor-grab active:cursor-grabbing",
-                  "bg-white dark:bg-[#1C1F1B] border border-[#20231F]/10 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col justify-between",
+                  "bg-white dark:bg-[#1C1F1B] border border-[#0D0D0E]/10 dark:border-white/10 shadow-2xl overflow-hidden flex flex-col justify-between",
                 )}
                 style={{
                   zIndex: isCurrentCard ? 3 : isPrevCard ? 2 : 1,
@@ -116,7 +116,7 @@ const TestimonialCarousel = React.forwardRef<
                         e.stopPropagation();
                         handlePrev();
                       }}
-                      className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-[#FF6747] hover:text-white transition-colors flex items-center justify-center text-sm font-bold text-gray-500 cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-[#D9381E] hover:text-white transition-colors flex items-center justify-center text-sm font-bold text-gray-500 cursor-pointer"
                     >
                       &larr;
                     </button>
@@ -127,7 +127,7 @@ const TestimonialCarousel = React.forwardRef<
                         e.stopPropagation();
                         handleNext();
                       }}
-                      className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-[#FF6747] hover:text-white transition-colors flex items-center justify-center text-sm font-bold text-gray-500 cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 hover:bg-[#D9381E] hover:text-white transition-colors flex items-center justify-center text-sm font-bold text-gray-500 cursor-pointer"
                     >
                       &rarr;
                     </button>
@@ -139,19 +139,19 @@ const TestimonialCarousel = React.forwardRef<
                     <img
                       src={testimonial.avatar}
                       alt={testimonial.name}
-                      className="w-20 h-20 rounded-full object-cover shadow-lg border-2 border-[#FF6747]"
+                      className="w-20 h-20 rounded-full object-cover shadow-lg border-2 border-[#D9381E]"
                     />
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#174D3B] border-2 border-white flex items-center justify-center">
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#141311] border-2 border-white flex items-center justify-center">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#E3E879]" />
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold uppercase tracking-tight text-[#20231F] dark:text-white">
+                    <h3 className="text-lg font-bold uppercase tracking-tight text-[#0D0D0E] dark:text-white">
                       {testimonial.name}
                     </h3>
                     {testimonial.role && (
-                      <p className="text-[11px] font-mono font-semibold text-[#FF6747] uppercase tracking-wider">
+                      <p className="text-[11px] font-mono font-semibold text-[#D9381E] uppercase tracking-wider">
                         {testimonial.role}
                       </p>
                     )}
@@ -162,9 +162,9 @@ const TestimonialCarousel = React.forwardRef<
                   </p>
                 </div>
 
-                <div className="px-6 py-2.5 bg-[#FAF8F4] dark:bg-[#151714] border-t border-[#20231F]/5 dark:border-white/5 flex items-center justify-between text-[10px] font-mono text-[#20231F]/60 dark:text-white/60">
+                <div className="px-6 py-2.5 bg-[#FAF8F4] dark:bg-[#151714] border-t border-[#0D0D0E]/5 dark:border-white/5 flex items-center justify-between text-[10px] font-mono text-[#0D0D0E]/60 dark:text-white/60">
                   <span>SWIPE CARD &bull; DRAG</span>
-                  <span className="text-[#174D3B] dark:text-[#E3E879] font-bold">ON-FLOOR COACH</span>
+                  <span className="text-[#141311] dark:text-[#E3E879] font-bold">ON-FLOOR COACH</span>
                 </div>
               </motion.div>
             );
@@ -181,8 +181,8 @@ const TestimonialCarousel = React.forwardRef<
                   className={cn(
                     "w-2.5 h-2.5 rounded-full transition-all cursor-pointer",
                     index === currentIndex
-                      ? "bg-[#FF6747] w-6"
-                      : "bg-[#20231F]/20 dark:bg-white/20 hover:bg-[#20231F]/40",
+                      ? "bg-[#D9381E] w-6"
+                      : "bg-[#0D0D0E]/20 dark:bg-white/20 hover:bg-[#0D0D0E]/40",
                   )}
                 />
               ))}

@@ -48,7 +48,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Dimmed backdrop */}
       <div
-        className="fixed inset-0 bg-[#20231F]/60 transition-opacity duration-300"
+        className="fixed inset-0 bg-[#0D0D0E]/60 transition-opacity duration-300"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -64,10 +64,10 @@ export const Drawer: React.FC<DrawerProps> = ({
         {/* Drawer Header */}
         <div className="flex items-start justify-between p-6 bg-[#FAF8F4] sticky top-0 z-20">
           <div>
-            <span className="text-sm text-[#FF6747] font-bold block mb-1">
+            <span className="text-sm text-[#D9381E] font-bold block mb-1">
               Appointment Portal
             </span>
-            <h3 id="drawer-title" className="font-display text-xl font-bold text-[#20231F] uppercase tracking-tight">
+            <h3 id="drawer-title" className="font-display text-xl font-bold text-[#0D0D0E] uppercase tracking-tight">
               {title}
             </h3>
             {subtitle && (
@@ -78,7 +78,7 @@ export const Drawer: React.FC<DrawerProps> = ({
           <button
             onClick={onClose}
             aria-label="Close drawer"
-            className="w-10 h-10 rounded-full border-2 border-[#20231F]/15 bg-white text-[#20231F] hover:bg-[#20231F] hover:text-[#F5F2EA] flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-xs"
+            className="w-10 h-10 rounded-full border-2 border-[#0D0D0E]/15 bg-white text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-[#F5F2EA] flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-xs"
           >
             <X className="w-5 h-5" />
           </button>

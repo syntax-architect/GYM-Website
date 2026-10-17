@@ -18,7 +18,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
   scrollProgress = 0,
   interactivePointer = true,
   className = '',
-  autoRotateSpeed = 0.35,
+  autoRotateSpeed = 1.1,
   finish = 'signature',
   exploded = false,
   wireframe = false,
@@ -73,23 +73,26 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     mats.collar.wireframe = wireframe;
 
     if (finish === 'signature') {
-      mats.persimmon.color.set('#FF6747');
-      mats.persimmon.metalness = 0.24;
-      mats.persimmon.roughness = 0.35;
-      mats.persimmon.clearcoat = 0.45;
+      // Left Head: Anodized Infrared Crimson Steel
+      mats.persimmon.color.set('#D9381E');
+      mats.persimmon.metalness = 0.62;
+      mats.persimmon.roughness = 0.24;
+      mats.persimmon.clearcoat = 0.65;
 
-      mats.periwinkle.color.set('#8177FF');
-      mats.periwinkle.metalness = 0.24;
-      mats.periwinkle.roughness = 0.35;
-      mats.periwinkle.clearcoat = 0.45;
+      // Right Head: Brushed Champagne Gold (Luxury Salon Wing)
+      mats.periwinkle.color.set('#C5A059');
+      mats.periwinkle.metalness = 0.86;
+      mats.periwinkle.roughness = 0.22;
+      mats.periwinkle.clearcoat = 0.7;
 
-      mats.carbon.color.set('#20231F');
-      mats.carbon.metalness = 0.78;
-      mats.carbon.roughness = 0.5;
+      // Center Shaft: Knurled Obsidian Gunmetal
+      mats.carbon.color.set('#141416');
+      mats.carbon.metalness = 0.88;
+      mats.carbon.roughness = 0.36;
 
-      mats.collar.color.set('#3A3F39');
-      mats.collar.metalness = 0.88;
-      mats.collar.roughness = 0.25;
+      mats.collar.color.set('#2C2C30');
+      mats.collar.metalness = 0.92;
+      mats.collar.roughness = 0.2;
     } else if (finish === 'stealth') {
       // Matte Black Oxide & Gunmetal knurling
       mats.persimmon.color.set('#1E201E');
@@ -171,33 +174,33 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
 
     // MATERIALS
     const persimmonMaterial = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#FF6747'),
-      metalness: 0.24,
-      roughness: 0.35,
-      clearcoat: 0.45,
+      color: new THREE.Color('#D9381E'),
+      metalness: 0.62,
+      roughness: 0.24,
+      clearcoat: 0.65,
       clearcoatRoughness: 0.18,
       reflectivity: 0.55,
     });
 
     const periwinkleMaterial = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#8177FF'),
-      metalness: 0.24,
-      roughness: 0.35,
-      clearcoat: 0.45,
+      color: new THREE.Color('#C5A059'),
+      metalness: 0.86,
+      roughness: 0.22,
+      clearcoat: 0.7,
       clearcoatRoughness: 0.18,
       reflectivity: 0.55,
     });
 
     const carbonMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#20231F'),
-      metalness: 0.78,
-      roughness: 0.5,
+      color: new THREE.Color('#141416'),
+      metalness: 0.88,
+      roughness: 0.36,
     });
 
     const collarMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#3A3F39'),
-      metalness: 0.88,
-      roughness: 0.25,
+      color: new THREE.Color('#2C2C30'),
+      metalness: 0.92,
+      roughness: 0.2,
     });
 
     const internalBushingMaterial = new THREE.MeshStandardMaterial({
@@ -317,7 +320,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     }
     particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     const particleMaterial = new THREE.PointsMaterial({
-      color: new THREE.Color('#20231F'),
+      color: new THREE.Color('#0D0D0E'),
       size: 0.022,
       transparent: true,
       opacity: 0.18,
@@ -337,11 +340,11 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     keyLight.shadow.bias = -0.001;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight('#DDE8F8', 1.6);
+    const fillLight = new THREE.DirectionalLight('#E6DEC8', 1.6);
     fillLight.position.set(3.5, 2.0, 2.0);
     scene.add(fillLight);
 
-    const bounceLight = new THREE.DirectionalLight('#FF6747', 0.85);
+    const bounceLight = new THREE.DirectionalLight('#C5A059', 0.95);
     bounceLight.position.set(0, -2.5, -1.0);
     scene.add(bounceLight);
 
@@ -407,8 +410,8 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
           velocityRef.current.x *= 0.93;
           velocityRef.current.y *= 0.93;
 
-          // Continuous gentle auto-spin when released
-          const autoSpin = autoRotateSpeed * 0.35 * delta;
+          // Continuous fluid auto-spin (increased speed for dynamic metallic reflections)
+          const autoSpin = autoRotateSpeed * 0.85 * delta;
           rotationRef.current.y += velocityRef.current.x + autoSpin;
           rotationRef.current.x += velocityRef.current.y;
         } else {

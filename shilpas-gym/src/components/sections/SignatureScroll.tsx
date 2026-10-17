@@ -1,209 +1,443 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ScrollImageSequence } from '../ui/ScrollImageSequence';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-interface Principle {
-  id: string;
+gsap.registerPlugin(ScrollTrigger);
+
+interface PrincipleSpec {
+  id: number;
+  indexLabel: string;
   tag: string;
   title: string;
+  serifAccent: string;
   description: string;
-  spec: string;
+  metaLeftLabel: string;
+  metaLeftValue: string;
+  badge: string;
+  frameRange: [number, number];
+  /** Normalized SVG coordinates (0-1000 viewBox) on the 3D dumbbell for Valmora leader line */
+  targetX: number;
+  targetY: number;
 }
 
-const PRINCIPLES: Principle[] = [
+const PRINCIPLES: PrincipleSpec[] = [
   {
-    id: 'equipment',
-    tag: 'Modern Equipment',
-    title: 'The Best Machines Give The Best Feeling',
-    description: 'Imported biomechanical selectorized machines, plate-loaded leg presses, Olympic power cages, and calibrated free weights designed for targeted muscle isolation and joint safety.',
-    spec: 'Range: Calibrated Heavy Machinery',
+    id: 1,
+    indexLabel: '01 / 03',
+    tag: 'MODERN EQUIPMENT',
+    title: 'CALIBRATED',
+    serifAccent: 'Machinery.',
+    description:
+      'Imported biomechanical selectorized machines, plate-loaded leg presses, Olympic power cages, and calibrated free weights engineered for targeted muscle isolation and joint safety.',
+    metaLeftLabel: 'RANGE',
+    metaLeftValue: 'Calibrated Heavy Machinery',
+    badge: 'STUDIO STANDARD',
+    frameRange: [1, 64],
+    targetX: 430,
+    targetY: 360,
   },
   {
-    id: 'coaching',
-    tag: 'Floor Coaching',
-    title: 'Supportive & Attentive Personal Guidance',
-    description: 'Certified male and female fitness instructors teach proper lifting form, structure progressive overload, and help you reach sustainable fat loss or strength goals.',
-    spec: 'Coaching: Certified Trainers On-Floor',
+    id: 2,
+    indexLabel: '02 / 03',
+    tag: 'FLOOR COACHING',
+    title: 'BIOMECHANICAL',
+    serifAccent: 'Supervision.',
+    description:
+      'Certified male and female floor coaches monitor every compound lift, correcting spinal alignment, tempo cadence, and progressive overload without ego-lifting.',
+    metaLeftLabel: 'SUPERVISION',
+    metaLeftValue: '1-on-1 & Floor Biomechanics',
+    badge: 'CERTIFIED STAFF',
+    frameRange: [65, 128],
+    targetX: 500,
+    targetY: 495,
   },
   {
-    id: 'salon',
-    tag: 'Private Wing',
-    title: 'Dedicated Unisex Salon & Makeup Studio',
-    description: 'A completely separate, hygienic unisex parlour wing featuring top-rated keratin hair smoothing, revitalizing hair spas, and professional HD bridal and party makeover artistry.',
-    spec: 'Services: Keratin, Hair Spa & Bridal Studio',
+    id: 3,
+    indexLabel: '03 / 03',
+    tag: 'PRIVATE WING',
+    title: 'LUXURY SALON',
+    serifAccent: 'Sanctuary.',
+    description:
+      'An acoustically separated, air-conditioned beauty wing featuring formaldehyde-free keratin smoothing, restorative hair botox spas, and high-definition bridal artistry.',
+    metaLeftLabel: 'SERVICES',
+    metaLeftValue: 'Keratin, Hair Spa & Bridal Studio',
+    badge: 'PRIVATE SUITE',
+    frameRange: [129, 192],
+    targetX: 575,
+    targetY: 635,
   },
 ];
 
 export const SignatureScroll: React.FC = () => {
-  const [activePrincipleIndex, setActivePrincipleIndex] = useState(0);
-  const [scrollNormalized, setScrollNormalized] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const currentFrameRef = useRef<number>(1);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!scrollContainerRef.current) return;
-      const rect = scrollContainerRef.current.getBoundingClientRect();
-      const containerHeight = scrollContainerRef.current.offsetHeight - window.innerHeight;
-      if (containerHeight <= 0) return;
+  const [currentFrame, setCurrentFrame] = useState<number>(1);
+  const [totalFrames, setTotalFrames] = useState<number>(192);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
-      const progress = Math.max(0, Math.min(1, -rect.top / containerHeight));
-      setScrollNormalized(progress);
+  // Render specific frame onto canvas with cover/contain scaling
+  const renderFrame = useCallback((frameNumber: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      if (progress < 0.35) {
-        setActivePrincipleIndex(0);
-      } else if (progress < 0.70) {
-        setActivePrincipleIndex(1);
-      } else {
-        setActivePrincipleIndex(2);
-      }
-    };
+    const img = imagesRef.current[frameNumber - 1];
+    if (!img || !img.complete || img.naturalWidth === 0) return;
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+    }
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, width, height);
+
+    // Draw image centered with clean aspect ratio preservation
+    const imgAspect = img.naturalWidth / img.naturalHeight;
+    const canvasAspect = width / height;
+
+    let drawWidth = width;
+    let drawHeight = height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasAspect > imgAspect) {
+      drawHeight = height * 0.92;
+      drawWidth = drawHeight * imgAspect;
+      offsetX = (width - drawWidth) / 2;
+      offsetY = (height - drawHeight) / 2;
+    } else {
+      drawWidth = width * 0.95;
+      drawHeight = drawWidth / imgAspect;
+      offsetX = (width - drawWidth) / 2;
+      offsetY = (height - drawHeight) / 2;
+    }
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    ctx.restore();
   }, []);
 
-  const currentPrinciple = PRINCIPLES[activePrincipleIndex];
-  const currentDegrees = Math.round(scrollNormalized * 360);
-  const currentFrame = Math.min(192, Math.max(1, Math.round(scrollNormalized * 191) + 1));
+  // Preload WebP frame sequence (Desktop 192 frames / Mobile 96 frames)
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    const count = isMobile ? 96 : 192;
+    setTotalFrames(count);
 
-  const handleScrubberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    setScrollNormalized(val);
-    if (scrollContainerRef.current) {
-      const containerHeight = scrollContainerRef.current.offsetHeight - window.innerHeight;
-      const targetY = scrollContainerRef.current.offsetTop + (val * containerHeight);
-      window.scrollTo({ top: targetY, behavior: 'instant' });
+    const loadedImages: HTMLImageElement[] = new Array(count);
+    imagesRef.current = loadedImages;
+
+    for (let i = 1; i <= count; i++) {
+      const img = new Image();
+      const padded = String(i).padStart(4, '0');
+      img.src = isMobile
+        ? `/assets/sequences/v04-sculpture/mobile/${padded}.webp`
+        : `/assets/sequences/v04-sculpture/${padded}.webp`;
+
+      if (i === 1) {
+        img.onload = () => {
+          renderFrame(1);
+        };
+      }
+      loadedImages[i - 1] = img;
     }
+
+    const handleResize = () => renderFrame(currentFrameRef.current);
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, [renderFrame]);
+
+  // GSAP ScrollTrigger Scrubbing
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: container,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.5,
+        onUpdate: (self) => {
+          const progress = self.progress;
+          const frameIndex = Math.max(
+            1,
+            Math.min(totalFrames, Math.round(progress * (totalFrames - 1)) + 1)
+          );
+
+          if (frameIndex !== currentFrameRef.current) {
+            currentFrameRef.current = frameIndex;
+            setCurrentFrame(frameIndex);
+            renderFrame(frameIndex);
+          }
+
+          if (progress < 0.34) {
+            setActiveIndex(0);
+          } else if (progress < 0.67) {
+            setActiveIndex(1);
+          } else {
+            setActiveIndex(2);
+          }
+        },
+      });
+    }, container);
+
+    return () => ctx.revert();
+  }, [totalFrames, renderFrame]);
+
+  // Allow user to click a pill on the right to jump/scrub to that principle
+  const handleSelectPrinciple = (idx: number) => {
+    setActiveIndex(idx);
+    const targetProgress = idx === 0 ? 0.12 : idx === 1 ? 0.5 : 0.88;
+    const targetFrame = Math.max(1, Math.round(targetProgress * totalFrames));
+    currentFrameRef.current = targetFrame;
+    setCurrentFrame(targetFrame);
+    renderFrame(targetFrame);
   };
 
+  const activeSpec = PRINCIPLES[activeIndex];
+  const turnDegrees = Math.round(((currentFrame - 1) / Math.max(1, totalFrames - 1)) * 360);
+  const paddedFrame = String(currentFrame).padStart(4, '0');
+  const paddedTotal = String(totalFrames).padStart(4, '0');
+
   return (
-    <section id="signature" ref={scrollContainerRef} className="relative w-full bg-[#F5F2EA]">
-      <ScrollImageSequence
-        sequencePath="/assets/sequences/v04-sculpture"
-        frameCount={192}
-        width={960}
-        height={540}
-        poster="/assets/sequences/v04-sculpture/poster.webp"
-        mobileSequence="/assets/sequences/v04-sculpture/mobile"
-        mobileFrameCount={96}
-        scrollDistance="140vh"
-        objectFit="contain"
-        className="w-full"
-      >
-        {/* Interactive Scrub Progress Bar at Top of Viewport */}
-        <div className="absolute top-0 inset-x-0 h-2 bg-[#20231F]/10 z-30 group">
-          <motion.div
-            className="h-full bg-gradient-to-r from-[#FF6747] via-[#8177FF] to-[#FF6747]"
-            style={{ width: `${Math.round(scrollNormalized * 100)}%` }}
-          />
-          {/* Invisible range input overlay for direct scrub dragging */}
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.005"
-            value={scrollNormalized}
-            onChange={handleScrubberChange}
-            aria-label="Scrub 3D frame sequence"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize pointer-events-auto"
+    <section
+      id="signature"
+      ref={containerRef}
+      className="relative w-full h-[280vh] bg-[#E8E4DC] text-[#20231F] select-none"
+    >
+      {/* Sticky Full-Viewport Stage */}
+      <div className="sticky top-0 left-0 w-full h-screen overflow-hidden flex flex-col justify-between py-20 sm:py-24">
+        {/* Radial Studio Backlight */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(circle at 52% 50%, rgba(255, 255, 255, 0.78) 0%, rgba(232, 228, 220, 0.35) 55%, rgba(220, 215, 205, 0.9) 100%)',
+          }}
+        />
+
+        {/* 192-Frame Sequence Canvas */}
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full max-w-[1150px] max-h-[82vh]"
           />
         </div>
 
-        {/* Top Telemetry Bar */}
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 flex justify-between items-start pointer-events-none pt-4">
-          <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xs border border-[#20231F]/5 flex items-center gap-2.5">
+        {/* VALMORA 1PX SVG ANATOMICAL LEADER LINE OVERLAY (Desktop) */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 1000 1000"
+          preserveAspectRatio="none"
+          className="pointer-events-none hidden lg:block absolute inset-0 w-full h-full z-20"
+        >
+          {/* Diagonal 1px Leader Line from Left Spec Card to 3D Dumbbell Target */}
+          <line
+            x1="365"
+            y1="520"
+            x2={activeSpec.targetX}
+            y2={activeSpec.targetY}
+            stroke="#20231F"
+            strokeWidth="1.2"
+            strokeDasharray="3 3"
+            opacity="0.45"
+          />
+          <line
+            x1="365"
+            y1="520"
+            x2={activeSpec.targetX}
+            y2={activeSpec.targetY}
+            stroke="#FF6747"
+            strokeWidth="1.5"
+            opacity="0.85"
+          />
+
+          {/* Anchor Node on Spec Card Edge */}
+          <circle cx="365" cy="520" r="3.5" fill="#FF6747" />
+
+          {/* Target Reticle on 3D Sculpture */}
+          <circle
+            cx={activeSpec.targetX}
+            cy={activeSpec.targetY}
+            r="5"
+            fill="#FF6747"
+          />
+          <circle
+            cx={activeSpec.targetX}
+            cy={activeSpec.targetY}
+            r="14"
+            fill="none"
+            stroke="#FF6747"
+            strokeWidth="1.2"
+            opacity="0.6"
+          />
+          <circle
+            cx={activeSpec.targetX}
+            cy={activeSpec.targetY}
+            r="22"
+            fill="none"
+            stroke="#20231F"
+            strokeWidth="0.8"
+            strokeDasharray="2 4"
+            opacity="0.35"
+          />
+        </svg>
+
+        {/* TOP TELEMETRY HUD BAR */}
+        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-4">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-[#20231F]/12 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-[#FF6747] animate-pulse" />
-            <span className="text-xs sm:text-sm text-[#20231F] uppercase font-bold tracking-wider">
-              360° Precision Biomechanics Sequence
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#20231F]">
+              360° PRECISION BIOMECHANICS SEQUENCE
             </span>
           </div>
 
-          <div className="flex items-center gap-3 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xs border border-[#20231F]/5 text-xs sm:text-sm text-[#20231F] font-semibold tabular-nums">
-            <span className="w-2 h-2 rounded-full bg-[#8177FF]" />
-            <span>Turn: {currentDegrees}°</span>
-            <span className="text-[#20231F]/30">|</span>
-            <span className="font-mono text-[#174D3B]">FRAME {currentFrame.toString().padStart(4, '0')} / 0192</span>
-            <span className="text-[#20231F]/30">|</span>
-            <span className="text-[#FF6747] font-bold">{currentPrinciple.tag}</span>
+          <div className="inline-flex items-center gap-3 sm:gap-4 px-5 py-2 rounded-full bg-white/90 backdrop-blur-md border border-[#20231F]/12 shadow-xs font-mono text-xs font-bold text-[#20231F]">
+            <span className="tabular-nums">Turn: {turnDegrees}°</span>
+            <span className="text-[#20231F]/25">|</span>
+            <span className="tabular-nums text-[#20231F]/70">
+              FRAME {paddedFrame} / {paddedTotal}
+            </span>
+            <span className="text-[#20231F]/25 hidden sm:inline">|</span>
+            <span className="text-[#FF6747] uppercase tracking-wider hidden sm:inline">
+              {activeSpec.tag}
+            </span>
           </div>
         </div>
 
-        {/* Principle Card Revealed by Scroll */}
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 flex flex-col md:flex-row items-end justify-between gap-6 pointer-events-none pb-8 sm:pb-12">
-          {/* Active Principle Card */}
-          <div className="w-full max-w-lg min-h-[200px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentPrinciple.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="w-full p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-3xl shadow-xl pointer-events-auto"
-              >
-                <div className="bg-white p-6 sm:p-8 rounded-[calc(1.5rem-0.25rem)] shadow-xs">
-                  <div className="flex items-center justify-between gap-4 mb-3">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#FF6747]/10 text-[#FF6747] border border-[#FF6747]/20">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747] animate-pulse" />
-                      {currentPrinciple.tag}
-                    </span>
-                    <span className="text-xs font-mono font-bold text-[#174D3B] uppercase tracking-wider">
-                      Principle 0{activePrincipleIndex + 1} / 03
-                    </span>
-                  </div>
+        {/* CENTER INTERACTIVE CALLOUT STAGE (Left Macro Spec Card + Right Quick Switcher) */}
+        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          {/* Left: Valmora-Style Macro Specification Card */}
+          <div className="w-full max-w-md bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-[#20231F]/12 shadow-sculptural transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <span className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#FF6747]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6747]" />
+                {activeSpec.tag}
+              </span>
+              <span className="font-serif italic text-2xl sm:text-3xl text-[#20231F]/45">
+                {activeSpec.indexLabel}
+              </span>
+            </div>
 
-                  <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-[#20231F] tracking-tight mb-3 leading-snug">
-                    {currentPrinciple.title}
-                  </h3>
+            <h3 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#20231F] leading-[1.02] mb-3">
+              {activeSpec.title}{' '}
+              <span className="font-serif italic font-normal capitalize text-[#FF6747]">
+                {activeSpec.serifAccent}
+              </span>
+            </h3>
 
-                  <p className="text-sm sm:text-base text-[#3E423C] leading-relaxed mb-6 font-normal">
-                    {currentPrinciple.description}
-                  </p>
+            <p className="font-sans text-sm sm:text-base text-[#4C514A] leading-relaxed mb-6">
+              {activeSpec.description}
+            </p>
 
-                  <div className="pt-3.5 border-t border-[#20231F]/10 flex items-center justify-between text-xs sm:text-sm text-[#20231F]/80 font-bold">
-                    <span className="font-mono text-[#174D3B]">{currentPrinciple.spec}</span>
-                    <span className="px-2.5 py-1 rounded-full bg-[#174D3B]/10 text-[#174D3B] text-[11px] font-extrabold uppercase tracking-wider">
-                      Studio Standard
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+            <div className="pt-4 border-t border-[#20231F]/10 flex items-center justify-between gap-3">
+              <div>
+                <span className="block font-mono text-[10px] uppercase tracking-widest text-[#20231F]/50">
+                  {activeSpec.metaLeftLabel}
+                </span>
+                <span className="font-sans text-xs sm:text-sm font-bold text-[#20231F]">
+                  {activeSpec.metaLeftValue}
+                </span>
+              </div>
+
+              <span className="px-3 py-1 rounded-full bg-[#174D3B]/10 text-[#174D3B] font-mono text-[10px] font-bold uppercase tracking-widest">
+                {activeSpec.badge}
+              </span>
+            </div>
           </div>
 
-          {/* Principle Navigation Segmented Pill Dock */}
-          <div className="flex md:flex-col gap-2 pointer-events-auto p-2 bg-[#20231F]/5 ring-1 ring-[#20231F]/10 rounded-2xl md:rounded-3xl shadow-md backdrop-blur-md">
-            {PRINCIPLES.map((p, idx) => {
-              const isActive = activePrincipleIndex === idx;
+          {/* Right: Interactive Hotspot Selector Dock */}
+          <div className="flex flex-row lg:flex-col gap-2.5 w-full lg:w-64 overflow-x-auto pb-2 lg:pb-0">
+            {PRINCIPLES.map((item, idx) => {
+              const isSelected = idx === activeIndex;
               return (
                 <button
-                  key={p.id}
+                  key={item.id}
                   type="button"
-                  onClick={() => {
-                    if (scrollContainerRef.current) {
-                      const top = scrollContainerRef.current.offsetTop + (idx * window.innerHeight * 0.45);
-                      window.scrollTo({ top, behavior: 'smooth' });
-                    }
-                  }}
-                  className={`px-5 py-3 rounded-xl md:rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-between gap-3 border-2 ${
-                    isActive
-                      ? 'bg-[#20231F] text-[#F5F2EA] border-[#20231F] shadow-md'
-                      : 'bg-white/80 text-[#20231F]/80 border-[#20231F]/10 hover:border-[#FF6747]/60 hover:text-[#20231F] hover:bg-white'
+                  onClick={() => handleSelectPrinciple(idx)}
+                  className={`flex-1 lg:flex-none px-4 py-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 ${
+                    isSelected
+                      ? 'bg-[#20231F] text-[#F5F2EA] border-[#20231F] shadow-lg'
+                      : 'bg-white/85 text-[#20231F] border-[#20231F]/12 hover:bg-white'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-[#FF6747] animate-pulse' : 'bg-[#20231F]/20'}`} />
-                    {p.tag}
-                  </span>
-                  <span className={`font-mono text-[10px] px-2 py-0.5 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-[#20231F]/5 text-[#20231F]/60'}`}>
-                    0{idx + 1}
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        isSelected ? 'bg-[#FF6747]' : 'bg-[#20231F]/30'
+                      }`}
+                    />
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider whitespace-nowrap">
+                      {item.tag}
+                    </span>
+                  </div>
+                  <span
+                    className={`font-mono text-[11px] px-2 py-0.5 rounded-md ${
+                      isSelected
+                        ? 'bg-white/15 text-white'
+                        : 'bg-[#20231F]/8 text-[#20231F]/70'
+                    }`}
+                  >
+                    #{item.id}
                   </span>
                 </button>
               );
             })}
           </div>
         </div>
-      </ScrollImageSequence>
+
+        {/* BOTTOM TIMELINE SCRUBBER BAR (Valmora 01 - 02 - 03 Progress Line) */}
+        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-3 gap-4 pt-3 border-t border-[#20231F]/15">
+            {PRINCIPLES.map((item, idx) => {
+              const isSelected = idx === activeIndex;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleSelectPrinciple(idx)}
+                  className="text-left group cursor-pointer"
+                >
+                  <div className="h-1 w-full bg-[#20231F]/12 rounded-full overflow-hidden mb-2">
+                    <div
+                      className={`h-full transition-all duration-300 ${
+                        isSelected ? 'w-full bg-[#FF6747]' : 'w-0 bg-transparent'
+                      }`}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-wider">
+                    <span
+                      className={
+                        isSelected
+                          ? 'font-bold text-[#20231F]'
+                          : 'text-[#20231F]/50 group-hover:text-[#20231F]'
+                      }
+                    >
+                      0{item.id} · {item.tag}
+                    </span>
+                    <span className="text-[#20231F]/40 hidden sm:inline">
+                      F{String(item.frameRange[0]).padStart(3, '0')}–
+                      {String(item.frameRange[1]).padStart(3, '0')}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
+
+export default SignatureScroll;

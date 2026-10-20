@@ -210,7 +210,7 @@ export const TransformationVisualizer: React.FC<TransformationVisualizerProps> =
             {/* AFTER IMAGE (Full Underlying Layer) */}
             <img
               src={currentCase.afterImage}
-              alt={`${currentCase.clientName} - ${currentCase.afterLabel} at Shilpa's Gym & Salon in Khardaha`}
+              alt={`${currentCase.title} - ${currentCase.afterLabel} at Shilpa's Gym & Salon in Khardaha`}
               loading="lazy"
               decoding="async"
               width={900}
@@ -227,7 +227,7 @@ export const TransformationVisualizer: React.FC<TransformationVisualizerProps> =
             >
               <img
                 src={currentCase.beforeImage}
-                alt={`${currentCase.clientName} - ${currentCase.beforeLabel} at Shilpa's Gym & Salon in Khardaha`}
+                alt={`${currentCase.title} - ${currentCase.beforeLabel} at Shilpa's Gym & Salon in Khardaha`}
                 loading="lazy"
                 decoding="async"
                 width={900}

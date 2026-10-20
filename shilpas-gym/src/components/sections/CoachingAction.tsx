@@ -326,7 +326,7 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
                     >
                       <img
                         src={member.image}
-                        alt={`${member.name} (${member.roleBengali}) - Certified Coach at Shilpa's Gym in Rahara, Khardaha`}
+                        alt={`${member.name} (${member.role}) - Certified Coach at Shilpa's Gym in Rahara, Khardaha`}
                         loading="lazy"
                         decoding="async"
                         width={400}

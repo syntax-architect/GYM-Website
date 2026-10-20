@@ -1,14 +1,17 @@
 import React from 'react';
 import { Star, ShieldCheck, Flame, Sparkles, Clock, MapPin } from 'lucide-react';
+import { useCmsStore } from '../../store/cmsStore';
 
 export const KineticTicker: React.FC = () => {
+  const brand = useCmsStore((s) => s.brand);
+
   const items = [
-    { icon: <Star className="w-3.5 h-3.5 fill-[#D9381E] text-[#D9381E]" />, label: '4.7 RATED ACROSS 355+ GOOGLE REVIEWS' },
+    { icon: <Star className="w-3.5 h-3.5 fill-[#D9381E] text-[#D9381E]" />, label: `${brand.googleRating} RATED ACROSS ${brand.reviewCount} GOOGLE REVIEWS` },
     { icon: <ShieldCheck className="w-3.5 h-3.5 text-[#C5A059]" />, label: 'BIOMECHANICAL TRAINING ATELIER' },
     { icon: <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />, label: 'PRIVATE UNISEX SALON & BRIDAL STUDIO' },
     { icon: <Flame className="w-3.5 h-3.5 text-[#D9381E]" />, label: 'CERTIFIED REHAB & HYPERTROPHY COACHES' },
-    { icon: <Clock className="w-3.5 h-3.5 text-[#E6DEC8]" />, label: 'OPEN DAILY 06:00 AM – 10:00 PM' },
-    { icon: <MapPin className="w-3.5 h-3.5 text-[#D9381E]" />, label: 'RAHARA & KHARDAHA · KOLKATA 700118' },
+    { icon: <Clock className="w-3.5 h-3.5 text-[#E6DEC8]" />, label: `OPEN DAILY ${brand.hours}` },
+    { icon: <MapPin className="w-3.5 h-3.5 text-[#D9381E]" />, label: `${brand.locationShort} · ${brand.plusCode}` },
   ];
 
   return (

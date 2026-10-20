@@ -135,7 +135,7 @@ export const ClassFinder: React.FC<ClassFinderProps> = ({ onSelectClass }) => {
               <span>ACT VI // THE PLAYBOOK & CONCIERGE</span>
             </div>
 
-            <h2 className="font-display text-4xl sm:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
+            <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
               THE STUDIO{' '}
               <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
                 Playbook.
@@ -149,7 +149,7 @@ export const ClassFinder: React.FC<ClassFinderProps> = ({ onSelectClass }) => {
           </div>
 
           {/* Oddball Q1-Q4 Game Clock Switcher (00:14-00:17 Motif) */}
-          <div className="flex flex-wrap items-center gap-2 bg-[#141614] text-[#F5F2EA] p-2 rounded-2xl border border-[#0D0D0E]/15 self-start lg:self-end shadow-lg">
+          <div className="w-full sm:w-auto flex flex-wrap items-center justify-between sm:justify-start gap-1.5 sm:gap-2 bg-[#141614] text-[#F5F2EA] p-2 rounded-2xl border border-[#0D0D0E]/15 self-start lg:self-end shadow-lg">
             {QUARTERS.map((q, idx) => {
               const isSelected = activeQuarter === idx;
               return (
@@ -157,10 +157,10 @@ export const ClassFinder: React.FC<ClassFinderProps> = ({ onSelectClass }) => {
                   key={q.id}
                   type="button"
                   onClick={() => setActiveQuarter(idx)}
-                  className={`px-3.5 py-2 rounded-xl font-mono text-xs font-extrabold uppercase transition-all cursor-pointer ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-3.5 py-2 rounded-xl font-mono text-[11px] sm:text-xs font-extrabold uppercase transition-all cursor-pointer text-center ${
                     isSelected
-                      ? 'bg-[#D9381E] text-white shadow-sm'
-                      : 'bg-white/5 text-white/60 hover:text-white'
+                      ? 'bg-[#D9381E] text-white shadow-md'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {q.id}
@@ -371,7 +371,7 @@ export const ClassFinder: React.FC<ClassFinderProps> = ({ onSelectClass }) => {
           </div>
 
           {/* RIGHT 5 COLUMNS: Oddball Tactical Playbook Clipboard + Tailored Dossier */}
-          <div className="lg:col-span-5 sticky top-24 space-y-6">
+          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
             {/* Tactical SVG Clipboard Card */}
             <div className="bg-[#FAF8F4] p-5 sm:p-6 rounded-3xl border-4 border-[#0D0D0E] shadow-xl">
               <div className="flex items-center justify-between mb-3">

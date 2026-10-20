@@ -61,9 +61,9 @@ export const PulseformIntroLoader: React.FC<PulseformIntroLoaderProps> = ({ onCo
         <p className="font-mono text-xs uppercase tracking-widest text-[#D9381E] mb-3">
           IMMERSIVE TRAINING STUDIO
         </p>
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-extrabold uppercase tracking-tight leading-none text-[#0D0D0E]">
+        <div role="heading" aria-level={2} className="text-4xl sm:text-6xl md:text-7xl font-display font-extrabold uppercase tracking-tight leading-none text-[#0D0D0E]">
           PULSEFORM
-        </h1>
+        </div>
         <p className="font-mono text-xs sm:text-sm text-[#4C514A] mt-4 max-w-md">
           A physical training studio engineered around sculptural geometry, kinetic performance, and structural integrity.
         </p>

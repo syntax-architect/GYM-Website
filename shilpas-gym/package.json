@@ -12,6 +12,7 @@
     "process:all": "node scripts/process-sequences.js --all"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.95.0",
     "@types/three": "^0.186.0",
     "clsx": "^2.1.1",
     "framer-motion": "^13.4.3",

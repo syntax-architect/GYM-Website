@@ -1,127 +1,159 @@
 import React from 'react';
-import { ArrowUpRight, MapPin, Clock, Phone } from 'lucide-react';
+import { MapPin, Clock, Phone, ArrowUpRight, Compass, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { PULSEFORM_ASSETS } from '../../config/assets';
+import { useCmsStore } from '../../store/cmsStore';
 
 export interface ClosingPortalProps {
   onOpenInquiry: () => void;
 }
 
 export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) => {
+  const brand = useCmsStore((s) => s.brand);
+
   return (
-    <section id="location" className="relative w-full py-28 lg:py-36 px-4 sm:px-6 lg:px-12 bg-[#F5F2EA] overflow-hidden">
-      <div className="max-w-[1440px] mx-auto relative z-20">
-        {/* Architectural Portal Video Frame */}
-        <div className="relative w-full rounded-sm overflow-hidden bg-[#0D0D0E] mb-16">
-          <div className="aspect-[16/9] lg:aspect-[2.2/1] w-full overflow-hidden">
+    <section
+      id="location"
+      className="w-full py-24 sm:py-32 px-4 sm:px-8 lg:px-12 bg-[#F4F1EA] text-[#0D0D0E]"
+    >
+      <div className="max-w-[1440px] mx-auto space-y-12">
+        {/* Top Editorial Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-[#0D0D0E]/70 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
+              <span>FINAL ACT // PRIVATE VIEWING & LOCATION</span>
+            </div>
+
+            <h2 className="font-display text-4xl sm:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
+              STEP THROUGH THE{' '}
+              <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
+                Sanctuary.
+              </span>
+            </h2>
+          </div>
+
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0D0D0E] text-[#F4F1EA] font-mono text-xs uppercase tracking-wider self-start lg:self-end">
+            <Compass className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>PLUS CODE: {brand.plusCode} · {brand.locationShort}</span>
+          </div>
+        </div>
+
+        {/* Unified 12-Column Architectural Portal + Studio Location Dossier */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          {/* Left 7 Columns: 3D Architectural Portal Cinema */}
+          <div className="lg:col-span-7 relative min-h-[380px] sm:min-h-[460px] rounded-3xl overflow-hidden bg-[#141311] border border-[#0D0D0E]/15 shadow-2xl">
             <video
-              src={PULSEFORM_ASSETS.V09.src}
-              poster={PULSEFORM_ASSETS.I11.src}
+              src={brand.portalVideoUrl}
+              poster="/assets/images/i11-portal-still.webp"
+              preload="metadata"
               autoPlay
               loop
               muted
               playsInline
               className="w-full h-full object-cover"
+              style={{
+                filter: 'sepia(0.26) hue-rotate(-18deg) saturate(1.2) contrast(1.1)',
+              }}
             />
-          </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/25" />
 
-          {/* Clean Portal Footnote */}
-          <div className="absolute bottom-6 left-6 right-6 flex flex-wrap justify-between items-center bg-black/60 p-4 rounded-xs text-white">
-            <span className="text-sm font-bold uppercase tracking-wide">
-              Shilpa's Gym & Beauty Salon · Rahara Atelier
-            </span>
-            <span className="text-sm text-white/80">
-              Naskarhat Madhya Para, Khardaha
-            </span>
-          </div>
-        </div>
-
-        {/* Final Conversion CTA & Studio Location Deck */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#141311]/10 text-[#141311] text-xs font-extrabold uppercase tracking-widest mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E]" />
-              <span>Studio Location & Booking</span>
+            <div className="absolute top-4 left-4 sm:top-6 sm:left-6 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 font-mono text-[11px] text-white uppercase tracking-widest">
+              <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />
+              <span>ARCHITECTURAL PORTAL // {brand.locationShort} ATELIER</span>
             </div>
 
-            <h2 className="text-4xl sm:text-6xl font-display font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-[0.98]">
-              Visit Shilpa's Studio.
-            </h2>
+            <div className="absolute bottom-4 inset-x-4 sm:bottom-6 sm:inset-x-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <span className="block font-mono text-[10px] uppercase tracking-widest text-[#C5A059]">
+                  DUAL-WING FACILITY
+                </span>
+                <p className="font-display text-xl sm:text-2xl font-extrabold uppercase text-white">
+                  {brand.gymName.toUpperCase()}
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-white/90 text-[#0D0D0E] font-mono text-xs font-bold">
+                {brand.locationShort}
+              </span>
+            </div>
+          </div>
 
-            <p className="mt-5 text-sm sm:text-base lg:text-lg text-[#3C403A] font-normal leading-relaxed max-w-xl">
-              Experience the premier workout and salon atmosphere in Khardaha and Rahara. Calibrated biomechanical machines, certified trainers, and private salon care under one roof.
-            </p>
+          {/* Right 5 Columns: Private Viewing & Directions Card */}
+          <div className="lg:col-span-5 bg-white p-7 sm:p-10 rounded-3xl border border-[#0D0D0E]/12 shadow-sculptural flex flex-col justify-between space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#D9381E]">
+                  STUDIO DOSSIER
+                </span>
+                <span className="px-3 py-1 rounded-full bg-[#141311] text-[#C5A059] font-mono text-xs font-bold">
+                  {brand.googleRating}★ ({brand.reviewCount})
+                </span>
+              </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <h3 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-none">
+                VISIT {brand.gymName.toUpperCase()}{' '}
+                <span className="font-serif italic font-normal capitalize text-[#D9381E]">
+                  Studio.
+                </span>
+              </h3>
+
+              <p className="font-sans text-sm sm:text-base text-[#4A4843] leading-relaxed">
+                Experience the premier workout and salon atmosphere in {brand.locationShort}.
+                Calibrated biomechanical machines, certified trainers, and private salon care under
+                one roof.
+              </p>
+            </div>
+
+            <div className="space-y-3.5 py-5 border-y border-[#0D0D0E]/10 font-sans text-sm">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-[#D9381E] shrink-0 mt-1" />
+                <div>
+                  <span className="font-bold block text-[#0D0D0E]">
+                    {brand.gymName.toUpperCase()}
+                  </span>
+                  <span className="text-[#4A4843] text-xs sm:text-sm">
+                    {brand.fullAddress}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Clock className="w-4 h-4 text-[#D9381E] shrink-0" />
+                <span className="text-[#0D0D0E] font-medium">
+                  Open Daily: <strong className="font-mono">{brand.hours}</strong>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-[#D9381E] shrink-0" />
+                <a
+                  href={`tel:${brand.phone.replace(/[^0-9+]/g, '')}`}
+                  className="font-mono font-bold text-[#D9381E] hover:underline"
+                >
+                  {brand.phone}
+                </a>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 variant="primary"
                 size="lg"
                 onClick={onOpenInquiry}
                 icon={<ArrowUpRight className="w-4 h-4" />}
+                className="flex-1 justify-center"
               >
-                BOOK GYM / SALON VISIT
+                BOOK STUDIO VISIT
               </Button>
 
               <a
-                href="https://maps.google.com/?q=P9FM%2B6V+Rahara,+Kolkata,+West+Bengal"
+                href="https://www.google.com/maps/search/?api=1&query=Shilpa's+Gym+%26+Beauty+Salon+Rahara+Khardaha+Kolkata"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group px-6 py-3.5 rounded-full bg-white hover:bg-[#141311] hover:text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#0D0D0E] border-2 border-[#0D0D0E]/15 hover:border-[#141311] shadow-xs hover:shadow-md transition-all duration-300 flex items-center gap-3 cursor-pointer min-h-[54px] active:scale-[0.97]"
+                className="px-5 py-3.5 rounded-full bg-[#141311] hover:bg-[#0D0D0E] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
               >
-                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D9381E]/15 group-hover:bg-white/20 flex items-center justify-center transition-colors">
-                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D9381E] group-hover:text-white transition-colors" />
-                </span>
-                <span>OPEN IN GOOGLE MAPS</span>
+                <Compass className="w-4 h-4 text-[#C5A059]" />
+                <span>GOOGLE MAPS</span>
               </a>
-            </div>
-          </div>
-
-          {/* Physical Location & Hours Card (Double-Bezel Agency Card) */}
-          <div className="lg:col-span-5 p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-3xl shadow-lg">
-            <div className="bg-white p-7 sm:p-9 rounded-[calc(1.5rem-0.25rem)] shadow-xs">
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#0D0D0E]/10">
-                <h3 className="font-display font-extrabold text-lg uppercase tracking-tight text-[#0D0D0E]">
-                  Studio Location
-                </h3>
-                <span className="text-xs text-[#141311] font-extrabold bg-[#EDE9DF] px-3 py-1 rounded-full">
-                  Rated 4.7 (355+ Reviews)
-                </span>
-              </div>
-
-              <div className="space-y-5 text-xs sm:text-sm text-[#3C403A]">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#D9381E]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <MapPin className="w-4 h-4 text-[#D9381E]" />
-                  </div>
-                  <div>
-                    <span className="font-extrabold text-[#0D0D0E] block uppercase tracking-tight">SHILPA'S GYM & BEAUTY SALON</span>
-                    <span className="text-xs sm:text-sm leading-relaxed text-[#5A6057]">
-                      Naskarhat Madhya Para, Halder Bagan, Rahara, Khardaha, Kolkata 700118
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#141311]/10 flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-4 h-4 text-[#141311]" />
-                  </div>
-                  <div>
-                    <span className="font-extrabold text-[#0D0D0E]">Hours:</span> Open Daily 06:00 AM – 10:00 PM
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#D9381E]/10 flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-4 h-4 text-[#D9381E]" />
-                  </div>
-                  <div>
-                    <span className="font-extrabold text-[#0D0D0E]">Hotline:</span>{' '}
-                    <a href="tel:07439761994" className="hover:text-[#D9381E] font-extrabold tabular-nums underline decoration-[#D9381E]">
-                      074397 61994
-                    </a>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -129,3 +161,5 @@ export const ClosingPortal: React.FC<ClosingPortalProps> = ({ onOpenInquiry }) =
     </section>
   );
 };
+
+export default ClosingPortal;

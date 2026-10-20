@@ -78,15 +78,35 @@ export const SignatureScroll: React.FC = () => {
   const [totalFrames, setTotalFrames] = useState<number>(192);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
-  // Render specific frame onto canvas with cover/contain scaling
+  const batchLoadingStartedRef = useRef(false);
+
+  // Render specific frame onto canvas with cover/contain scaling & nearest-loaded fallback
   const renderFrame = useCallback((frameNumber: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const img = imagesRef.current[frameNumber - 1];
-    if (!img || !img.complete || img.naturalWidth === 0) return;
+    let img = imagesRef.current[frameNumber - 1];
+    if (!img || !img.complete || img.naturalWidth === 0) {
+      // Nearest-loaded-frame fallback so fast scrolling never flashes blank!
+      const total = imagesRef.current.length;
+      let closestImg: HTMLImageElement | null = null;
+      for (let offset = 1; offset < total; offset++) {
+        const left = frameNumber - 1 - offset;
+        const right = frameNumber - 1 + offset;
+        if (left >= 0 && imagesRef.current[left]?.complete && imagesRef.current[left].naturalWidth > 0) {
+          closestImg = imagesRef.current[left];
+          break;
+        }
+        if (right < total && imagesRef.current[right]?.complete && imagesRef.current[right].naturalWidth > 0) {
+          closestImg = imagesRef.current[right];
+          break;
+        }
+      }
+      if (!closestImg) return;
+      img = closestImg;
+    }
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const width = canvas.clientWidth;
@@ -126,7 +146,7 @@ export const SignatureScroll: React.FC = () => {
     ctx.restore();
   }, []);
 
-  // Preload WebP frame sequence (Desktop 192 frames / Mobile 96 frames)
+  // Progressive 2-Stage Preloader: Frame 1 immediately (~20KB), rest batched on scroll/idle
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
     const count = isMobile ? 96 : 192;
@@ -135,24 +155,95 @@ export const SignatureScroll: React.FC = () => {
     const loadedImages: HTMLImageElement[] = new Array(count);
     imagesRef.current = loadedImages;
 
-    for (let i = 1; i <= count; i++) {
-      const img = new Image();
-      const padded = String(i).padStart(4, '0');
-      img.src = isMobile
+    const getFrameUrl = (idx: number) => {
+      const padded = String(idx).padStart(4, '0');
+      return isMobile
         ? `/assets/sequences/v04-sculpture/mobile/${padded}.webp`
         : `/assets/sequences/v04-sculpture/${padded}.webp`;
+    };
 
-      if (i === 1) {
-        img.onload = () => {
-          renderFrame(1);
-        };
-      }
-      loadedImages[i - 1] = img;
+    // Stage 1: ONLY preload Frame 0001.webp on initial mount
+    const frame1 = new Image();
+    frame1.src = getFrameUrl(1);
+    frame1.onload = () => {
+      loadedImages[0] = frame1;
+      renderFrame(1);
+    };
+    loadedImages[0] = frame1;
+
+    // Stage 2: Batch-load frames 0002 to count in chunks of 16
+    const startBatchPreload = () => {
+      if (batchLoadingStartedRef.current) return;
+      batchLoadingStartedRef.current = true;
+
+      const BATCH_SIZE = 16;
+      let currentBatchStart = 2;
+
+      const loadNextChunk = () => {
+        if (currentBatchStart > count) return;
+        const currentBatchEnd = Math.min(count, currentBatchStart + BATCH_SIZE - 1);
+        let pending = currentBatchEnd - currentBatchStart + 1;
+
+        for (let i = currentBatchStart; i <= currentBatchEnd; i++) {
+          const img = new Image();
+          img.src = getFrameUrl(i);
+          img.onload = () => {
+            loadedImages[i - 1] = img;
+            pending--;
+            if (pending === 0) {
+              if ('requestIdleCallback' in window) {
+                (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback(loadNextChunk, { timeout: 200 });
+              } else {
+                setTimeout(loadNextChunk, 16);
+              }
+            }
+          };
+          img.onerror = () => {
+            pending--;
+            if (pending === 0) {
+              setTimeout(loadNextChunk, 16);
+            }
+          };
+          loadedImages[i - 1] = img;
+        }
+
+        currentBatchStart = currentBatchEnd + 1;
+      };
+
+      loadNextChunk();
+    };
+
+    // Trigger Stage 2 with IntersectionObserver (800px margin) or fallback idle
+    const container = containerRef.current;
+    let observer: IntersectionObserver | null = null;
+
+    if (container && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            startBatchPreload();
+            observer?.disconnect();
+          }
+        },
+        { rootMargin: '800px 0px' }
+      );
+      observer.observe(container);
+    } else {
+      setTimeout(startBatchPreload, 2500);
     }
+
+    const idleTimer = setTimeout(() => {
+      startBatchPreload();
+    }, 3000);
 
     const handleResize = () => renderFrame(currentFrameRef.current);
     window.addEventListener('resize', handleResize, { passive: true });
-    return () => window.removeEventListener('resize', handleResize);
+
+    return () => {
+      observer?.disconnect();
+      clearTimeout(idleTimer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [renderFrame]);
 
   // GSAP ScrollTrigger Scrubbing
@@ -214,8 +305,10 @@ export const SignatureScroll: React.FC = () => {
       ref={containerRef}
       className="relative w-full h-[280vh] bg-[#E8E4DC] text-[#0D0D0E] select-none z-10"
     >
+      <h2 className="sr-only">Signature 360° Biomechanical Sequence</h2>
+
       {/* Sticky Full-Viewport Stage */}
-      <div className="sticky top-0 left-0 w-full h-[100dvh] max-h-screen overflow-hidden flex flex-col justify-between pt-20 pb-5 sm:pt-24 sm:pb-6">
+      <div className="sticky top-0 left-0 w-full h-[100svh] overflow-hidden flex flex-col justify-between pt-16 sm:pt-24 pb-3 sm:pb-6">
         {/* Radial Studio Backlight */}
         <div
           aria-hidden="true"
@@ -226,11 +319,18 @@ export const SignatureScroll: React.FC = () => {
           }}
         />
 
-        {/* 192-Frame Sequence Canvas */}
-        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        {/* 192-Frame Sequence Canvas with Warm Bronze/Crimson Optical Grade & Vignette Mask */}
+        <div className="absolute inset-0 z-10 flex items-start sm:items-center justify-center pt-16 sm:pt-0 pointer-events-none">
           <canvas
             ref={canvasRef}
-            className="w-full h-full max-w-[1150px] max-h-[82vh]"
+            className="w-full h-full max-w-[1080px] max-h-[55vh] sm:max-h-[80vh]"
+            style={{
+              filter: 'sepia(0.24) hue-rotate(-14deg) saturate(1.25) contrast(1.06)',
+              WebkitMaskImage:
+                'radial-gradient(ellipse 68% 68% at 50% 50%, #000 62%, transparent 100%)',
+              maskImage:
+                'radial-gradient(ellipse 68% 68% at 50% 50%, #000 62%, transparent 100%)',
+            }}
           />
         </div>
 
@@ -294,15 +394,15 @@ export const SignatureScroll: React.FC = () => {
         </svg>
 
         {/* TOP TELEMETRY HUD BAR */}
-        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-[#D9381E] animate-pulse" />
-            <span className="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#0D0D0E]">
-              360° PRECISION BIOMECHANICS SEQUENCE
+        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-3 sm:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#D9381E] animate-pulse" />
+            <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#0D0D0E]">
+              360° PRECISION BIOMECHANICS
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-2.5 sm:gap-4 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs font-mono text-[11px] sm:text-xs font-bold text-[#0D0D0E]">
+          <div className="inline-flex items-center gap-2 sm:gap-4 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs font-mono text-[10px] sm:text-xs font-bold text-[#0D0D0E]">
             <span className="tabular-nums">Turn: {turnDegrees}°</span>
             <span className="text-[#0D0D0E]/25">|</span>
             <span className="tabular-nums text-[#0D0D0E]/70">
@@ -316,34 +416,34 @@ export const SignatureScroll: React.FC = () => {
         </div>
 
         {/* CENTER INTERACTIVE CALLOUT STAGE (Left Macro Spec Card + Right Quick Switcher) */}
-        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 sm:gap-8">
+        <div className="relative z-30 max-w-[1440px] w-full mx-auto px-3 sm:px-8 lg:px-12 my-auto flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-8">
           {/* Left: Valmora-Style Double-Bezel Specification Card */}
-          <div className="w-full max-w-md p-1.5 sm:p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-[2rem] shadow-sculptural transition-all duration-300">
-            <div className="bg-white/95 backdrop-blur-xl p-5 sm:p-7 rounded-[calc(2rem-0.375rem)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)]">
-              <div className="flex items-center justify-between mb-3">
-                <span className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#D9381E]">
+          <div className="w-full max-w-md p-1 sm:p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-2xl sm:rounded-[2rem] shadow-sculptural transition-all duration-300">
+            <div className="bg-white/95 backdrop-blur-xl p-3.5 sm:p-7 rounded-[calc(1rem)] sm:rounded-[calc(2rem-0.375rem)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)]">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <span className="inline-flex items-center gap-1.5 sm:gap-2 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#D9381E]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E]" />
                   {activeSpec.tag}
                 </span>
-                <span className="font-serif italic text-xl sm:text-2xl text-[#0D0D0E]/45">
+                <span className="font-serif italic text-lg sm:text-2xl text-[#0D0D0E]/45">
                   {activeSpec.indexLabel}
                 </span>
               </div>
 
-              <h3 className="font-display text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-[1.05] mb-2.5">
+              <h3 className="font-display text-lg sm:text-2xl font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-[1.05] mb-1.5 sm:mb-2.5">
                 {activeSpec.title}{' '}
                 <span className="font-serif italic font-normal capitalize text-[#D9381E]">
                   {activeSpec.serifAccent}
                 </span>
               </h3>
 
-              <p className="font-sans text-xs sm:text-sm text-[#4C514A] leading-relaxed mb-4">
+              <p className="font-sans text-xs sm:text-sm text-[#4C514A] leading-relaxed mb-2.5 sm:mb-4 line-clamp-2 sm:line-clamp-none">
                 {activeSpec.description}
               </p>
 
-              <div className="pt-3 border-t border-[#0D0D0E]/10 flex items-center justify-between gap-3">
+              <div className="pt-2 sm:pt-3 border-t border-[#0D0D0E]/10 flex items-center justify-between gap-3">
                 <div>
-                  <span className="block font-mono text-[10px] uppercase tracking-widest text-[#0D0D0E]/50">
+                  <span className="block font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-[#0D0D0E]/50">
                     {activeSpec.metaLeftLabel}
                   </span>
                   <span className="font-sans text-xs sm:text-sm font-bold text-[#0D0D0E]">
@@ -351,7 +451,7 @@ export const SignatureScroll: React.FC = () => {
                   </span>
                 </div>
 
-                <span className="px-2.5 py-1 rounded-full bg-[#141311]/10 text-[#141311] font-mono text-[10px] font-bold uppercase tracking-widest">
+                <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-[#141311]/10 text-[#141311] font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">
                   {activeSpec.badge}
                 </span>
               </div>
@@ -409,6 +509,7 @@ export const SignatureScroll: React.FC = () => {
                   type="button"
                   onClick={() => handleSelectPrinciple(idx)}
                   className="text-left group cursor-pointer"
+                  aria-label={`Jump to principle 0${idx + 1} - ${item.tag}`}
                 >
                   <div className="h-1 w-full bg-[#0D0D0E]/12 rounded-full overflow-hidden mb-2">
                     <div

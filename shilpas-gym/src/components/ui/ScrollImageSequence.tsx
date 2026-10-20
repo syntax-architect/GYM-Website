@@ -324,6 +324,10 @@ export const ScrollImageSequence: React.FC<ScrollImageSequenceProps> = ({
             src={poster}
             alt=""
             aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            width={1920}
+            height={1080}
             className="absolute inset-0 w-full h-full z-[5] pointer-events-none"
             style={{
               objectFit: objectFit === 'cover' ? 'cover' : 'contain',

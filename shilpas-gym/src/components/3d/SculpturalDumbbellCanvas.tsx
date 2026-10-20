@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
+import { useCmsStore } from '../../store/cmsStore';
 
 export type DumbbellFinish = 'signature' | 'stealth' | 'prestige';
 
@@ -24,6 +25,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
   wireframe = false,
   onTelemetryChange,
 }) => {
+  const brand = useCmsStore((s) => s.brand);
   const mountRef = useRef<HTMLDivElement>(null);
   const isReducedMotionRef = useRef<boolean>(false);
   const onTelemetryChangeRef = useRef(onTelemetryChange);
@@ -144,9 +146,9 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
 
     const scene = new THREE.Scene();
 
-    // 70mm product photography camera with ample breathing room
-    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
-    camera.position.set(0, 0.2, 5.5);
+    // 70mm product photography camera pulled back for zero clipping & clean orbital framing
+    const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
+    camera.position.set(0, 0.12, 6.9);
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -173,22 +175,27 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     scene.add(dumbbellGroup);
 
     // MATERIALS
+    const primaryHex = finish === 'signature' ? brand.primaryColor : finish === 'stealth' ? '#18181A' : '#C5A059';
+    const secondaryHex = finish === 'signature' ? brand.secondaryColor : finish === 'stealth' ? '#26262B' : '#E0BC75';
+
     const persimmonMaterial = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#D9381E'),
-      metalness: 0.62,
+      color: new THREE.Color(primaryHex),
+      metalness: finish === 'prestige' ? 0.92 : finish === 'stealth' ? 0.85 : 0.62,
       roughness: 0.24,
       clearcoat: 0.65,
       clearcoatRoughness: 0.18,
       reflectivity: 0.55,
+      wireframe,
     });
 
     const periwinkleMaterial = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#C5A059'),
-      metalness: 0.86,
+      color: new THREE.Color(secondaryHex),
+      metalness: finish === 'prestige' ? 0.95 : finish === 'stealth' ? 0.88 : 0.86,
       roughness: 0.22,
       clearcoat: 0.7,
       clearcoatRoughness: 0.18,
       reflectivity: 0.55,
+      wireframe,
     });
 
     const carbonMaterial = new THREE.MeshStandardMaterial({
@@ -377,8 +384,29 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     let lastTime = performance.now();
     const startTime = performance.now();
     let animationFrameId: number;
+    let isVisible = true;
+    let isRunning = false;
+
+    const startLoop = () => {
+      if (!isRunning) {
+        isRunning = true;
+        lastTime = performance.now();
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    const stopLoop = () => {
+      if (isRunning) {
+        isRunning = false;
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
 
     const animate = () => {
+      if (!isVisible) {
+        stopLoop();
+        return;
+      }
       animationFrameId = requestAnimationFrame(animate);
       const now = performance.now();
       const delta = Math.min((now - lastTime) / 1000, 0.1);
@@ -446,12 +474,29 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       renderer.render(scene, camera);
     };
 
-    animate();
+    // Viewport-based IntersectionObserver to freeze GPU/CPU when Hero scrolls off-screen
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          isVisible = true;
+          startLoop();
+        } else {
+          isVisible = false;
+          stopLoop();
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(container);
+
+    startLoop();
 
     return () => {
+      observer.disconnect();
+      stopLoop();
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
@@ -464,7 +509,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       particleGeometry.dispose();
       particleMaterial.dispose();
     };
-  }, [scrollProgress, interactivePointer, autoRotateSpeed, exploded, finish]);
+  }, [scrollProgress, interactivePointer, autoRotateSpeed, exploded, finish, wireframe, brand.primaryColor, brand.secondaryColor]);
 
   // Pointer drag event handlers for 360° tactile orbit
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -506,7 +551,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      className={`relative w-full h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[600px] select-none touch-none ${
+      className={`relative w-full h-full min-h-[260px] sm:min-h-[360px] lg:min-h-[480px] select-none touch-pan-y lg:touch-none ${
         cursorState === 'grabbing' ? 'cursor-grabbing' : 'cursor-grab'
       } ${className}`}
       aria-label="Interactive 3D Sculptural Training Object — Drag to rotate in 360 degrees"

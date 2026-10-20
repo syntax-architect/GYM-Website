@@ -5,6 +5,7 @@ import {
   type DumbbellFinish,
 } from '../3d/SculpturalDumbbellCanvas';
 import { Button } from '../ui/Button';
+import { useCmsStore } from '../../store/cmsStore';
 
 export interface HeroMasterProps {
   onOpenInquiry: () => void;
@@ -17,8 +18,8 @@ const FINISH_SPECS: Record<
   signature: {
     label: 'SIGNATURE',
     dot: 'bg-[#D9381E]',
-    code: 'SPEC // 01 · PERSIMMON & PERIWINKLE',
-    materialNote: '216,000 PSI Carbon Shaft · Dual Urethane Heads',
+    code: 'SPEC // 01 · INFRARED & CHAMPAGNE GOLD',
+    materialNote: '216,000 PSI Carbon Shaft · Anodized Dual Heads',
   },
   stealth: {
     label: 'STEALTH',
@@ -28,25 +29,25 @@ const FINISH_SPECS: Record<
   },
   prestige: {
     label: 'PRESTIGE',
-    dot: 'bg-[#CFA852]',
+    dot: 'bg-[#C5A059]',
     code: 'SPEC // 03 · CHAMPAGNE BRONZE',
     materialNote: 'Hand-Polished Brass Alloy · Atelier Edition',
   },
 };
 
 export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
+  const brand = useCmsStore((s) => s.brand);
   const [finish, setFinish] = useState<DumbbellFinish>('signature');
   const [exploded, setExploded] = useState<boolean>(false);
   const [wireframe, setWireframe] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'3d' | 'loop'>('3d');
   const [rotationY, setRotationY] = useState<number>(32);
-  const [velocityLabel, setVelocityLabel] = useState<string>('0.4x IDLE');
+  const [velocityLabel, setVelocityLabel] = useState<string>('1.1x ORBIT');
   const [scrollProgress, setScrollProgress] = useState<number>(0);
 
   const lastAngleRef = useRef<number>(32);
   const lastTimeRef = useRef<number>(performance.now());
 
-  // Track subtle window scroll for 3D parallax coupling
   useEffect(() => {
     const onScroll = () => {
       const progress = Math.min(1, window.scrollY / window.innerHeight);
@@ -56,7 +57,6 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Calculate Valmora-style real-time angular velocity telemetry
   const handleTelemetryChange = useCallback(
     (data: { rotationY: number; finish: DumbbellFinish; isExploded: boolean }) => {
       const now = performance.now();
@@ -85,55 +85,51 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
     []
   );
 
-  // Format angle into Valmora timecode style (00:03:42)
   const paddedAngle = String(rotationY).padStart(3, '0');
   const activeSpec = FINISH_SPECS[finish];
 
   return (
-    <section className="relative w-full min-h-[100svh] bg-[#F5F2EA] text-[#0D0D0E] overflow-hidden flex flex-col justify-between pt-36 sm:pt-40 lg:pt-44 pb-8 select-none">
-      {/* Subtle Architectural Radial Spotlight & Grid Lines */}
+    <section className="relative w-full min-h-[100svh] lg:h-[100svh] bg-[#F4F1EA] text-[#0D0D0E] overflow-hidden flex flex-col justify-between pt-20 sm:pt-24 pb-4 sm:pb-5 select-none">
+      {/* Warm Architectural Radial Backlight */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(circle at 68% 46%, rgba(217, 56, 30, 0.10) 0%, rgba(197, 160, 89, 0.08) 32%, rgba(245, 242, 234, 0) 70%)',
+            'radial-gradient(circle at 72% 48%, rgba(217, 56, 30, 0.08) 0%, rgba(197, 160, 89, 0.12) 34%, rgba(244, 241, 234, 0) 70%)',
         }}
       />
 
-      {/* Fine 1px Architectural Crosshairs (Valmora Atelier Motif) */}
+      {/* Fine 1px Architectural Crosshairs */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-36 sm:top-40 lg:top-44 h-px bg-[#0D0D0E]/10"
+        className="pointer-events-none absolute inset-x-0 top-20 sm:top-24 h-px bg-[#0D0D0E]/8"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none hidden lg:block absolute top-36 sm:top-40 lg:top-44 bottom-16 left-[52%] w-px bg-[#0D0D0E]/8"
+        className="pointer-events-none hidden lg:block absolute top-24 bottom-14 left-[50%] w-px bg-[#0D0D0E]/8"
       />
 
-      {/* FULL-BLEED INTERACTIVE 3D / VIDEO STAGE (Unboxed) */}
-      <div className="relative lg:absolute lg:inset-y-16 lg:right-0 lg:w-[58%] h-[420px] sm:h-[500px] lg:h-auto z-10 flex items-center justify-center order-2 lg:order-none">
-        {/* Valmora-Inspired SVG Orbital Drag Arc & Leader Reticle */}
+      {/* RIGHT-SIDE INTERACTIVE 3D STAGE (Properly Scaled & Framed) */}
+      <div className="relative lg:absolute lg:top-20 lg:bottom-14 lg:right-0 lg:w-[52%] h-[280px] sm:h-[360px] lg:h-auto z-10 flex items-center justify-center order-2 lg:order-none">
         {viewMode === '3d' && (
           <svg
             aria-hidden="true"
             viewBox="0 0 600 600"
-            className="pointer-events-none absolute w-[88%] max-w-[540px] h-auto opacity-65"
+            className="pointer-events-none absolute w-[82%] max-w-[460px] h-auto opacity-70"
           >
-            {/* Dashed Orbital Ring */}
             <circle
               cx="300"
               cy="300"
-              r="230"
+              r="225"
               fill="none"
               stroke="#0D0D0E"
               strokeWidth="1"
               strokeDasharray="4 6"
-              opacity="0.25"
+              opacity="0.22"
             />
-            {/* Active Scrubbing Arc */}
             <path
-              d="M 120 160 A 230 230 0 0 1 515 380"
+              d="M 120 160 A 225 225 0 0 1 510 380"
               fill="none"
               stroke="#D9381E"
               strokeWidth="1.5"
@@ -141,10 +137,9 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
               strokeDashoffset={Math.round(360 - (rotationY / 360) * 360)}
               className="transition-all duration-150"
             />
-            {/* Target Reticle Dot on Arc */}
-            <circle cx="485" cy="165" r="4" fill="#D9381E" />
+            <circle cx="480" cy="165" r="4" fill="#D9381E" />
             <circle
-              cx="485"
+              cx="480"
               cy="165"
               r="11"
               fill="none"
@@ -155,17 +150,16 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
           </svg>
         )}
 
-        {/* Drag-to-Reveal Floating Prompt (Valmora Motif) */}
+        {/* Floating Drag Prompt */}
         {viewMode === '3d' && (
-          <div className="pointer-events-none absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#0D0D0E]/90 text-[#F5F2EA] backdrop-blur-md shadow-lg border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-[#D9381E] animate-ping" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em]">
-              DRAG TO ORBIT · {paddedAngle}°
+          <div className="pointer-events-none absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0D0D0E]/90 text-[#F4F1EA] backdrop-blur-md shadow-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E] animate-ping" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
+              DRAG 360° TO INSPECT · {paddedAngle}°
             </span>
           </div>
         )}
 
-        {/* 3D Canvas or Master Loop Video */}
         {viewMode === '3d' ? (
           <div className="w-full h-full flex items-center justify-center">
             <SculpturalDumbbellCanvas
@@ -178,18 +172,21 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
             />
           </div>
         ) : (
-          <div className="w-full h-full px-4 sm:px-10 lg:px-14 flex items-center justify-center">
-            <div className="relative w-full max-w-[680px] aspect-video rounded-2xl overflow-hidden shadow-2xl ring-1 ring-[#0D0D0E]/15">
+          <div className="w-full h-full px-4 sm:px-10 flex items-center justify-center">
+            <div className="relative w-full max-w-[600px] aspect-video rounded-2xl overflow-hidden shadow-2xl ring-1 ring-[#0D0D0E]/15">
               <video
-                src="/assets/videos/v01-hero-loop.mp4"
+                src={brand.heroLoopVideoUrl}
                 poster="/assets/images/i01-hero-still.webp"
                 autoPlay
                 loop
                 muted
                 playsInline
                 className="w-full h-full object-cover"
+                style={{
+                  filter: 'sepia(0.2) hue-rotate(-12deg) contrast(1.08) saturate(1.15)',
+                }}
               />
-              <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-black/70 text-white font-mono text-[10px] uppercase tracking-widest">
+              <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-black/75 text-white font-mono text-[10px] uppercase tracking-widest">
                 MASTER REEL // V01 STUDIO LOOP
               </div>
             </div>
@@ -197,40 +194,36 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
         )}
       </div>
 
-      {/* TOP TELEMETRY BAR (Valmora + Oddball HUD) */}
-      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-2 flex flex-wrap items-center justify-between gap-4">
-        {/* Verified Local Authority Pill */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/85 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs">
-          <span className="w-2 h-2 rounded-full bg-[#141311]" />
-          <span className="font-sans text-xs sm:text-sm font-bold text-[#0D0D0E]">
-            4.7 Rating across 355+ Google Reviews · Rahara & Khardaha
+      {/* TOP TELEMETRY ROW */}
+      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-1 flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/10 shadow-xs">
+          <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
+          <span className="font-sans text-xs font-bold text-[#0D0D0E]">
+            {brand.googleRating} Rating across {brand.reviewCount} Google Reviews · {brand.locationShort}
           </span>
         </div>
 
-        {/* Live Telemetry Readout (Top-Right HUD) */}
-        <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-full bg-[#0D0D0E] text-[#F5F2EA] font-mono text-xs tracking-wider shadow-md">
+        <div className="hidden sm:flex items-center gap-3.5 px-4 py-1.5 rounded-full bg-[#0D0D0E] text-[#F4F1EA] font-mono text-[11px] tracking-wider shadow-md">
           <span className="text-[#D9381E] font-bold">REEL 01</span>
-          <span className="text-white/30">·</span>
+          <span className="text-white/25">·</span>
           <span className="tabular-nums">
             00:0{finish === 'signature' ? '1' : finish === 'stealth' ? '2' : '3'}:{paddedAngle.slice(0, 2)}
           </span>
-          <span className="text-white/30">·</span>
-          <span className="text-[#E6DEC8] tabular-nums">{velocityLabel}</span>
+          <span className="text-white/25">·</span>
+          <span className="text-[#C5A059] tabular-nums">{velocityLabel}</span>
         </div>
       </div>
 
-      {/* MAIN EDITORIAL FOREGROUND */}
-      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto py-6 lg:py-12 pointer-events-none">
-        <div className="max-w-2xl space-y-6 pointer-events-auto">
-          {/* Technical Act Tag */}
-          <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.2em] text-[#141311] font-semibold">
-            <span>ACT I // DUAL SANCTUARY</span>
-            <span className="w-8 h-px bg-[#141311]/40" />
-            <span className="text-[#0D0D0E]/60">{activeSpec.code}</span>
+      {/* MAIN EDITORIAL FOREGROUND (Compact so CTA & Bottom Bar never overflow 100svh) */}
+      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 my-auto py-2 lg:py-0 pointer-events-none order-1 lg:order-none">
+        <div className="max-w-xl xl:max-w-2xl space-y-4 sm:space-y-5 pointer-events-auto">
+          <div className="flex flex-wrap items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-[#0D0D0E]/70 font-semibold">
+            <span className="text-[#D9381E] font-bold">ACT I // DUAL SANCTUARY</span>
+            <span className="w-6 h-px bg-[#0D0D0E]/30" />
+            <span>{activeSpec.code}</span>
           </div>
 
-          {/* High-Contrast Valmora / Oddball Display Typography */}
-          <h1 className="font-display text-5xl sm:text-7xl xl:text-[5.4rem] font-extrabold uppercase tracking-[-0.035em] text-[#0D0D0E] leading-[0.94]">
+          <h1 className="font-display text-4xl sm:text-6xl xl:text-[4.85rem] font-extrabold uppercase tracking-[-0.035em] text-[#0D0D0E] leading-[0.92]">
             STRENGTH <br />
             MEETS{' '}
             <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E] pr-2">
@@ -238,37 +231,34 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
             </span>
           </h1>
 
-          {/* Concise Editorial Copy */}
-          <p className="font-sans text-base sm:text-lg text-[#4C514A] max-w-xl leading-relaxed font-normal">
-            Khardaha’s premier unisex fitness atelier and private beauty studio.
+          <p className="font-sans text-sm sm:text-base lg:text-lg text-[#4A4843] max-w-lg leading-relaxed font-normal">
+            {brand.locationShort}’s premier unisex fitness atelier and private beauty studio.
             Biomechanical strength training meets bespoke keratin & bridal artistry
             under one calibrated roof.
           </p>
 
-          {/* Primary Conversion Actions */}
-          <div className="flex flex-wrap items-center gap-3.5 pt-2">
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <Button
               variant="primary"
               size="lg"
               onClick={onOpenInquiry}
               icon={<ArrowUpRight className="w-4 h-4" />}
-              className="min-h-[54px] px-8 shadow-persimmon-subtle"
+              className="min-h-[48px] sm:min-h-[52px] px-6 sm:px-7 shadow-persimmon-subtle"
             >
               BOOK FREE TRIAL PASS
             </Button>
 
             <a
-              href="tel:07439761994"
-              className="inline-flex items-center gap-3 px-6 min-h-[54px] rounded-full bg-white/90 hover:bg-[#0D0D0E] text-[#0D0D0E] hover:text-[#F5F2EA] border border-[#0D0D0E]/15 font-mono text-xs sm:text-sm font-bold tracking-wider transition-all duration-200 shadow-xs active:scale-95"
+              href={`tel:${brand.phone.replace(/[^0-9+]/g, '')}`}
+              className="inline-flex items-center gap-2.5 px-4 sm:px-5 min-h-[48px] sm:min-h-[52px] rounded-full bg-white/95 hover:bg-[#0D0D0E] text-[#0D0D0E] hover:text-[#F4F1EA] border border-[#0D0D0E]/15 font-mono text-xs sm:text-sm font-bold tracking-wider transition-all duration-200 shadow-xs active:scale-95"
             >
-              <Phone className="w-4 h-4 text-[#D9381E]" />
-              <span className="tabular-nums">074397 61994</span>
+              <Phone className="w-3.5 h-3.5 text-[#D9381E]" />
+              <span className="tabular-nums">{brand.phone}</span>
             </a>
           </div>
 
-          {/* 3-Pillar Micro Badges */}
-          <div className="pt-4 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#0D0D0E]/75 font-semibold">
-            <span className="inline-flex items-center gap-2">
+          <div className="pt-1 flex flex-wrap items-center gap-x-5 gap-y-1.5 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.15em] text-[#0D0D0E]/70 font-semibold">
+            <span className="inline-flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#D9381E]" />
               WOMEN-OWNED STUDIO
             </span>
@@ -281,23 +271,21 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
       </div>
 
       {/* BOTTOM ARCHITECTURAL BAR + FLOATING 3D HARDWARE CONTROLLER */}
-      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-4 border-t border-[#0D0D0E]/12 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-        {/* Left: Physical Telemetry & Google Plus Code */}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm text-[#0D0D0E]/80 font-medium">
-          <span className="inline-flex items-center gap-2">
+      <div className="relative z-20 max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-12 pt-3 border-t border-[#0D0D0E]/10 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 order-3 lg:order-none">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[#0D0D0E]/75 font-medium">
+          <span className="inline-flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
-            <MapPin className="w-3.5 h-3.5 text-[#141311]" />
-            Naskarhat Madhya Para, Rahara, Khardaha, Kolkata 700118
+            <MapPin className="w-3.5 h-3.5 text-[#0D0D0E]" />
+            {brand.fullAddress}
           </span>
-          <span className="inline-flex items-center gap-1.5 font-mono text-xs text-[#0D0D0E]/70">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-[#0D0D0E]/65">
             <Clock className="w-3.5 h-3.5 text-[#D9381E]" />
-            Open Daily: 06:00 AM – 10:00 PM
+            Open Daily: {brand.hours}
           </span>
         </div>
 
-        {/* Right: Floating Hardware Spec Dock (Controls 3D Dumbbell State) */}
-        <div className="w-full xl:w-auto flex flex-wrap items-center justify-between xl:justify-end gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-[#0D0D0E]/12 shadow-sculptural">
-          {/* Material Finish Selector Pills */}
+        {/* Floating Hardware Spec Dock */}
+        <div className="w-full xl:w-auto flex items-center justify-start xl:justify-end gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-[#0D0D0E]/12 shadow-sculptural overflow-x-auto max-w-full no-scrollbar">
           <div className="flex items-center gap-1">
             {(['signature', 'stealth', 'prestige'] as DumbbellFinish[]).map((item) => {
               const isSelected = finish === item;
@@ -310,9 +298,9 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
                     setViewMode('3d');
                     setFinish(item);
                   }}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     isSelected && viewMode === '3d'
-                      ? 'bg-[#0D0D0E] text-[#F5F2EA] shadow-xs'
+                      ? 'bg-[#0D0D0E] text-[#F4F1EA] shadow-xs'
                       : 'text-[#0D0D0E]/70 hover:text-[#0D0D0E] hover:bg-[#0D0D0E]/5'
                   }`}
                 >
@@ -325,16 +313,15 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
 
           <div className="h-4 w-px bg-[#0D0D0E]/15 hidden sm:block" />
 
-          {/* Explode Bushing Spec & Wireframe Toggles */}
           {viewMode === '3d' && (
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setExploded((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   exploded
                     ? 'bg-[#D9381E] text-white'
-                    : 'bg-[#F5F2EA] text-[#0D0D0E] hover:bg-[#0D0D0E]/10'
+                    : 'bg-[#F4F1EA] text-[#0D0D0E] hover:bg-[#0D0D0E]/10'
                 }`}
               >
                 <Layers className="w-3 h-3" />
@@ -344,10 +331,10 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
               <button
                 type="button"
                 onClick={() => setWireframe((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   wireframe
                     ? 'bg-[#C5A059] text-white'
-                    : 'bg-[#F5F2EA] text-[#0D0D0E] hover:bg-[#0D0D0E]/10'
+                    : 'bg-[#F4F1EA] text-[#0D0D0E] hover:bg-[#0D0D0E]/10'
                 }`}
               >
                 <Eye className="w-3 h-3" />
@@ -358,12 +345,11 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
 
           <div className="h-4 w-px bg-[#0D0D0E]/15 hidden sm:block" />
 
-          {/* 3D vs Loop Switcher */}
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => setViewMode('3d')}
-              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase cursor-pointer transition-all ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase cursor-pointer transition-all ${
                 viewMode === '3d'
                   ? 'bg-[#141311] text-white'
                   : 'text-[#0D0D0E]/65 hover:text-[#0D0D0E]'
@@ -375,7 +361,7 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
             <button
               type="button"
               onClick={() => setViewMode('loop')}
-              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-mono text-[11px] font-bold uppercase cursor-pointer transition-all ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-mono text-[10px] font-bold uppercase cursor-pointer transition-all ${
                 viewMode === 'loop'
                   ? 'bg-[#141311] text-white'
                   : 'text-[#0D0D0E]/65 hover:text-[#0D0D0E]'

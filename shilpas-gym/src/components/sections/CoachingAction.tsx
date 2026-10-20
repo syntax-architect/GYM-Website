@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Star, RotateCw, ArrowUpRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { useCmsStore } from '../../store/cmsStore';
 
 export interface CoachingActionProps {
   onOpenInquiry?: (plan?: string) => void;
@@ -22,7 +23,7 @@ interface RosterMember {
   }[];
 }
 
-const ROSTER: RosterMember[] = [
+export const DEFAULT_ROSTER: RosterMember[] = [
   {
     id: 'rajesh-sen',
     number: '01',
@@ -67,7 +68,7 @@ const ROSTER: RosterMember[] = [
     role: 'FOUNDER & MASTER AESTHETICIAN',
     specialtyTag: 'HD BRIDAL MAKEOVERS & STYLING',
     experience: '10+ Years Experience',
-    image: '/assets/library/A11_female_coach.jpeg',
+    image: '/assets/showcase/shilpas_salon_glamour.jpg',
     quote:
       'Strength on the training floor paired with rejuvenating salon care. Total physical wellness and self-confidence under one roof.',
     accentColor: '#C5A059',
@@ -85,7 +86,7 @@ const ROSTER: RosterMember[] = [
     role: 'SENIOR HAIR SPA & KERATIN SPECIALIST',
     specialtyTag: 'FORMALDEHYDE-FREE HAIR BOTOX & SPA',
     experience: '7+ Years Experience',
-    image: '/assets/library/A13_female_coaching_interaction.jpeg',
+    image: '/assets/showcase/shilpas_salon_hair_spa.jpg',
     quote:
       'Premium treatments, hygienic suites, and restorative self-care designed to revitalize you after intense workouts.',
     accentColor: '#C5A059',
@@ -126,13 +127,15 @@ const VERIFIED_REVIEWS = [
 ];
 
 export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry }) => {
+  const brand = useCmsStore((s) => s.brand);
+  const trainers = useCmsStore((s) => s.trainers);
   const [flippedIds, setFlippedIds] = useState<Record<string, boolean>>({});
 
   const toggleCardFlip = (id: string) => {
     setFlippedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleDraftSpecialist = (member: RosterMember, e: React.MouseEvent) => {
+  const handleDraftSpecialist = (member: { id: string; name: string; role: string; [key: string]: any }, e: React.MouseEvent) => {
     e.stopPropagation();
     if (onOpenInquiry) {
       onOpenInquiry(`Session with ${member.name} (${member.role})`);
@@ -153,16 +156,16 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
                 <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
                 <span>VERIFIED MEMBER PROOF</span>
               </div>
-              <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.96]">
+              <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.96]">
                 GOOGLE VERIFIED{' '}
                 <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
                   Community.
                 </span>
               </h2>
               <p className="font-sans text-base sm:text-lg text-[#4C514A]">
-                Rated 4.7 out of 5 across 355+ Google reviews. Members consistently praise our
-                motivating floor atmosphere, calibrated machinery, and private salon suite in
-                Rahara, Khardaha.
+                Rated {brand.googleRating} out of 5 across {brand.reviewCount} Google reviews. Members consistently praise our
+                motivating floor atmosphere, calibrated machinery, and private salon suite in{' '}
+                {brand.locationShort}.
               </p>
             </div>
 
@@ -173,7 +176,7 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
                 ))}
               </div>
               <span className="font-mono text-xs font-bold text-[#0D0D0E]">
-                4.7 / 5.0 · 355+ GOOGLE REVIEWS
+                {brand.googleRating} / 5.0 · {brand.reviewCount} GOOGLE REVIEWS
               </span>
             </div>
           </div>
@@ -265,7 +268,7 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
                 <span>ACT V // THE STARTING LINEUP</span>
               </div>
 
-              <h2 className="font-display text-4xl sm:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
+              <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
                 THE FLOOR{' '}
                 <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
                   Roster.
@@ -286,19 +289,28 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
 
           {/* 4-Card 3D Collectible Roster Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {ROSTER.map((member) => {
+            {trainers.map((member) => {
               const isFlipped = !!flippedIds[member.id];
               return (
                 <div
                   key={member.id}
                   onClick={() => toggleCardFlip(member.id)}
-                  onMouseEnter={() => setFlippedIds((prev) => ({ ...prev, [member.id]: true }))}
-                  onMouseLeave={() => setFlippedIds((prev) => ({ ...prev, [member.id]: false }))}
-                  className="group relative h-[490px] w-full cursor-pointer select-none"
+                  onMouseEnter={() => {
+                    if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+                      setFlippedIds((prev) => ({ ...prev, [member.id]: true }));
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+                      setFlippedIds((prev) => ({ ...prev, [member.id]: false }));
+                    }
+                  }}
+                  className="group relative h-[440px] sm:h-[490px] w-full cursor-pointer select-none"
                   style={{ perspective: '1200px' }}
                 >
+                  {/* pointer-events-none prevents 3D rotation edge from triggering mouseleave jitter */}
                   <div
-                    className="relative w-full h-full transition-transform duration-500 ease-out"
+                    className="relative w-full h-full transition-transform duration-500 ease-out pointer-events-none will-change-transform"
                     style={{
                       transformStyle: 'preserve-3d',
                       transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
@@ -307,21 +319,26 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
                     {/* FRONT OF COLLECTIBLE CARD */}
                     <div
                       className="absolute inset-0 w-full h-full rounded-3xl overflow-hidden bg-[#161815] text-[#F5F2EA] border-2 border-[#0D0D0E]/15 shadow-xl flex flex-col justify-between"
-                      style={{ backfaceVisibility: 'hidden' }}
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                      }}
                     >
-                      {/* Full-Bleed Portrait with Dark Gradient Scrim */}
                       <img
                         src={member.image}
-                        alt={member.name}
+                        alt={`${member.name} (${member.roleBengali}) - Certified Coach at Shilpa's Gym in Rahara, Khardaha`}
+                        loading="lazy"
+                        decoding="async"
+                        width={400}
+                        height={550}
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).src =
                             '/assets/images/i08-coach-portrait.webp';
                         }}
-                        className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 opacity-90"
+                        className="absolute inset-0 w-full h-full object-cover object-[50%_20%] transition-transform duration-700 group-hover:scale-105 opacity-90"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0D0F0E] via-[#0D0F0E]/35 to-black/30" />
 
-                      {/* Top Jersey Number & Position Badge (Oddball 00:12 Motif) */}
                       <div className="relative z-10 p-5 flex items-start justify-between">
                         <span
                           className="font-display text-5xl font-black leading-none tracking-tighter drop-shadow-md"
@@ -341,7 +358,6 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
                         </span>
                       </div>
 
-                      {/* Bottom Specialist Identity */}
                       <div className="relative z-10 p-6 space-y-2.5">
                         <span className="inline-block font-mono text-[10px] font-bold uppercase tracking-widest text-[#D9381E]">
                           {member.specialtyTag}
@@ -357,53 +373,52 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
 
                         <div className="pt-3 border-t border-white/15 flex items-center justify-between font-mono text-[11px] text-white/80">
                           <span>{member.experience}</span>
-                          <span className="inline-flex items-center gap-1 text-[#D9381E] font-bold">
-                            <RotateCw className="w-3 h-3" />
-                            STATS
+                          <span className="inline-flex items-center gap-1.5 text-[#C5A059] font-bold bg-[#0D0D0E]/60 backdrop-blur-xs px-2.5 py-1 rounded-full border border-[#C5A059]/40 sm:bg-transparent sm:border-none sm:p-0">
+                            <RotateCw className="w-3 h-3 text-[#D9381E]" />
+                            <span className="sm:hidden text-[10px] tracking-wider text-white">TAP CARD TO FLIP ↻</span>
+                            <span className="hidden sm:inline">STATS</span>
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* BACK OF COLLECTIBLE CARD (Oddball RPG Stat Bars & Contract CTA) */}
+                    {/* BACK OF COLLECTIBLE CARD */}
                     <div
-                      className="absolute inset-0 w-full h-full rounded-3xl overflow-hidden bg-[#141614] text-[#F5F2EA] border-2 border-[#D9381E] p-6 flex flex-col justify-between shadow-2xl"
+                      className="absolute inset-0 w-full h-full rounded-3xl overflow-hidden bg-[#141311] text-[#F5F2EA] border-2 border-[#D9381E] p-4 sm:p-6 flex flex-col justify-between shadow-2xl"
                       style={{
                         backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
                         transform: 'rotateY(180deg)',
                       }}
                     >
-                      {/* Top Header */}
                       <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#D9381E]">
+                        <div className="flex items-center justify-between mb-2 sm:mb-3">
+                          <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#C5A059]">
                             #{member.number} · {member.positionCode} SPEC
                           </span>
                           <Sparkles className="w-4 h-4 text-[#D9381E]" />
                         </div>
 
-                        <h3 className="font-display text-xl font-extrabold uppercase tracking-tight text-white mb-1">
+                        <h3 className="font-display text-lg sm:text-xl font-extrabold uppercase tracking-tight text-white mb-0.5 sm:mb-1">
                           {member.name}
                         </h3>
-                        <p className="font-mono text-[11px] text-white/55 uppercase tracking-wider mb-5">
+                        <p className="font-mono text-[10px] sm:text-[11px] text-white/55 uppercase tracking-wider mb-2.5 sm:mb-5">
                           {member.role}
                         </p>
 
-                        {/* Philosophy Quote */}
-                        <blockquote className="p-4 rounded-2xl bg-white/5 border border-white/10 font-serif italic text-base sm:text-lg text-[#E6DEC8] leading-snug mb-6">
+                        <blockquote className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 font-serif italic text-xs sm:text-base text-[#E6DEC8] leading-snug mb-3 sm:mb-6">
                           “{member.quote}”
                         </blockquote>
                       </div>
 
-                      {/* Oddball RPG Stat Bars */}
-                      <div className="space-y-3.5 my-auto">
+                      <div className="space-y-2 sm:space-y-3.5 my-auto">
                         {member.stats.map((st) => (
                           <div key={st.label}>
-                            <div className="flex items-center justify-between font-mono text-[11px] mb-1">
+                            <div className="flex items-center justify-between font-mono text-[10px] sm:text-[11px] mb-1">
                               <span className="text-white/75 uppercase tracking-wider">
                                 {st.label}
                               </span>
-                              <span className="text-[#D9381E] font-bold tabular-nums text-sm">
+                              <span className="text-[#C5A059] font-bold tabular-nums text-xs sm:text-sm">
                                 {st.value}
                               </span>
                             </div>
@@ -417,11 +432,10 @@ export const CoachingAction: React.FC<CoachingActionProps> = ({ onOpenInquiry })
                         ))}
                       </div>
 
-                      {/* Bottom Action Button */}
                       <button
                         type="button"
                         onClick={(e) => handleDraftSpecialist(member, e)}
-                        className="w-full mt-4 py-3.5 px-4 rounded-full bg-[#D9381E] hover:bg-[#B82B14] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg active:scale-95"
+                        className="pointer-events-auto w-full mt-3 sm:mt-4 py-2.5 sm:py-3.5 px-4 rounded-full bg-[#D9381E] hover:bg-[#B82B14] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg"
                       >
                         <span>DRAFT THIS SPECIALIST</span>
                         <ArrowUpRight className="w-4 h-4" />

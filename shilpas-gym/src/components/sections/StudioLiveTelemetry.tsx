@@ -1,271 +1,226 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Clock, Users, ShieldCheck, Thermometer, Sparkles, ArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowUpRight, Thermometer, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useCmsStore } from '../../store/cmsStore';
 
 export interface StudioLiveTelemetryProps {
-  onOpenInquiry?: () => void;
+  onOpenInquiry: () => void;
 }
 
-interface HourData {
-  hour: number;
-  label: string;
-  occupancy: number; // 0 to 100
-  status: 'Quiet' | 'Optimal' | 'Energetic' | 'Peak';
+interface HourSlot {
+  hour: string;
+  timeLabel?: string;
+  density: number;
+  status: 'QUIET' | 'MODERATE' | 'PRIME' | 'PEAK' | 'OPTIMAL';
+  note: string;
 }
 
-const HOURLY_SCHEDULE: HourData[] = [
-  { hour: 6, label: '06 AM', occupancy: 45, status: 'Optimal' },
-  { hour: 7, label: '07 AM', occupancy: 78, status: 'Peak' },
-  { hour: 8, label: '08 AM', occupancy: 84, status: 'Peak' },
-  { hour: 9, label: '09 AM', occupancy: 65, status: 'Energetic' },
-  { hour: 10, label: '10 AM', occupancy: 40, status: 'Optimal' },
-  { hour: 11, label: '11 AM', occupancy: 22, status: 'Quiet' },
-  { hour: 12, label: '12 PM', occupancy: 18, status: 'Quiet' },
-  { hour: 13, label: '01 PM', occupancy: 15, status: 'Quiet' },
-  { hour: 14, label: '02 PM', occupancy: 19, status: 'Quiet' },
-  { hour: 15, label: '03 PM', occupancy: 25, status: 'Quiet' },
-  { hour: 16, label: '04 PM', occupancy: 38, status: 'Optimal' },
-  { hour: 17, label: '05 PM', occupancy: 62, status: 'Energetic' },
-  { hour: 18, label: '06 PM', occupancy: 88, status: 'Peak' },
-  { hour: 19, label: '07 PM', occupancy: 92, status: 'Peak' },
-  { hour: 20, label: '08 PM', occupancy: 74, status: 'Energetic' },
-  { hour: 21, label: '09 PM', occupancy: 42, status: 'Optimal' },
+const HOURLY_CURVE: HourSlot[] = [
+  { hour: '06', timeLabel: '06:00 AM', density: 42, status: 'OPTIMAL', note: 'Morning barbell & conditioning crew.' },
+  { hour: '07', timeLabel: '07:00 AM', density: 68, status: 'OPTIMAL', note: 'Active morning rush; all racks supervised.' },
+  { hour: '08', timeLabel: '08:00 AM', density: 78, status: 'PEAK', note: 'High-energy morning peak session.' },
+  { hour: '09', timeLabel: '09:00 AM', density: 54, status: 'OPTIMAL', note: 'Balanced floor & salon opening prep.' },
+  { hour: '10', timeLabel: '10:00 AM', density: 32, status: 'QUIET', note: 'Calm floor; ideal for 1-on-1 form coaching.' },
+  { hour: '11', timeLabel: '11:00 AM', density: 26, status: 'QUIET', note: 'Private salon keratin appointments active.' },
+  { hour: '12', timeLabel: '12:00 PM', density: 22, status: 'QUIET', note: 'Zero wait time on all Olympic cages.' },
+  { hour: '13', timeLabel: '01:00 PM', density: 15, status: 'QUIET', note: 'Serene midday window; maximum privacy.' },
+  { hour: '14', timeLabel: '02:00 PM', density: 18, status: 'QUIET', note: 'Quiet strength floor & bridal consultations.' },
+  { hour: '15', timeLabel: '03:00 PM', density: 28, status: 'QUIET', note: 'Afternoon personal training window.' },
+  { hour: '16', timeLabel: '04:00 PM', density: 45, status: 'OPTIMAL', note: 'Early evening warm-up cadence.' },
+  { hour: '17', timeLabel: '05:00 PM', density: 72, status: 'OPTIMAL', note: 'Evening strength & cardio momentum.' },
+  { hour: '18', timeLabel: '06:00 PM', density: 88, status: 'PEAK', note: 'Prime evening atmosphere; 2 floor coaches active.' },
+  { hour: '19', timeLabel: '07:00 PM', density: 92, status: 'PEAK', note: 'Peak hypertrophy & conditioning window.' },
+  { hour: '20', timeLabel: '08:00 PM', density: 74, status: 'OPTIMAL', note: 'Late evening heavy compound lifting.' },
+  { hour: '21', timeLabel: '09:00 PM', density: 44, status: 'OPTIMAL', note: 'Cool-down & final strength sets until 10 PM.' },
 ];
 
 export const StudioLiveTelemetry: React.FC<StudioLiveTelemetryProps> = ({ onOpenInquiry }) => {
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
-  const [selectedHour, setSelectedHour] = useState<number>(() => new Date().getHours());
+  const brand = useCmsStore((s) => s.brand);
+  const hourlyCurve = useCmsStore((s) => s.hourlyCurve);
+  const [selectedHour, setSelectedHour] = useState<string>('13');
+  const currentSlot = hourlyCurve.find((h) => h.hour === selectedHour) || hourlyCurve[7] || HOURLY_CURVE[7];
+  const isOverridden = brand.liveOccupancyOverride !== null;
+  const activeDensity = isOverridden ? brand.liveOccupancyOverride! : currentSlot.density;
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const currentHour = currentTime.getHours();
-  const isOpen = currentHour >= 6 && currentHour < 22;
-
-  // Determine current active capacity
-  const currentData = useMemo(() => {
-    const match = HOURLY_SCHEDULE.find((h) => h.hour === selectedHour);
-    if (match) return match;
-    return { hour: currentHour, label: 'Now', occupancy: isOpen ? 35 : 0, status: 'Quiet' as const };
-  }, [selectedHour, currentHour, isOpen]);
-
-  const formattedTime = currentTime.toLocaleTimeString('en-IN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-  });
+  const getBarColor = (status: HourSlot['status'], isSelected: boolean) => {
+    if (isSelected) return 'bg-[#D9381E] ring-2 ring-white';
+    if (status === 'QUIET') return 'bg-emerald-500/80 hover:bg-emerald-400';
+    if (status === 'OPTIMAL' || status === 'MODERATE' || status === 'PRIME') return 'bg-[#C5A059] hover:bg-[#D9B978]';
+    return 'bg-[#D9381E]/80 hover:bg-[#D9381E]';
+  };
 
   return (
-    <section className="relative w-full py-20 px-4 sm:px-6 lg:px-12 bg-[#161815] text-[#F5F2EA] overflow-hidden">
-      {/* Background Subtle Radial Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#D9381E]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#141311]/20 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 max-w-[1440px] mx-auto">
+    <section className="w-full py-12 sm:py-16 px-3 sm:px-6 lg:px-8 bg-[#F4F1EA]">
+      <div className="max-w-[1440px] mx-auto rounded-[2rem] bg-[#141311] text-[#F4F1EA] p-6 sm:p-10 lg:p-12 border border-white/10 shadow-2xl">
         {/* Top Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-extrabold uppercase tracking-widest text-[#D9381E] mb-3">
-              <Clock className="w-3.5 h-3.5 animate-spin" />
-              <span>Real-Time Studio Telemetry</span>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/8 border border-white/15 font-mono text-[11px] uppercase tracking-widest text-[#C5A059]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>REAL-TIME STUDIO TELEMETRY</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold uppercase tracking-tight text-white leading-tight">
-              LIVE FLOOR CAPACITY & ATMOSPHERE
+
+            <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-tight text-white leading-[0.95]">
+              LIVE FLOOR CAPACITY &{' '}
+              <span className="font-serif italic font-normal capitalize text-[#D9381E]">
+                Atmosphere.
+              </span>
             </h2>
           </div>
 
-          {/* Current Studio Status Pill */}
-          <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-3 px-5 rounded-full border border-white/15 shadow-sm">
-            <div className="flex items-center gap-2.5">
-              <span className={`w-3 h-3 rounded-full ${isOpen ? 'bg-[#22C55E] animate-ping' : 'bg-red-500'}`} />
-              <div>
-                <span className="block text-xs uppercase font-extrabold tracking-wider text-white">
-                  {isOpen ? 'STUDIO OPEN NOW' : 'DOORS OPEN 06:00 AM'}
-                </span>
-                <span className="text-[11px] text-white/70 font-mono tabular-nums">
-                  {formattedTime} IST · Khardaha, Kolkata
-                </span>
-              </div>
+          <div className="px-5 py-3 rounded-2xl bg-black/50 border border-white/10 font-mono text-xs">
+            <div className="flex items-center gap-2 text-emerald-400 font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>STUDIO OPEN DAILY</span>
             </div>
+            <span className="text-white/55 text-[11px]">
+              {brand.hours} IST · {brand.locationShort}
+            </span>
           </div>
         </div>
 
-        {/* 3-Column Telemetry Dashboard in Double-Bezel Cards */}
+        {/* 12-Column Telemetry Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Column 1: Current Capacity Gauge in Double-Bezel Card */}
-          <div className="lg:col-span-4 p-2 sm:p-2.5 bg-white/5 ring-1 ring-white/10 rounded-[2.5rem] shadow-xl">
-            <div className="bg-[#1C1F1B] rounded-[calc(2.5rem-0.625rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-inner">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs uppercase font-extrabold text-white/70 tracking-wider">
-                    Selected Window
-                  </span>
-                  <span className="text-xs font-mono font-extrabold text-[#D9381E] bg-[#D9381E]/10 px-2.5 py-1 rounded-full border border-[#D9381E]/20">
-                    {currentData.label}
-                  </span>
-                </div>
-
-                {/* Big Percentage Indicator */}
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-6xl sm:text-7xl font-display font-black tracking-tight text-white tabular-nums">
-                    {currentData.occupancy}%
-                  </span>
-                  <span className="text-xs uppercase font-extrabold text-white/60 tracking-wider">Floor Density</span>
-                </div>
-
-                <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden mb-4">
-                  <div
-                    style={{ width: `${currentData.occupancy}%` }}
-                    className={`h-full transition-all duration-500 rounded-full ${
-                      currentData.occupancy > 75
-                        ? 'bg-gradient-to-r from-[#D9381E] to-[#DC2626]'
-                        : currentData.occupancy > 40
-                        ? 'bg-gradient-to-r from-[#C5A059] to-[#D9381E]'
-                        : 'bg-gradient-to-r from-[#22C55E] to-[#141311]'
-                    }`}
-                  />
-                </div>
-
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-semibold">
-                    <span className="text-white/70">Atmosphere Rating:</span>
-                    <span className="text-[#D9381E] font-extrabold uppercase tracking-wider">{currentData.status}</span>
-                  </div>
-                  <p className="text-xs text-white/60 leading-relaxed font-normal">
-                    {currentData.occupancy < 35
-                      ? 'Serene environment. Zero wait time on squat racks, leg presses, and private salon appointments.'
-                      : currentData.occupancy < 70
-                      ? 'Balanced training flow. Ample space for supersets, personal training drills, and hair spas.'
-                      : 'High energy community vibe. Spotters available, uptempo soundscape, floor coaches active.'}
-                  </p>
-                </div>
+          {/* Left 4 Columns: Active Window Readout */}
+          <div className="lg:col-span-4 bg-[#1C1A17] p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between space-y-6">
+            <div>
+              <div className="flex items-center justify-between font-mono text-xs mb-4">
+                <span className="text-white/50 uppercase tracking-widest">
+                  {isOverridden ? 'STAFF OVERRIDE' : 'SELECTED WINDOW'}
+                </span>
+                <span className="px-3 py-1 rounded-full bg-[#D9381E] text-white font-bold">
+                  {isOverridden ? 'LIVE FLOOR SENSOR' : (currentSlot.timeLabel || `${currentSlot.hour}:00`)}
+                </span>
               </div>
 
-              <div className="pt-6">
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={onOpenInquiry}
-                  className="w-full justify-center shadow-lg shadow-[#D9381E]/20"
-                  icon={<ArrowUpRight className="w-4 h-4" />}
-                >
-                  RESERVE FLOOR PASS
-                </Button>
+              <div className="flex items-baseline gap-3 mb-4">
+                <span className="font-serif italic text-6xl sm:text-7xl text-white leading-none tabular-nums">
+                  {activeDensity}%
+                </span>
+                <span className="font-mono text-xs uppercase tracking-widest text-[#C5A059]">
+                  {isOverridden ? 'LIVE OVERRIDE' : 'FLOOR DENSITY'}
+                </span>
               </div>
+
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-5">
+                <div
+                  className="h-full bg-[#D9381E] transition-all duration-300"
+                  style={{ width: `${activeDensity}%` }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between font-mono text-xs py-2 border-y border-white/10 mb-3">
+                <span className="text-white/60">ATMOSPHERE RATING:</span>
+                <span className="text-emerald-400 font-bold">{currentSlot.status}</span>
+              </div>
+
+              <p className="font-sans text-xs sm:text-sm text-[#E6DEC8]/80 leading-relaxed">
+                {currentSlot.note}
+              </p>
             </div>
+
+            <Button
+              variant="primary"
+              size="md"
+              onClick={onOpenInquiry}
+              icon={<ArrowUpRight className="w-4 h-4" />}
+              className="w-full justify-center"
+            >
+              RESERVE FLOOR PASS
+            </Button>
           </div>
 
-          {/* Column 2: Interactive 16-Hour Rush Curve Bar Chart in Double-Bezel Card */}
-          <div className="lg:col-span-8 p-2 sm:p-2.5 bg-white/5 ring-1 ring-white/10 rounded-[2.5rem] shadow-xl">
-            <div className="bg-[#1C1F1B] rounded-[calc(2.5rem-0.625rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-inner">
+          {/* Right 8 Columns: Interactive 16-Hour Rush Curve + 4 Environmental Sensors */}
+          <div className="lg:col-span-8 bg-[#1C1A17] p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between space-y-8">
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
                 <div>
-                  <h3 className="font-display font-extrabold text-lg text-white uppercase tracking-tight">
-                    Typical Daily Occupancy Pattern
-                  </h3>
-                  <span className="text-xs text-white/60">
+                  <span className="block font-display text-sm sm:text-base font-extrabold uppercase text-white">
+                    TYPICAL DAILY OCCUPANCY PATTERN
+                  </span>
+                  <span className="font-sans text-xs text-white/50">
                     Click any hour column below to inspect traffic and atmospheric conditions.
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
-                    <span className="text-white/70">Quiet (&lt;35%)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-4 font-mono text-[11px]">
+                  <span className="inline-flex items-center gap-1.5 text-white/75">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                    Quiet (&lt;35%)
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-white/75">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#C5A059]" />
-                    <span className="text-white/70">Optimal</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
+                    Optimal
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-white/75">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#D9381E]" />
-                    <span className="text-white/70">Peak (&gt;75%)</span>
-                  </div>
+                    Peak (&gt;75%)
+                  </span>
                 </div>
               </div>
 
-              {/* Hourly Vertical Bars */}
-              <div className="grid grid-cols-8 sm:grid-cols-16 gap-1.5 sm:gap-2 items-end h-44 pt-6 px-1 border-b border-white/10 pb-2">
-                {HOURLY_SCHEDULE.map((item) => {
-                  const isCurrentNow = item.hour === currentHour;
-                  const isSelected = item.hour === selectedHour;
-
-                  return (
-                    <button
-                      key={item.hour}
-                      onClick={() => setSelectedHour(item.hour)}
-                      title={`${item.label}: ${item.occupancy}% Occupancy (${item.status})`}
-                      className="group flex flex-col items-center h-full justify-end cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-[#D9381E]"
-                    >
-                      <div className="w-full relative flex items-end justify-center">
+              {/* 16 Interactive Bar Columns (Horizontally scrollable on mobile for comfortable tap targets) */}
+              <div className="overflow-x-auto pb-2 no-scrollbar">
+                <div className="h-44 min-w-[460px] sm:min-w-0 flex items-end justify-between gap-1.5 sm:gap-2.5 pt-6 px-2 border-b border-white/10">
+                  {hourlyCurve.map((slot) => {
+                    const isSelected = slot.hour === selectedHour;
+                    return (
+                      <button
+                        key={slot.hour}
+                        type="button"
+                        onClick={() => setSelectedHour(slot.hour)}
+                        className="flex-1 h-full min-w-[22px] flex flex-col items-center justify-end group cursor-pointer"
+                        aria-label={`Inspect ${slot.timeLabel || slot.hour} occupancy`}
+                      >
                         <div
-                          style={{ height: `${item.occupancy * 1.3}px` }}
-                          className={`w-full max-w-[24px] rounded-t-sm transition-all duration-300 ${
+                          className={`w-full rounded-t-md transition-all duration-300 ${getBarColor(
+                            slot.status,
                             isSelected
-                              ? 'bg-[#D9381E] shadow-[0_0_12px_#D9381E]'
-                              : isCurrentNow
-                              ? 'bg-white shadow-[0_0_8px_white]'
-                              : item.occupancy > 75
-                              ? 'bg-[#D9381E]/80 group-hover:bg-[#D9381E]'
-                              : item.occupancy > 40
-                              ? 'bg-[#C5A059]/80 group-hover:bg-[#C5A059]'
-                              : 'bg-[#22C55E]/70 group-hover:bg-[#22C55E]'
-                          }`}
+                          )}`}
+                          style={{ height: `${slot.density}%` }}
                         />
-                      </div>
-                      <span className={`text-[10px] mt-2 font-mono tabular-nums leading-none ${
-                        isSelected ? 'font-bold text-[#D9381E]' : isCurrentNow ? 'font-bold text-white' : 'text-white/50'
-                      }`}>
-                        {item.hour.toString().padStart(2, '0')}
-                      </span>
-                    </button>
-                  );
-                })}
+                        <span
+                          className={`font-mono text-[10px] mt-2 pb-2 tabular-nums ${
+                            isSelected ? 'text-[#D9381E] font-bold' : 'text-white/45 group-hover:text-white'
+                          }`}
+                        >
+                          {String(slot.hour).padStart(2, '0')}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Live Studio Hygiene & Environment Diagnostics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-2">
-              <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2.5">
-                <Thermometer className="w-4 h-4 text-[#C5A059] flex-shrink-0" />
-                <div>
-                  <span className="block text-xs font-bold text-white">21°C Climate</span>
-                  <span className="text-[10px] text-white/60">Air-Conditioned</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-[#22C55E] flex-shrink-0" />
-                <div>
-                  <span className="block text-xs font-bold text-white">Continuous</span>
-                  <span className="text-[10px] text-white/60">Machine Sanitization</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2.5">
-                <Sparkles className="w-4 h-4 text-[#D9381E] flex-shrink-0" />
-                <div>
-                  <span className="block text-xs font-bold text-white">Salon Stylists</span>
-                  <span className="text-[10px] text-white/60">On-Floor Active</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 rounded-xl border border-white/5 flex items-center gap-2.5">
-                <Users className="w-4 h-4 text-[#E6DEC8] flex-shrink-0" />
-                <div>
-                  <span className="block text-xs font-bold text-white">Floor Trainers</span>
-                  <span className="text-[10px] text-white/60">Attentive Form Guard</span>
-                </div>
-              </div>
+            {/* 4 Environmental Telemetry Badges */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { icon: Thermometer, title: '21°C Climate', sub: 'Air-Conditioned' },
+                { icon: ShieldCheck, title: 'Continuous', sub: 'Machine Sanitation' },
+                { icon: Sparkles, title: 'Salon Stylists', sub: 'Private Wing Active' },
+                { icon: Users, title: 'Floor Trainers', sub: 'Attentive Form Guard' },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.title}
+                    className="p-3.5 rounded-2xl bg-black/35 border border-white/8"
+                  >
+                    <Icon className="w-4 h-4 text-[#C5A059] mb-2" />
+                    <span className="block font-display text-xs sm:text-sm font-bold text-white">
+                      {item.title}
+                    </span>
+                    <span className="block font-mono text-[10px] text-white/50">{item.sub}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
 };
+
+export default StudioLiveTelemetry;

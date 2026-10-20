@@ -1,248 +1,302 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
-import { SectionHeader } from '../ui/SectionHeader';
+import { ArrowUpRight, Sparkles, ShieldCheck, Dumbbell, Heart } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { PULSEFORM_ASSETS } from '../../config/assets';
-
-interface TrainingMode {
-  id: string;
-  title: string;
-  category: string;
-  tagline: string;
-  description: string;
-  imageSrc: string;
-  videoSrc?: string;
-  specs: { label: string; value: string }[];
-}
-
-const MODES: TrainingMode[] = [
-  {
-    id: 'strength',
-    title: 'Unisex Strength & Iron',
-    category: 'Gym Floor',
-    tagline: 'Calibrated Machinery & Free Weights',
-    description: 'Biomechanical selectorized stations, Olympic squat racks, dumbbells, and cable systems engineered for safe muscular hypertrophy and posture alignment.',
-    imageSrc: PULSEFORM_ASSETS.I04.src,
-    videoSrc: PULSEFORM_ASSETS.V06.src,
-    specs: [
-      { label: 'Machinery', value: 'Imported Biomechanical Lines' },
-      { label: 'Atmosphere', value: 'Air-Conditioned Unisex Floor' },
-      { label: 'Supervision', value: 'Certified Floor Instructors' },
-    ],
-  },
-  {
-    id: 'conditioning',
-    title: 'Fat Loss & Personal Coaching',
-    category: '1-on-1 Coaching',
-    tagline: 'Targeted Weight Loss & Custom Nutrition',
-    description: 'Targeted fat burn, conditioning lines, and 1-on-1 personal coaching with certified male and female fitness instructors tailored to your body composition.',
-    imageSrc: PULSEFORM_ASSETS.I05.src,
-    videoSrc: PULSEFORM_ASSETS.V05.src,
-    specs: [
-      { label: 'Trainers', value: 'Male & Female Available' },
-      { label: 'Programs', value: 'Hypertrophy & Fat Loss' },
-      { label: 'Nutrition', value: 'Custom Macro Blueprint' },
-    ],
-  },
-  {
-    id: 'keratin',
-    title: 'Keratin & Hair Spa Lounge',
-    category: 'Private Salon',
-    tagline: 'Hair Smoothing & Restorative Care',
-    description: 'Formaldehyde-free keratin smoothing, deep hair botox, protein spa, and restorative therapies administered by senior salon technicians.',
-    imageSrc: PULSEFORM_ASSETS.I06.src,
-    videoSrc: PULSEFORM_ASSETS.V07.src,
-    specs: [
-      { label: 'Formula', value: 'Formaldehyde-Free Botox & Keratin' },
-      { label: 'Privacy', value: 'Dedicated Salon Suite' },
-      { label: 'Outcome', value: 'Silky Shine & Zero Frizz' },
-    ],
-  },
-  {
-    id: 'makeup',
-    title: 'Bridal & Makeup Studio',
-    category: 'Beauty Studio',
-    tagline: 'HD Celebration Glamour & Skin Grooming',
-    description: 'High-definition bridal artistry, party reception looks, skin brightening, and unisex facial grooming in Rahara.',
-    imageSrc: PULSEFORM_ASSETS.I07.src,
-    specs: [
-      { label: 'Artistry', value: 'HD & Airbrush Bridal' },
-      { label: 'Clientele', value: 'Unisex Parlour & Skin Care' },
-      { label: 'Standards', value: 'Dermatologist Certified' },
-    ],
-  },
-];
+import { useCmsStore } from '../../store/cmsStore';
 
 export interface DisciplinesMatrixProps {
   onOpenInquiry: (plan?: string) => void;
 }
 
+interface DisciplineItem {
+  id: string;
+  number: string;
+  badge: string;
+  title: string;
+  serifTitle: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  video?: string;
+  specs: { label: string; value: string }[];
+  ctaText: string;
+  planName: string;
+}
+
+const DISCIPLINES: DisciplineItem[] = [
+  {
+    id: 'strength',
+    number: '#1',
+    badge: 'GYM FLOOR',
+    title: 'UNISEX STRENGTH &',
+    serifTitle: 'Calibrated Iron.',
+    subtitle: 'Calibrated Machinery & Free Weights',
+    description:
+      'Biomechanical selectorized stations, Olympic squat racks, dumbbells, and cable systems engineered for safe muscular hypertrophy and joint alignment.',
+    image: '/assets/images/i09-macro-plate.webp',
+    video: '/assets/videos/v06-strength.mp4',
+    specs: [
+      { label: 'MACHINERY', value: 'Imported Biomechanical' },
+      { label: 'ATMOSPHERE', value: 'Air-Conditioned Unisex' },
+      { label: 'SUPERVISION', value: 'On-Floor Form Coaching' },
+    ],
+    ctaText: 'RESERVE GYM FLOOR PASS',
+    planName: 'Unisex Gym Access (₹1,499/mo)',
+  },
+  {
+    id: 'coaching',
+    number: '#2',
+    badge: '1-ON-1 COACHING',
+    title: 'FAT LOSS & PERSONAL',
+    serifTitle: 'Transformation.',
+    subtitle: 'Targeted Weight Loss & Custom Nutrition',
+    description:
+      'Dedicated 1-on-1 personal training with certified male and female coaches. Structured metabolic conditioning, battle-rope intervals, and custom high-protein Indian meal blueprints.',
+    image: '/assets/images/i05-conditioning-still.webp',
+    video: '/assets/videos/v05-conditioning.mp4',
+    specs: [
+      { label: 'TRAINERS', value: 'Male & Female Certified' },
+      { label: 'FOCUS', value: 'Hypertrophy & Fat Loss' },
+      { label: 'NUTRITION', value: 'Custom Macro Blueprint' },
+    ],
+    ctaText: 'INQUIRE ABOUT 1-ON-1 COACHING',
+    planName: 'PT Transformation (₹3,499/mo)',
+  },
+  {
+    id: 'keratin',
+    number: '#3',
+    badge: 'PRIVATE SALON',
+    title: 'KERATIN & HAIR SPA',
+    serifTitle: 'Sanctuary.',
+    subtitle: 'Hair Smoothing & Restorative Care',
+    description:
+      'Formaldehyde-free keratin smoothing, deep hair botox, protein spa, and restorative scalp therapies administered by senior salon technicians in a private suite.',
+    image: '/assets/showcase/shilpas_salon_hair_spa.jpg',
+    specs: [
+      { label: 'FORMULA', value: 'Formaldehyde-Free Botox & Keratin' },
+      { label: 'PRIVACY', value: 'Dedicated Salon Suite' },
+      { label: 'OUTCOME', value: 'Silky Shine & Zero Frizz' },
+    ],
+    ctaText: 'BOOK KERATIN & HAIR SPA',
+    planName: 'Keratin & Hair Spa Lounge',
+  },
+  {
+    id: 'bridal',
+    number: '#4',
+    badge: 'BEAUTY STUDIO',
+    title: 'BRIDAL & MAKEUP',
+    serifTitle: 'Artistry.',
+    subtitle: 'HD Celebration Glamour & Skin Grooming',
+    description:
+      'High-definition waterproof bridal artistry, reception styling, skin brightening facials, and unisex grooming crafted by founder Shilpa Roy and master aestheticians.',
+    image: '/assets/showcase/shilpas_salon_glamour.jpg',
+    specs: [
+      { label: 'ARTISTRY', value: 'HD & Airbrush Bridal' },
+      { label: 'CLIENTELE', value: 'Unisex Parlour & Skin Care' },
+      { label: 'STANDARDS', value: 'Dermatologist Tested' },
+    ],
+    ctaText: 'BOOK BRIDAL / BEAUTY CONSULTATION',
+    planName: 'Bridal & Makeup Studio Consultation',
+  },
+];
+
 export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInquiry }) => {
-  const [selectedId, setSelectedId] = useState<string>('strength');
-  const activeMode = MODES.find((m) => m.id === selectedId) || MODES[0];
+  const disciplines = useCmsStore((s) => s.disciplines);
+  const [activeId, setActiveId] = useState<string>('strength');
+  const activeItem = disciplines.find((d) => d.id === activeId) || disciplines[0] || DISCIPLINES[0];
 
   return (
-    <section id="disciplines" className="relative z-20 w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#EDE9DF] shadow-[0_-24px_50px_rgba(0,0,0,0.06)]">
+    <section
+      id="disciplines"
+      className="w-full py-24 sm:py-32 px-4 sm:px-8 lg:px-12 bg-[#F4F1EA] text-[#0D0D0E]"
+    >
       <div className="max-w-[1440px] mx-auto">
-        <SectionHeader
-          tag="Curated Disciplines"
-          title="Strength Meets Salon Sanctuary."
-          description="Explore our specialized unisex gym floor and private salon suites in Khardaha. Select any discipline to inspect equipment and specifications."
-        />
+        {/* Editorial Section Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-[#0D0D0E]/70 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
+              <span>ACT III // CURATED DISCIPLINES</span>
+            </div>
 
-        {/* Asymmetric Studio Split Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-          {/* Left Column: Interactive Selector List (Double-Bezel Architecture) */}
-          <div className="lg:col-span-5 flex flex-col justify-between gap-3">
-            {MODES.map((mode, idx) => {
-              const isSelected = mode.id === selectedId;
-              const formattedIndex = `0${idx + 1}`;
+            <h2 className="font-display text-4xl sm:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
+              STRENGTH MEETS{' '}
+              <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
+                Salon Sanctuary.
+              </span>
+            </h2>
+
+            <p className="font-sans text-base sm:text-lg text-[#4A4843]">
+              Explore our specialized unisex gym floor and private salon suites in Khardaha. Select
+              any discipline to inspect equipment and specifications.
+            </p>
+          </div>
+
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0D0D0E] text-[#F4F1EA] font-mono text-xs uppercase tracking-wider self-start lg:self-end">
+            <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>04 SPECIALIZED WINGS · UNDER ONE ROOF</span>
+          </div>
+        </div>
+
+        {/* 12-Column Interactive Matrix */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left 5 Columns: 4 Tactile Selector Cards (Horizontal scroll on mobile, stacked on desktop) */}
+          <div className="lg:col-span-5 flex lg:flex-col overflow-x-auto lg:overflow-visible gap-2.5 sm:gap-3.5 pb-2 lg:pb-0 no-scrollbar">
+            {disciplines.map((item) => {
+              const isSelected = item.id === activeId;
               return (
-                <div
-                  key={mode.id}
-                  className={`p-1.5 rounded-[1.75rem] transition-all duration-300 ${
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveId(item.id)}
+                  className={`min-w-[240px] sm:min-w-[280px] lg:min-w-0 w-full p-4 sm:p-6 rounded-2xl sm:rounded-3xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 sm:gap-4 shrink-0 lg:shrink ${
                     isSelected
-                      ? 'bg-[#D9381E]/20 ring-1 ring-[#D9381E]/60 shadow-lg'
-                      : 'bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/8 hover:ring-[#0D0D0E]/15'
+                      ? 'bg-[#0D0D0E] text-[#F4F1EA] border-[#0D0D0E] shadow-xl'
+                      : 'bg-white text-[#0D0D0E] border-[#0D0D0E]/10 hover:border-[#D9381E]/50 shadow-xs'
                   }`}
                 >
-                  <button
-                    type="button"
-                    onClick={() => setSelectedId(mode.id)}
-                    className={`w-full p-4 sm:p-5 rounded-[calc(1.75rem-0.375rem)] text-left transition-all duration-300 cursor-pointer flex items-center justify-between group active:scale-[0.98] ${
-                      isSelected
-                        ? 'bg-[#0D0D0E] text-[#F5F2EA] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]'
-                        : 'bg-white text-[#0D0D0E] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)] hover:bg-[#FAF8F4]'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3.5">
-                      {/* Index Capsule */}
-                      <div
-                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full font-mono text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-md font-mono text-[11px] font-bold ${
                           isSelected
-                            ? 'bg-[#D9381E] text-[#0D0D0E]'
-                            : 'bg-[#EDE9DF] text-[#0D0D0E]/70 group-hover:bg-[#D9381E]/20 group-hover:text-[#D9381E]'
+                            ? 'bg-[#D9381E] text-white'
+                            : 'bg-[#F4F1EA] text-[#0D0D0E]/70'
                         }`}
                       >
-                        {formattedIndex}
-                      </div>
-
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className={`text-[11px] sm:text-xs font-extrabold uppercase tracking-wider ${
-                              isSelected ? 'text-[#D9381E]' : 'text-[#141311]'
-                            }`}
-                          >
-                            {mode.category}
-                          </span>
-                          {isSelected && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E] animate-pulse" />
-                          )}
-                        </div>
-                        <h3 className="text-base sm:text-lg font-display font-extrabold uppercase tracking-tight mb-0.5">
-                          {mode.title}
-                        </h3>
-                        <p
-                          className={`text-xs leading-relaxed ${
-                            isSelected ? 'text-[#F5F2EA]/80' : 'text-[#50554E]'
-                          }`}
-                        >
-                          {mode.tagline}
-                        </p>
-                      </div>
+                        {item.number}
+                      </span>
+                      <span
+                        className={`font-mono text-[11px] font-bold uppercase tracking-widest ${
+                          isSelected ? 'text-[#C5A059]' : 'text-[#D9381E]'
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
                     </div>
 
-                    {/* Trailing Interactive Arrow Capsule */}
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5 ${
-                        isSelected
-                          ? 'bg-white/10 text-[#D9381E]'
-                          : 'bg-[#EDE9DF] text-[#0D0D0E]/50 group-hover:bg-[#D9381E] group-hover:text-white'
+                    <h3 className="font-display text-lg sm:text-xl font-extrabold uppercase tracking-tight">
+                      {item.title} {item.serifTitle.replace('.', '')}
+                    </h3>
+
+                    <p
+                      className={`font-sans text-xs sm:text-sm ${
+                        isSelected ? 'text-white/70' : 'text-[#4A4843]'
                       }`}
                     >
-                      <ArrowUpRight className="w-4 h-4" />
-                    </div>
-                  </button>
-                </div>
+                      {item.subtitle}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                      isSelected
+                        ? 'bg-[#D9381E] text-white'
+                        : 'bg-[#F4F1EA] text-[#0D0D0E]/60'
+                    }`}
+                  >
+                    <ArrowUpRight className="w-4 h-4" />
+                  </div>
+                </button>
               );
             })}
           </div>
 
-          {/* Right Column: Double-Bezel Visual Showcase & Specifications */}
-          <div className="lg:col-span-7 p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-3xl shadow-lg">
-            <div className="bg-white rounded-[calc(1.5rem-0.25rem)] p-6 sm:p-8 flex flex-col justify-between h-full shadow-xs">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeMode.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-                  className="space-y-6"
+          {/* Right 7 Columns: Instant-Render Media & Specification Dossier (Zero Blank Flash) */}
+          <div className="lg:col-span-7 bg-white p-4 sm:p-6 rounded-3xl border border-[#0D0D0E]/12 shadow-sculptural">
+            {/* Media Frame with Guaranteed Poster Image + Video Overlay */}
+            <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-[#141311] mb-6">
+              <img
+                key={`img-${activeItem.id}`}
+                src={activeItem.image}
+                alt={`${activeItem.title} - ${activeItem.subtitle} at Shilpa's Gym & Salon in Rahara, Khardaha`}
+                loading="lazy"
+                decoding="async"
+                width={800}
+                height={500}
+                className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+              />
+
+              {activeItem.video && (
+                <video
+                  key={`vid-${activeItem.id}`}
+                  src={activeItem.video}
+                  poster={activeItem.image}
+                  preload="metadata"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )}
+
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20" />
+
+              <div className="absolute top-4 left-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/75 backdrop-blur-md text-white font-mono text-[11px] font-bold uppercase tracking-widest border border-white/15">
+                <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
+                <span>{activeItem.badge}</span>
+              </div>
+
+              <div className="absolute bottom-4 right-4 px-3.5 py-1.5 rounded-full bg-white/90 text-[#0D0D0E] font-mono text-[11px] font-bold uppercase tracking-wider">
+                SPEC {activeItem.number} // KHARDAHA ATELIER
+              </div>
+            </div>
+
+            {/* Detail Copy & 3-Column Spec Grid */}
+            <div className="px-2 sm:px-4 pb-2 space-y-6">
+              <div>
+                <h3 className="font-display text-2xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#0D0D0E] leading-[1.02] mb-2.5">
+                  {activeItem.title}{' '}
+                  <span className="font-serif italic font-normal capitalize text-[#D9381E]">
+                    {activeItem.serifTitle}
+                  </span>
+                </h3>
+                <p className="font-sans text-sm sm:text-base text-[#4A4843] leading-relaxed">
+                  {activeItem.description}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-[#0D0D0E]/10">
+                {activeItem.specs.map((sp) => (
+                  <div
+                    key={sp.label}
+                    className="p-3.5 rounded-2xl bg-[#F4F1EA] border border-[#0D0D0E]/8"
+                  >
+                    <span className="block font-mono text-[10px] font-bold uppercase tracking-widest text-[#D9381E] mb-1">
+                      {sp.label}
+                    </span>
+                    <span className="font-sans text-xs sm:text-sm font-bold text-[#0D0D0E]">
+                      {sp.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center justify-between gap-4">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => onOpenInquiry(activeItem.planName)}
+                  icon={<ArrowUpRight className="w-4 h-4" />}
                 >
-                  {/* Visual Media Frame */}
-                  <div className="relative w-full aspect-[16/10] bg-[#0D0D0E] rounded-2xl overflow-hidden shadow-inner">
-                    {activeMode.videoSrc ? (
-                      <video
-                        src={activeMode.videoSrc}
-                        poster={activeMode.imageSrc}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={activeMode.imageSrc}
-                        alt={activeMode.title}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                    <div className="absolute top-4 left-4 bg-[#0D0D0E]/90 backdrop-blur-md text-[#F5F2EA] px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-white/10">
-                      {activeMode.category}
-                    </div>
-                  </div>
+                  {activeItem.ctaText}
+                </Button>
 
-                  {/* Information & Details */}
-                  <div>
-                    <h4 className="text-2xl sm:text-3xl font-display font-extrabold uppercase tracking-tight text-[#0D0D0E] mb-2">
-                      {activeMode.title}
-                    </h4>
-                    <p className="text-sm sm:text-base text-[#3E423C] leading-relaxed">
-                      {activeMode.description}
-                    </p>
-                  </div>
-
-                  {/* Specifications Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                    {activeMode.specs.map((spec) => (
-                      <div key={spec.label} className="bg-[#FAF8F4] p-4 rounded-xl border border-[#0D0D0E]/5">
-                        <span className="block text-xs uppercase font-extrabold text-[#141311] tracking-wider mb-1">
-                          {spec.label}
-                        </span>
-                        <span className="text-sm font-bold text-[#0D0D0E]">
-                          {spec.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Conversion Trigger */}
-                  <div className="pt-2 flex flex-wrap items-center gap-4">
-                    <Button
-                      variant="primary"
-                      size="md"
-                      onClick={() => onOpenInquiry(activeMode.title)}
-                      icon={<ArrowUpRight className="w-4 h-4" />}
-                    >
-                      INQUIRE ABOUT {activeMode.category.toUpperCase()}
-                    </Button>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                <div className="flex items-center gap-4 font-mono text-xs text-[#0D0D0E]/65">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Dumbbell className="w-3.5 h-3.5 text-[#D9381E]" />
+                    Calibrated
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#C5A059]" />
+                    Hygienic Suite
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5 text-[#D9381E]" />
+                    Unisex
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -250,3 +304,5 @@ export const DisciplinesMatrix: React.FC<DisciplinesMatrixProps> = ({ onOpenInqu
     </section>
   );
 };
+
+export default DisciplinesMatrix;

@@ -59,6 +59,7 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
         <video
           src={asset.src}
           poster={asset.poster}
+          preload="metadata"
           autoPlay={autoPlayVideo}
           loop
           muted
@@ -72,6 +73,8 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
           alt={asset.alt}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
+          width={1200}
+          height={800}
           onLoad={() => setIsLoaded(true)}
           className={`w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.03] ${
             isLoaded ? 'opacity-100 filter-none' : 'opacity-80 blur-[2px]'

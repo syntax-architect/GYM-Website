@@ -312,7 +312,9 @@ export function TiltedGridHero({
                   {img ? (
                     <img
                       src={img.src}
-                      alt={k === 0 ? (img.alt ?? "") : ""}
+                      alt={k === 0 ? (img.alt ?? "Shilpa's Gym & Beauty Salon studio showcase in Khardaha") : ""}
+                      loading="lazy"
+                      decoding="async"
                       draggable={false}
                       className="absolute top-0 max-w-none object-cover"
                       style={{

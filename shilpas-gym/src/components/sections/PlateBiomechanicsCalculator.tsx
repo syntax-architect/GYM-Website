@@ -244,30 +244,30 @@ export const PlateBiomechanicsCalculator: React.FC<PlateBiomechanicsCalculatorPr
                 />
 
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => adjustWeight(-5)}
-                      className="px-3 py-1.5 rounded-lg border border-[#0D0D0E]/20 font-mono text-xs font-bold text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-white transition-colors cursor-pointer active:scale-95"
+                      className="px-3 py-1.5 min-h-[38px] rounded-lg border border-[#0D0D0E]/20 font-mono text-xs font-bold text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-white transition-colors cursor-pointer active:scale-95"
                     >
                       -5kg
                     </button>
                     <button
                       type="button"
                       onClick={() => adjustWeight(5)}
-                      className="px-3 py-1.5 rounded-lg border border-[#0D0D0E]/20 font-mono text-xs font-bold text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-white transition-colors cursor-pointer active:scale-95"
+                      className="px-3 py-1.5 min-h-[38px] rounded-lg border border-[#0D0D0E]/20 font-mono text-xs font-bold text-[#0D0D0E] hover:bg-[#0D0D0E] hover:text-white transition-colors cursor-pointer active:scale-95"
                     >
                       +5kg
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex flex-wrap items-center gap-1">
                     {QUICK_WEIGHTS.map((w) => (
                       <button
                         key={w}
                         type="button"
                         onClick={() => setTargetWeight(w)}
-                        className={`px-2.5 py-1.5 rounded-lg font-mono text-[11px] font-bold transition-all cursor-pointer active:scale-95 ${
+                        className={`px-2.5 py-1.5 min-h-[38px] rounded-lg font-mono text-[11px] font-bold transition-all cursor-pointer active:scale-95 ${
                           targetWeight === w
                             ? 'bg-[#D9381E] text-white'
                             : 'bg-[#F5F2EA] text-[#0D0D0E]/70 hover:bg-[#0D0D0E]/10'
@@ -483,6 +483,7 @@ export const PlateBiomechanicsCalculator: React.FC<PlateBiomechanicsCalculatorPr
                       return (
                         <div
                           key={zone.code}
+                          onClick={() => setHoveredZoneIndex((prev) => (prev === idx ? null : idx))}
                           onMouseEnter={() => setHoveredZoneIndex(idx)}
                           onMouseLeave={() => setHoveredZoneIndex(null)}
                           className={`py-3 px-3 rounded-xl transition-all cursor-pointer flex items-center justify-between ${
@@ -529,11 +530,11 @@ export const PlateBiomechanicsCalculator: React.FC<PlateBiomechanicsCalculatorPr
                 </div>
 
                 {/* Graphic Barbell Sleeve & Plates */}
-                <div className="relative w-full h-48 sm:h-52 rounded-2xl bg-[#0B0C0B] border border-white/10 flex items-center justify-center overflow-hidden px-6">
+                <div className="relative w-full h-44 sm:h-52 rounded-2xl bg-[#0B0C0B] border border-white/10 flex items-center justify-start sm:justify-center overflow-x-auto px-3 sm:px-6 no-scrollbar">
                   {/* Knurled Shaft & Sleeve */}
-                  <div className="relative w-full max-w-xl flex items-center">
+                  <div className="relative w-full max-w-xl flex items-center shrink-0">
                     {/* Left Inner Shaft */}
-                    <div className="w-24 sm:w-32 h-4 bg-gradient-to-b from-zinc-400 via-zinc-200 to-zinc-500 rounded-l-sm" />
+                    <div className="w-12 sm:w-28 h-4 bg-gradient-to-b from-zinc-400 via-zinc-200 to-zinc-500 rounded-l-sm shrink-0" />
                     {/* Sleeve Collar Stop */}
                     <div className="w-4 h-10 bg-zinc-300 border-x border-black/40 shrink-0" />
 

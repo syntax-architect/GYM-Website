@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Phone, MessageCircle, ArrowUpRight, Check } from 'lucide-react';
+import { useCmsStore } from '../../store/cmsStore';
 
 export interface InquiryDrawerProps {
   isOpen: boolean;
@@ -27,6 +28,9 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
   onClose,
   selectedPlan,
 }) => {
+  const brand = useCmsStore((s) => s.brand);
+  const addLeadInquiry = useCmsStore((s) => s.addLeadInquiry);
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -45,8 +49,20 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 1. Save lead inquiry into CMS Store & Supabase table `inquiries`
+    addLeadInquiry({
+      name: name.trim() || 'Anonymous Athlete',
+      phone: phone.trim() || brand.phone,
+      email: email.trim() || undefined,
+      selectedTrack: interest,
+      timeWindow,
+      notes: notes.trim() || undefined,
+    });
+
+    // 2. Open WhatsApp conversation with formatted dossier
     const message = [
-      `*SHILPA'S GYM & SALON — CONTRACT DOSSIER #2026*`,
+      `*${brand.gymName.toUpperCase()} — CONTRACT DOSSIER #2026*`,
       ``,
       `*Member Name:* ${name}`,
       `*Phone / WhatsApp:* ${phone}`,
@@ -55,12 +71,13 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
       `*Preferred Slot:* ${timeWindow}`,
       notes ? `*Playbook Notes:* ${notes}` : null,
       ``,
-      `Please confirm my studio visit at Rahara, Khardaha.`,
+      `Please confirm my studio visit at ${brand.locationShort}.`,
     ]
       .filter(Boolean)
       .join('\n');
 
-    const whatsappUrl = `https://wa.me/917439761994?text=${encodeURIComponent(message)}`;
+    const cleanWaNumber = brand.whatsapp.replace(/[^0-9]/g, '');
+    const whatsappUrl = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     onClose();
   };
@@ -73,7 +90,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
       <div
         onClick={(e) => e.stopPropagation()}
         data-lenis-prevent
-        className="relative w-full max-w-xl h-full bg-[#F5F2EA] text-[#0D0D0E] shadow-2xl border-l-2 border-[#0D0D0E] overflow-y-auto p-6 sm:p-10 flex flex-col justify-between"
+        className="relative w-full max-w-xl h-[100dvh] bg-[#F5F2EA] text-[#0D0D0E] shadow-2xl border-l-2 border-[#0D0D0E] overflow-y-auto p-5 sm:p-10 flex flex-col justify-between"
       >
         {/* Top Contract Header (Oddball 00:18 + Valmora 00:24 Motif) */}
         <div>
@@ -173,7 +190,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Sourav Mukherjee"
-                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-base sm:text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
                 />
               </div>
 
@@ -187,7 +204,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98300 00000"
-                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-mono text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-mono text-base sm:text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
                 />
               </div>
             </div>
@@ -201,7 +218,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
                 <select
                   value={timeWindow}
                   onChange={(e) => setTimeWindow(e.target.value)}
-                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-base sm:text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
                 >
                   {TIME_WINDOWS.map((win) => (
                     <option key={win} value={win}>
@@ -220,7 +237,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@domain.com"
-                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
+                  className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-base sm:text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E]"
                 />
               </div>
             </div>
@@ -235,7 +252,7 @@ export const InquiryDrawer: React.FC<InquiryDrawerProps> = ({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Tell us a date that suits, target weight/physique goal, or bridal booking inquiry..."
-                className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E] resize-none"
+                className="w-full bg-white px-4 py-3 rounded-xl border border-[#0D0D0E]/20 font-sans text-base sm:text-sm text-[#0D0D0E] focus:outline-none focus:border-[#D9381E] resize-none"
               />
             </div>
 

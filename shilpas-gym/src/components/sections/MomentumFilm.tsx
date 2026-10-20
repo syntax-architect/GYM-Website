@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Sparkles, Activity } from 'lucide-react';
+import { useCmsStore } from '../../store/cmsStore';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -35,6 +36,7 @@ const MANIFESTO_WORDS = [
 ];
 
 export const MomentumFilm: React.FC = () => {
+  const brand = useCmsStore((s) => s.brand);
   const sectionRef = useRef<HTMLElement>(null);
   const wordsContainerRef = useRef<HTMLParagraphElement>(null);
   const videoFrameRef = useRef<HTMLDivElement>(null);
@@ -132,17 +134,17 @@ export const MomentumFilm: React.FC = () => {
         </div>
 
         {/* Oddball-Inspired Scroll-Scrubbed Word Highlight Paragraph */}
-        <div className="max-w-5xl mb-14 sm:mb-20">
+        <div className="max-w-5xl mb-10 sm:mb-20">
           <p
             ref={wordsContainerRef}
-            className="font-display text-2xl sm:text-4xl lg:text-[2.75rem] font-extrabold uppercase tracking-[-0.02em] leading-[1.18] text-[#0D0D0E] flex flex-wrap gap-x-3 gap-y-2"
+            className="font-display text-xl sm:text-4xl lg:text-[2.75rem] font-extrabold uppercase tracking-[-0.02em] leading-[1.18] text-[#0D0D0E] flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1.5 sm:gap-y-2"
           >
             {MANIFESTO_WORDS.map((item, idx) => (
               <span
                 key={idx}
                 className={`manifesto-word inline-block transition-colors duration-150 ${
                   item.accent
-                    ? 'font-serif italic font-normal capitalize tracking-normal text-[#D9381E] text-3xl sm:text-5xl lg:text-[3.1rem]'
+                    ? 'font-serif italic font-normal capitalize tracking-normal text-[#D9381E] text-2xl sm:text-5xl lg:text-[3.1rem]'
                     : 'text-[#0D0D0E]'
                 }`}
               >
@@ -155,11 +157,12 @@ export const MomentumFilm: React.FC = () => {
         {/* Full-Bleed Expanding Cinema Stage */}
         <div
           ref={videoFrameRef}
-          className="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/9] bg-[#161815] overflow-hidden shadow-2xl ring-1 ring-[#0D0D0E]/15 will-change-transform"
+          className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9] rounded-2xl sm:rounded-3xl bg-[#161815] overflow-hidden shadow-2xl ring-1 ring-[#0D0D0E]/15 will-change-transform"
         >
           <video
-            src="/assets/videos/v03-momentum.mp4"
+            src={brand.momentumVideoUrl}
             poster="/assets/images/i04-strength-still.webp"
+            preload="metadata"
             autoPlay
             loop
             muted
@@ -171,20 +174,20 @@ export const MomentumFilm: React.FC = () => {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/25" />
 
           {/* Top-Left Camera Telemetry */}
-          <div className="pointer-events-none absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white font-mono text-[11px] uppercase tracking-widest">
-            <span className="w-2 h-2 rounded-full bg-[#D9381E] animate-ping" />
-            <span>OPTICAL TRACKING // 28MM COMPETITION KNURL</span>
+          <div className="pointer-events-none absolute top-3 left-3 sm:top-6 sm:left-6 flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white font-mono text-[9px] sm:text-[11px] uppercase tracking-widest">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#D9381E] animate-ping" />
+            <span>OPTICAL TRACKING // 28MM KNURL</span>
           </div>
 
           {/* Bottom-Left & Bottom-Right HUD Callouts */}
-          <div className="pointer-events-none absolute bottom-4 inset-x-4 sm:bottom-6 sm:inset-x-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-[#F5F2EA] font-mono text-xs uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-[#D9381E]" />
-              <span>SHILPA&apos;S GYM TRAINING FLOOR · RAHARA, KHARDAHA</span>
+          <div className="pointer-events-none absolute bottom-3 inset-x-3 sm:bottom-6 sm:inset-x-6 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-[#F5F2EA] font-mono text-[9px] sm:text-xs uppercase tracking-wider">
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#D9381E]" />
+              <span>{brand.gymName.toUpperCase()} · {brand.locationShort}</span>
             </div>
 
             <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-full bg-white/90 text-[#0D0D0E] font-mono text-xs font-bold uppercase tracking-wider">
-              <span>TENSILE RATING: 216,000 PSI</span>
+              <span>TENSILE: 216,000 PSI</span>
             </div>
           </div>
         </div>

@@ -1,102 +1,154 @@
-import React, { useState } from 'react';
-import { SectionHeader } from '../ui/SectionHeader';
-import { Button } from '../ui/Button';
-import { User, ArrowUpRight } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { ArrowUpRight, Clock, UserCheck, Sparkles } from 'lucide-react';
+import { useCmsStore } from '../../store/cmsStore';
 
 export interface TimetableBookingProps {
   onBookClass: (sessionTitle: string, time: string, coach: string) => void;
 }
 
-interface ClassSession {
+type DayKey = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN';
+type CategoryFilter = 'all' | 'strength' | 'cardio' | 'keratin' | 'bridal';
+
+interface ScheduleSlot {
   id: string;
+  day?: string;
   time: string;
-  discipline: 'strength' | 'conditioning' | 'mobility' | 'private';
+  duration: string;
   title: string;
   coach: string;
-  duration: string;
-  bay: string;
-  spotsLeft: number;
+  zone: string;
+  slotsLeft: number;
+  category: Exclude<CategoryFilter, 'all'>;
 }
 
-const SCHEDULE_DATA: Record<string, ClassSession[]> = {
-  Mon: [
-    { id: 'm1', time: '06:00 – 08:30', discipline: 'strength', title: 'Morning Iron & Strength Circuit', coach: 'Senior Gym Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 8 },
-    { id: 'm2', time: '08:30 – 10:30', discipline: 'conditioning', title: 'Fat Loss & High-Intensity Cardio', coach: 'Fitness Coach', duration: '60 min', bay: 'Cardio Zone', spotsLeft: 5 },
-    { id: 'm3', time: '11:00 – 14:00', discipline: 'private', title: '1-on-1 Personal Training & Body Measurement', coach: 'Dedicated PT', duration: '60 min', bay: 'PT Bay', spotsLeft: 2 },
-    { id: 'm4', time: '12:00 – 17:00', discipline: 'mobility', title: 'Keratin Hair Spa & Treatment Lounge', coach: 'Senior Hair Stylist', duration: '90–120 min', bay: 'Unisex Salon Suite', spotsLeft: 3 },
-    { id: 'm5', time: '17:30 – 22:00', discipline: 'strength', title: 'Evening Peak Muscle Building & Hypertrophy', coach: 'Lead Floor Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 6 },
-  ],
-  Tue: [
-    { id: 't1', time: '06:00 – 09:00', discipline: 'strength', title: 'Morning Strength & Calibrated Machines', coach: 'Floor Instructor', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 10 },
-    { id: 't2', time: '09:00 – 11:00', discipline: 'conditioning', title: 'Aerobic Fat Burn & Core Conditioning', coach: 'Fitness Coach', duration: '60 min', bay: 'Cardio Zone', spotsLeft: 4 },
-    { id: 't3', time: '12:00 – 16:00', discipline: 'mobility', title: 'Hair Botox, Protein Spa & Rejuvenation', coach: 'Senior Hair Stylist', duration: '90 min', bay: 'Unisex Salon Suite', spotsLeft: 2 },
-    { id: 't4', time: '17:00 – 22:00', discipline: 'strength', title: 'Evening Strength & Powerlifting Floor', coach: 'Senior Gym Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 7 },
-  ],
-  Wed: [
-    { id: 'w1', time: '06:00 – 08:30', discipline: 'strength', title: 'Morning Iron & Strength Circuit', coach: 'Senior Gym Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 9 },
-    { id: 'w2', time: '08:30 – 10:30', discipline: 'conditioning', title: 'Metabolic Conditioning & Fat Loss', coach: 'Fitness Coach', duration: '60 min', bay: 'Cardio Zone', spotsLeft: 6 },
-    { id: 'w3', time: '14:00 – 18:00', discipline: 'private', title: 'Bridal Consultation & Skin Glow Facial', coach: 'Lead Makeup Artist', duration: '60 min', bay: 'Beauty Studio', spotsLeft: 2 },
-    { id: 'w4', time: '17:30 – 22:00', discipline: 'strength', title: 'Evening Peak Muscle Building Floor', coach: 'Lead Floor Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 5 },
-  ],
-  Thu: [
-    { id: 'th1', time: '06:00 – 09:00', discipline: 'strength', title: 'Morning Strength & Dumbbell Rows', coach: 'Floor Instructor', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 12 },
-    { id: 'th2', time: '10:00 – 13:00', discipline: 'private', title: 'Personalized Weight Loss Check-in & PT', coach: 'Dedicated PT', duration: '60 min', bay: 'PT Bay', spotsLeft: 2 },
-    { id: 'th3', time: '14:00 – 17:30', discipline: 'mobility', title: 'Keratin Gloss & Deep Conditioning Treatment', coach: 'Master Hair Stylist', duration: '120 min', bay: 'Unisex Salon Suite', spotsLeft: 1 },
-    { id: 'th4', time: '17:30 – 22:00', discipline: 'strength', title: 'Evening Iron & Barbell Floor', coach: 'Senior Gym Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 8 },
-  ],
-  Fri: [
-    { id: 'f1', time: '06:00 – 08:30', discipline: 'strength', title: 'Compound Lifting & Posture Strength', coach: 'Senior Gym Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 7 },
-    { id: 'f2', time: '09:00 – 11:00', discipline: 'conditioning', title: 'High-Energy Cardio & Treadmill Surge', coach: 'Fitness Coach', duration: '60 min', bay: 'Cardio Zone', spotsLeft: 4 },
-    { id: 'f3', time: '13:00 – 17:00', discipline: 'mobility', title: 'Unisex Aesthetic Facial & Scalp Revival', coach: 'Salon Aesthetician', duration: '75 min', bay: 'Beauty Studio', spotsLeft: 3 },
-    { id: 'f4', time: '17:30 – 22:00', discipline: 'strength', title: 'Friday Night Pump & Functional Training', coach: 'Lead Floor Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 6 },
-  ],
-  Sat: [
-    { id: 's1', time: '07:00 – 10:30', discipline: 'strength', title: 'Weekend Heavy Loading Intensive', coach: 'Senior Gym Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 4 },
-    { id: 's2', time: '11:00 – 15:00', discipline: 'mobility', title: 'Keratin Therapy & Event Hair Styling', coach: 'Senior Hair Stylist', duration: '120 min', bay: 'Unisex Salon Suite', spotsLeft: 2 },
-    { id: 's3', time: '15:30 – 19:30', discipline: 'private', title: 'Pre-Wedding & Party HD Makeup Studio', coach: 'Lead Makeup Artist', duration: '90 min', bay: 'Beauty Studio', spotsLeft: 1 },
-    { id: 's4', time: '18:00 – 22:00', discipline: 'strength', title: 'Saturday Evening Fitness Floor', coach: 'Floor Staff', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 9 },
-  ],
-  Sun: [
-    { id: 'su1', time: '08:00 – 12:00', discipline: 'strength', title: 'Sunday Morning Workout & Mobility Flow', coach: 'Senior Gym Trainer', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 10 },
-    { id: 'su2', time: '12:00 – 16:00', discipline: 'mobility', title: 'Sunday Self-Care: Hair Spa & Skin Care', coach: 'Salon Aesthetician', duration: '90 min', bay: 'Unisex Salon Suite', spotsLeft: 3 },
-    { id: 'su3', time: '17:00 – 22:00', discipline: 'strength', title: 'Sunday Evening Workout & Reset', coach: 'Floor Staff', duration: 'Full Access', bay: 'Gym Floor A', spotsLeft: 12 },
-  ],
-};
+const BASE_SESSIONS: ScheduleSlot[] = [
+  {
+    id: 's1',
+    time: '06:00 – 08:30',
+    duration: 'FULL ACCESS',
+    title: 'MORNING IRON & BIOMECHANICAL STRENGTH CIRCUIT',
+    coach: 'Coach Rajesh Sen',
+    zone: 'Gym Floor A',
+    slotsLeft: 8,
+    category: 'strength',
+  },
+  {
+    id: 's2',
+    time: '08:30 – 10:30',
+    duration: '60 MIN',
+    title: 'FAT LOSS & METABOLIC CONDITIONING SURGE',
+    coach: 'Coach Priya Mukherjee',
+    zone: 'Cardio & Turf Zone',
+    slotsLeft: 5,
+    category: 'cardio',
+  },
+  {
+    id: 's3',
+    time: '11:00 – 14:00',
+    duration: '60 MIN',
+    title: '1-ON-1 PERSONAL TRAINING & BODY RECOMPOSITION',
+    coach: 'Dedicated PT Specialist',
+    zone: 'Private PT Bay',
+    slotsLeft: 2,
+    category: 'strength',
+  },
+  {
+    id: 's4',
+    time: '12:00 – 17:00',
+    duration: '90–120 MIN',
+    title: 'FORMALDEHYDE-FREE KERATIN & HAIR BOTOX LOUNGE',
+    coach: 'Tania Roy',
+    zone: 'Private Salon Suite',
+    slotsLeft: 3,
+    category: 'keratin',
+  },
+  {
+    id: 's5',
+    time: '15:00 – 18:00',
+    duration: 'BY APPOINTMENT',
+    title: 'HD BRIDAL MAKEOVER & SKIN LUMINESCENCE STUDIO',
+    coach: 'Shilpa Roy',
+    zone: 'Bridal Artistry Wing',
+    slotsLeft: 2,
+    category: 'bridal',
+  },
+  {
+    id: 's6',
+    time: '17:30 – 22:00',
+    duration: 'FULL ACCESS',
+    title: 'EVENING PEAK MUSCLE HYPERTROPHY & HEAVY IRON',
+    coach: 'Lead Floor Trainers',
+    zone: 'Olympic Lifting Floor',
+    slotsLeft: 6,
+    category: 'strength',
+  },
+];
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS: DayKey[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
 export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass }) => {
-  const [selectedDay, setSelectedDay] = useState<string>('Mon');
-  const [disciplineFilter, setDisciplineFilter] = useState<string>('all');
+  const brand = useCmsStore((s) => s.brand);
+  const timetableSlots = useCmsStore((s) => s.timetableSlots);
+  const [selectedDay, setSelectedDay] = useState<DayKey>('MON');
+  const [filter, setFilter] = useState<CategoryFilter>('all');
 
-  const sessions = (SCHEDULE_DATA[selectedDay] || []).filter((s) => {
-    if (disciplineFilter === 'all') return true;
-    return s.discipline === disciplineFilter;
-  });
+  const filteredSessions = useMemo(() => {
+    const list = timetableSlots && timetableSlots.length > 0 ? timetableSlots : BASE_SESSIONS;
+    return list.filter((s) => {
+      const matchesCategory = filter === 'all' ? true : s.category === filter;
+      const matchesDay = !s.day || s.day === 'ALL' || s.day === selectedDay;
+      return matchesCategory && matchesDay;
+    });
+  }, [timetableSlots, filter, selectedDay]);
 
   return (
-    <section id="timetable" className="w-full py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#EDE9DF]">
+    <section
+      id="timetable"
+      className="w-full py-24 sm:py-32 px-4 sm:px-8 lg:px-12 bg-[#F4F1EA] text-[#0D0D0E]"
+    >
       <div className="max-w-[1440px] mx-auto">
-        <SectionHeader
-          tag="Weekly Timetable"
-          title="Daily Studio Schedule."
-          description="Open daily from 06:00 AM to 10:00 PM. Reserve your training slot on the gym floor or book private salon treatments in Rahara, Khardaha."
-        />
+        {/* Top Editorial Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-[#0D0D0E]/70 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-[#D9381E]" />
+              <span>WEEKLY TIMETABLE // LIVE SLOT ROSTER</span>
+            </div>
 
-        {/* High-End Segmented Day Dock */}
-        <div className="mb-6 flex items-center overflow-x-auto pb-2">
-          <div className="p-1.5 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-full inline-flex items-center gap-1.5 shadow-xs">
+            <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-[-0.03em] text-[#0D0D0E] leading-[0.95]">
+              DAILY STUDIO{' '}
+              <span className="font-serif italic font-normal capitalize tracking-normal text-[#D9381E]">
+                Schedule.
+              </span>
+            </h2>
+
+            <p className="font-sans text-base sm:text-lg text-[#4A4843]">
+              Open daily from {brand.hours}. Reserve your training slot on the gym floor or
+              book private salon treatments in {brand.locationShort}.
+            </p>
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0D0D0E] text-[#F4F1EA] font-mono text-xs uppercase tracking-wider self-start lg:self-end">
+            <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />
+            <span>ACTIVE DAY // {selectedDay}</span>
+          </div>
+        </div>
+
+        {/* Day Selector Strip + Category Filter Pills */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-[#0D0D0E]/10 mb-8 overflow-hidden">
+          {/* Days */}
+          <div className="flex flex-nowrap overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap items-center gap-2">
             {DAYS.map((day) => {
-              const isActive = selectedDay === day;
+              const active = selectedDay === day;
               return (
                 <button
                   key={day}
                   type="button"
                   onClick={() => setSelectedDay(day)}
-                  className={`px-5 sm:px-7 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap active:scale-95 ${
-                    isActive
-                      ? 'bg-[#0D0D0E] text-[#F5F2EA] shadow-md border border-[#0D0D0E]'
-                      : 'text-[#0D0D0E]/70 hover:text-[#0D0D0E] hover:bg-white/80'
+                  className={`shrink-0 min-h-[42px] px-5 py-2.5 rounded-full font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    active
+                      ? 'bg-[#0D0D0E] text-[#F4F1EA] shadow-md'
+                      : 'bg-white text-[#0D0D0E]/70 border border-[#0D0D0E]/12 hover:border-[#0D0D0E]'
                   }`}
                 >
                   {day}
@@ -104,84 +156,86 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
               );
             })}
           </div>
+
+          {/* Discipline Filters */}
+          <div className="flex flex-nowrap overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap items-center gap-2">
+            {[
+              { id: 'all', label: 'ALL SESSIONS' },
+              { id: 'strength', label: 'GYM & STRENGTH' },
+              { id: 'cardio', label: 'FAT LOSS & CARDIO' },
+              { id: 'keratin', label: 'KERATIN & HAIR SPA' },
+              { id: 'bridal', label: 'BRIDAL & MAKEUP' },
+            ].map((tab) => {
+              const active = filter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setFilter(tab.id as CategoryFilter)}
+                  className={`shrink-0 min-h-[40px] px-4 py-2 rounded-full font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                    active
+                      ? 'bg-[#D9381E] text-white shadow-xs'
+                      : 'bg-white/80 text-[#0D0D0E]/70 border border-[#0D0D0E]/10 hover:text-[#0D0D0E]'
+                  }`}
+                >
+                  ● {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Tactile Discipline Filter Pills */}
-        <div className="flex flex-wrap items-center gap-2 mb-8">
-          {[
-            { id: 'all', label: 'All Sessions' },
-            { id: 'strength', label: 'Gym & Strength' },
-            { id: 'conditioning', label: 'Fat Loss & Cardio' },
-            { id: 'mobility', label: 'Keratin & Hair Spa' },
-            { id: 'private', label: 'Personal Coaching & Bridal' },
-          ].map((flt) => {
-            const isActive = disciplineFilter === flt.id;
-            return (
-              <button
-                key={flt.id}
-                type="button"
-                onClick={() => setDisciplineFilter(flt.id)}
-                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer border active:scale-95 flex items-center gap-2 ${
-                  isActive
-                    ? 'bg-[#D9381E] text-[#0D0D0E] border-[#D9381E] shadow-xs'
-                    : 'bg-white/90 text-[#0D0D0E]/75 border-[#0D0D0E]/15 hover:border-[#D9381E]/60 hover:text-[#0D0D0E]'
-                }`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#0D0D0E]' : 'bg-[#D9381E]'}`} />
-                <span>{flt.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Schedule List with Double-Bezel Framing */}
-        <div className="space-y-3.5">
-          {sessions.map((session) => (
+        {/* Flight-Board Session Rows */}
+        <div className="space-y-4">
+          {filteredSessions.map((slot) => (
             <div
-              key={session.id}
-              className="p-1.5 sm:p-2 bg-[#0D0D0E]/5 ring-1 ring-[#0D0D0E]/10 rounded-[2rem] shadow-xs hover:shadow-md transition-all duration-300"
+              key={`${selectedDay}-${slot.id}`}
+              className="group bg-white hover:bg-[#141311] text-[#0D0D0E] hover:text-[#F4F1EA] p-6 sm:p-7 rounded-3xl border border-[#0D0D0E]/12 shadow-xs hover:shadow-2xl transition-all duration-300 flex flex-col lg:flex-row lg:items-center justify-between gap-6"
             >
-              <div className="bg-white p-5 sm:p-6 rounded-[calc(2rem-0.375rem)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)] flex flex-col md:flex-row md:items-center justify-between gap-5">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-                  <div className="w-44 flex-shrink-0">
-                    <span className="text-base font-extrabold text-[#0D0D0E] tabular-nums block tracking-tight">
-                      {session.time}
-                    </span>
-                    <span className="text-xs text-[#141311] font-bold uppercase tracking-wider">
-                      {session.duration}
-                    </span>
-                  </div>
-
-                  <div>
-                    <h4 className="text-base sm:text-lg font-display font-extrabold text-[#0D0D0E] uppercase tracking-tight mb-1">
-                      {session.title}
-                    </h4>
-                    <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-[#4E534B]">
-                      <span className="flex items-center gap-1.5 font-medium">
-                        <User className="w-3.5 h-3.5 text-[#D9381E]" />
-                        <span>{session.coach}</span>
-                      </span>
-                      <span>·</span>
-                      <span>{session.bay}</span>
-                      <span>·</span>
-                      <span className="inline-flex items-center gap-1 text-[#141311] font-bold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#141311]" />
-                        <span>{session.spotsLeft} slots left</span>
-                      </span>
-                    </div>
-                  </div>
+              {/* Left Timecode Column */}
+              <div className="flex items-center gap-4 lg:w-56 shrink-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#F4F1EA] group-hover:bg-white/10 flex items-center justify-center text-[#D9381E] shrink-0">
+                  <Clock className="w-4 h-4" />
                 </div>
-
-                <div className="flex items-center justify-end">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() => onBookClass(session.title, session.time, session.coach)}
-                    icon={<ArrowUpRight className="w-3.5 h-3.5" />}
-                  >
-                    RESERVE SLOT
-                  </Button>
+                <div>
+                  <span className="block font-mono text-sm sm:text-base font-extrabold tabular-nums">
+                    {slot.time}
+                  </span>
+                  <span className="block font-mono text-[10px] uppercase tracking-widest opacity-55">
+                    {slot.duration} · {selectedDay}
+                  </span>
                 </div>
+              </div>
+
+              {/* Center Session Title & Specialist */}
+              <div className="flex-1 space-y-1.5">
+                <h3 className="font-display text-lg sm:text-xl font-extrabold uppercase tracking-tight">
+                  {slot.title}
+                </h3>
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-1 font-mono text-xs opacity-75">
+                  <span className="inline-flex items-center gap-1.5">
+                    <UserCheck className="w-3.5 h-3.5 text-[#D9381E]" />
+                    {slot.coach}
+                  </span>
+                  <span>•</span>
+                  <span>{slot.zone}</span>
+                  <span>•</span>
+                  <span className="text-[#D9381E] group-hover:text-[#C5A059] font-bold">
+                    ● {slot.slotsLeft} slots left
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Action Button */}
+              <div className="flex items-center justify-end shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onBookClass(slot.title, `${selectedDay} · ${slot.time}`, slot.coach)}
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#D9381E] hover:bg-[#B82B14] text-white font-mono text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
+                >
+                  <span>RESERVE SLOT</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}
@@ -190,3 +244,5 @@ export const TimetableBooking: React.FC<TimetableBookingProps> = ({ onBookClass 
     </section>
   );
 };
+
+export default TimetableBooking;

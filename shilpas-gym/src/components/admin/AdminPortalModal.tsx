@@ -20,6 +20,10 @@ import {
   Phone,
   MessageCircle,
   Activity,
+  LogOut,
+  Mail,
+  Key,
+  Loader2,
 } from 'lucide-react';
 import {
   useCmsStore,
@@ -28,7 +32,7 @@ import {
   type TimetableSlot,
   type LeadInquiry,
 } from '../../store/cmsStore';
-import { isSupabaseConfigured } from '../../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 type AdminTab =
   | 'brand'
@@ -43,6 +47,13 @@ type AdminTab =
 export const AdminPortalModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authMode, setAuthMode] = useState<'email' | 'pin'>('email');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [currentSessionUser, setCurrentSessionUser] = useState<string | null>(null);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
   const [activeTab, setActiveTab] = useState<AdminTab>('brand');
@@ -116,17 +127,102 @@ export const AdminPortalModal: React.FC = () => {
     };
   }, []);
 
+  // Monitor Supabase Auth Session
+  useEffect(() => {
+    if (!supabase) return;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setIsAuthenticated(true);
+        setCurrentSessionUser(session.user.email ?? 'Supabase Admin');
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setIsAuthenticated(true);
+        setCurrentSessionUser(session.user.email ?? 'Supabase Admin');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const showToast = (msg: string) => {
     setSuccessToast(msg);
     setTimeout(() => setSuccessToast(null), 3000);
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailInput.trim() || !passwordInput) {
+      setAuthError('Please enter both email and password.');
+      return;
+    }
+    if (!supabase) {
+      setAuthError('Supabase is not configured. Please switch to Quick PIN mode.');
+      return;
+    }
+
+    setIsAuthLoading(true);
+    setAuthError(null);
+
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email: emailInput.trim(),
+          password: passwordInput,
+        });
+        if (error) throw error;
+        if (data.session) {
+          setIsAuthenticated(true);
+          setCurrentSessionUser(data.user?.email ?? emailInput.trim());
+          showToast('Admin account created & authenticated!');
+        } else {
+          showToast('Admin registered! Please sign in or check your verification email.');
+          setIsSignUp(false);
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: emailInput.trim(),
+          password: passwordInput,
+        });
+        if (error) throw error;
+        setIsAuthenticated(true);
+        setCurrentSessionUser(data.user?.email ?? emailInput.trim());
+        showToast('Authenticated via Supabase!');
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Authentication failed. Please verify credentials.');
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+    setIsAuthenticated(false);
+    setCurrentSessionUser(null);
+    setEmailInput('');
+    setPasswordInput('');
+    setPinInput('');
+    showToast('Signed out of Admin Portal');
   };
 
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (pinInput.trim() === expectedPin.trim() || pinInput.trim() === '2026') {
       setIsAuthenticated(true);
+      setCurrentSessionUser('Staff Quick Session');
       setPinError(false);
       setPinInput('');
+      showToast('Staff PIN verified!');
     } else {
       setPinError(true);
     }
@@ -282,6 +378,23 @@ export const AdminPortalModal: React.FC = () => {
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">RESET</span>
                 </button>
+
+                {currentSessionUser && (
+                  <span className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/5 border border-white/10 font-mono text-[10px] text-white/80">
+                    <Mail className="w-3 h-3 text-[#C5A059]" />
+                    <span className="truncate max-w-[140px]">{currentSessionUser}</span>
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-300 font-mono text-xs font-bold transition-colors cursor-pointer"
+                  title="Sign out of Admin Portal"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">SIGN OUT</span>
+                </button>
               </>
             )}
 
@@ -297,7 +410,7 @@ export const AdminPortalModal: React.FC = () => {
         </div>
 
         {/* ============================================================================== */}
-        {/* AUTHENTICATION GATE (PIN OR SUPABASE) */}
+        {/* AUTHENTICATION GATE (SUPABASE EMAIL/PASSWORD & STAFF PIN) */}
         {/* ============================================================================== */}
         {!isAuthenticated ? (
           <div className="flex-1 flex items-center justify-center p-6 bg-[#0D0D0E]">
@@ -308,47 +421,155 @@ export const AdminPortalModal: React.FC = () => {
 
               <div>
                 <h3 className="font-display text-2xl font-black uppercase text-white tracking-tight">
-                  STAFF & ADMIN ACCESS
+                  ADMINISTRATIVE ACCESS
                 </h3>
                 <p className="font-sans text-xs text-white/60 mt-1">
-                  Enter staff PIN or master administrative code to open the White-Label CMS.
+                  Connect to Supabase live database or enter staff verification code.
                 </p>
               </div>
 
-              <form onSubmit={handlePinSubmit} className="space-y-4">
-                <div>
-                  <input
-                    type="password"
-                    maxLength={10}
-                    value={pinInput}
-                    onChange={(e) => {
-                      setPinInput(e.target.value);
-                      setPinError(false);
-                    }}
-                    placeholder="Enter Staff PIN (Default: 2026)"
-                    className={`w-full bg-[#1C1A17] text-center font-mono text-xl tracking-[0.3em] px-4 py-3.5 rounded-2xl border ${
-                      pinError ? 'border-red-500 text-red-400' : 'border-white/20 text-white'
-                    } focus:outline-none focus:border-[#D9381E]`}
-                    autoFocus
-                  />
-                  {pinError && (
-                    <p className="font-mono text-xs text-red-400 mt-2">
-                      Incorrect PIN code. Try default PIN: <strong>2026</strong>
-                    </p>
-                  )}
-                </div>
-
+              {/* Mode Switcher Tabs */}
+              <div className="flex rounded-xl bg-white/5 p-1 border border-white/10 text-xs font-mono font-bold">
                 <button
-                  type="submit"
-                  className="w-full py-3.5 px-6 rounded-2xl bg-[#D9381E] hover:bg-[#B82B14] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg active:scale-95"
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('email');
+                    setAuthError(null);
+                  }}
+                  className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    authMode === 'email'
+                      ? 'bg-[#D9381E] text-white shadow-sm'
+                      : 'text-white/60 hover:text-white'
+                  }`}
                 >
-                  <Unlock className="w-4 h-4" />
-                  <span>UNLOCK CONTROL CENTER</span>
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>SUPABASE AUTH</span>
                 </button>
-              </form>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('pin');
+                    setAuthError(null);
+                  }}
+                  className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    authMode === 'pin'
+                      ? 'bg-[#D9381E] text-white shadow-sm'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  <Key className="w-3.5 h-3.5" />
+                  <span>STAFF PIN</span>
+                </button>
+              </div>
+
+              {authMode === 'email' ? (
+                /* SUPABASE EMAIL & PASSWORD FORM */
+                <form onSubmit={handleEmailAuth} className="space-y-4 text-left">
+                  <div>
+                    <label className="block font-mono text-[11px] text-white/70 uppercase mb-1.5 font-bold">
+                      Admin Email Address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      placeholder="admin@shilpasgym.com"
+                      className="w-full bg-[#1C1A17] text-white font-mono text-sm px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:border-[#D9381E] transition-colors"
+                      autoFocus
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-mono text-[11px] text-white/70 uppercase mb-1.5 font-bold">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={passwordInput}
+                      onChange={(e) => setPasswordInput(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-[#1C1A17] text-white font-mono text-sm px-4 py-3 rounded-xl border border-white/20 focus:outline-none focus:border-[#D9381E] transition-colors"
+                    />
+                  </div>
+
+                  {authError && (
+                    <div className="p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 font-mono text-xs">
+                      {authError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isAuthLoading}
+                    className="w-full py-3.5 px-6 rounded-2xl bg-[#D9381E] hover:bg-[#B82B14] disabled:opacity-50 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg active:scale-95"
+                  >
+                    {isAuthLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>AUTHENTICATING...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Unlock className="w-4 h-4" />
+                        <span>{isSignUp ? 'CREATE ADMIN ACCOUNT' : 'SIGN IN WITH SUPABASE'}</span>
+                      </>
+                    )}
+                  </button>
+
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSignUp(!isSignUp);
+                        setAuthError(null);
+                      }}
+                      className="font-mono text-xs text-[#C5A059] hover:underline cursor-pointer"
+                    >
+                      {isSignUp
+                        ? 'Already have an account? Sign In'
+                        : 'First-time setup? Register initial Supabase admin'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                /* STAFF PIN FORM */
+                <form onSubmit={handlePinSubmit} className="space-y-4">
+                  <div>
+                    <input
+                      type="password"
+                      maxLength={10}
+                      value={pinInput}
+                      onChange={(e) => {
+                        setPinInput(e.target.value);
+                        setPinError(false);
+                      }}
+                      placeholder="Enter Staff PIN (Default: 2026)"
+                      className={`w-full bg-[#1C1A17] text-center font-mono text-xl tracking-[0.3em] px-4 py-3.5 rounded-2xl border ${
+                        pinError ? 'border-red-500 text-red-400' : 'border-white/20 text-white'
+                      } focus:outline-none focus:border-[#D9381E]`}
+                      autoFocus
+                    />
+                    {pinError && (
+                      <p className="font-mono text-xs text-red-400 mt-2">
+                        Incorrect PIN code. Try default PIN: <strong>2026</strong>
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3.5 px-6 rounded-2xl bg-[#D9381E] hover:bg-[#B82B14] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg active:scale-95"
+                  >
+                    <Unlock className="w-4 h-4" />
+                    <span>UNLOCK VIA QUICK PIN</span>
+                  </button>
+                </form>
+              )}
 
               <div className="pt-4 border-t border-white/10 font-mono text-[11px] text-white/45 flex items-center justify-between">
-                <span>CLIENT DEMO QUICK PIN: 2026</span>
+                <span>QUICK DEMO PIN: 2026</span>
                 <span className="text-[#C5A059]">CTRL + SHIFT + A</span>
               </div>
             </div>

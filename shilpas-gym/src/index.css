@@ -112,3 +112,22 @@ html.lenis body {
     scroll-behavior: auto !important;
   }
 }
+
+/* GPU Hardware Acceleration & Frame Stability */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Off-screen Image & Media Content Visibility */
+img:not([fetchpriority="high"]),
+video:not([autoplay]) {
+  content-visibility: auto;
+}
+
+/* Smooth composite containment */
+.contain-paint {
+  contain: paint layout;
+}
+

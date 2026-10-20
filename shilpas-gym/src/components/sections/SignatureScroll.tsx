@@ -74,13 +74,31 @@ export const SignatureScroll: React.FC = () => {
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef<number>(1);
 
-  const [currentFrame, setCurrentFrame] = useState<number>(1);
   const [totalFrames, setTotalFrames] = useState<number>(192);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const batchLoadingStartedRef = useRef(false);
+  const canvasSizeRef = useRef<{ width: number; height: number; dpr: number }>({ width: 0, height: 0, dpr: 1 });
+  const turnDegreesSpanRef = useRef<HTMLSpanElement>(null);
+  const paddedFrameSpanRef = useRef<HTMLSpanElement>(null);
+  const activeIndexRef = useRef<number>(0);
 
-  // Render specific frame onto canvas with cover/contain scaling & nearest-loaded fallback
+  // Measure and cache canvas backing-store buffer (runs strictly on resize & mount, NOT during scroll)
+  const updateCanvasDimensions = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = canvas.clientWidth || window.innerWidth;
+    const height = canvas.clientHeight || window.innerHeight;
+    canvasSizeRef.current = { width, height, dpr };
+
+    if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+    }
+  }, []);
+
+  // Render specific frame onto canvas using cached geometry — ZERO layout reflows!
   const renderFrame = useCallback((frameNumber: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -108,14 +126,8 @@ export const SignatureScroll: React.FC = () => {
       img = closestImg;
     }
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-
-    if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-    }
+    const { width, height, dpr } = canvasSizeRef.current;
+    if (width === 0 || height === 0) return;
 
     ctx.save();
     ctx.scale(dpr, dpr);
@@ -164,9 +176,11 @@ export const SignatureScroll: React.FC = () => {
 
     // Stage 1: ONLY preload Frame 0001.webp on initial mount
     const frame1 = new Image();
+    frame1.decoding = 'async';
     frame1.src = getFrameUrl(1);
     frame1.onload = () => {
       loadedImages[0] = frame1;
+      updateCanvasDimensions();
       renderFrame(1);
     };
     loadedImages[0] = frame1;
@@ -186,6 +200,7 @@ export const SignatureScroll: React.FC = () => {
 
         for (let i = currentBatchStart; i <= currentBatchEnd; i++) {
           const img = new Image();
+          img.decoding = 'async';
           img.src = getFrameUrl(i);
           img.onload = () => {
             loadedImages[i - 1] = img;
@@ -236,7 +251,12 @@ export const SignatureScroll: React.FC = () => {
       startBatchPreload();
     }, 3000);
 
-    const handleResize = () => renderFrame(currentFrameRef.current);
+    const handleResize = () => {
+      updateCanvasDimensions();
+      renderFrame(currentFrameRef.current);
+    };
+
+    updateCanvasDimensions();
     window.addEventListener('resize', handleResize, { passive: true });
 
     return () => {
@@ -244,9 +264,9 @@ export const SignatureScroll: React.FC = () => {
       clearTimeout(idleTimer);
       window.removeEventListener('resize', handleResize);
     };
-  }, [renderFrame]);
+  }, [renderFrame, updateCanvasDimensions]);
 
-  // GSAP ScrollTrigger Scrubbing
+  // GSAP ScrollTrigger Scrubbing with ZERO React Re-Renders
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -256,7 +276,7 @@ export const SignatureScroll: React.FC = () => {
         trigger: container,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 0.5,
+        scrub: 0.1,
         onUpdate: (self) => {
           const progress = self.progress;
           const frameIndex = Math.max(
@@ -266,16 +286,23 @@ export const SignatureScroll: React.FC = () => {
 
           if (frameIndex !== currentFrameRef.current) {
             currentFrameRef.current = frameIndex;
-            setCurrentFrame(frameIndex);
             renderFrame(frameIndex);
+
+            // Direct DOM update for zero React render overhead on scroll!
+            if (turnDegreesSpanRef.current) {
+              const turnDegrees = Math.round(((frameIndex - 1) / Math.max(1, totalFrames - 1)) * 360);
+              turnDegreesSpanRef.current.textContent = `Turn: ${turnDegrees}°`;
+            }
+            if (paddedFrameSpanRef.current) {
+              const padded = String(frameIndex).padStart(4, '0');
+              paddedFrameSpanRef.current.textContent = `FRAME ${padded} / ${String(totalFrames).padStart(4, '0')}`;
+            }
           }
 
-          if (progress < 0.34) {
-            setActiveIndex(0);
-          } else if (progress < 0.67) {
-            setActiveIndex(1);
-          } else {
-            setActiveIndex(2);
+          const nextIdx = progress < 0.34 ? 0 : progress < 0.67 ? 1 : 2;
+          if (nextIdx !== activeIndexRef.current) {
+            activeIndexRef.current = nextIdx;
+            setActiveIndex(nextIdx);
           }
         },
       });
@@ -286,17 +313,26 @@ export const SignatureScroll: React.FC = () => {
 
   // Allow user to click a pill on the right to jump/scrub to that principle
   const handleSelectPrinciple = (idx: number) => {
+    activeIndexRef.current = idx;
     setActiveIndex(idx);
     const targetProgress = idx === 0 ? 0.12 : idx === 1 ? 0.5 : 0.88;
     const targetFrame = Math.max(1, Math.round(targetProgress * totalFrames));
     currentFrameRef.current = targetFrame;
-    setCurrentFrame(targetFrame);
     renderFrame(targetFrame);
+
+    if (turnDegreesSpanRef.current) {
+      const turnDegrees = Math.round(((targetFrame - 1) / Math.max(1, totalFrames - 1)) * 360);
+      turnDegreesSpanRef.current.textContent = `Turn: ${turnDegrees}°`;
+    }
+    if (paddedFrameSpanRef.current) {
+      const padded = String(targetFrame).padStart(4, '0');
+      paddedFrameSpanRef.current.textContent = `FRAME ${padded} / ${String(totalFrames).padStart(4, '0')}`;
+    }
   };
 
   const activeSpec = PRINCIPLES[activeIndex];
-  const turnDegrees = Math.round(((currentFrame - 1) / Math.max(1, totalFrames - 1)) * 360);
-  const paddedFrame = String(currentFrame).padStart(4, '0');
+  const turnDegrees = Math.round(((currentFrameRef.current - 1) / Math.max(1, totalFrames - 1)) * 360);
+  const paddedFrame = String(currentFrameRef.current).padStart(4, '0');
   const paddedTotal = String(totalFrames).padStart(4, '0');
 
   return (
@@ -403,9 +439,9 @@ export const SignatureScroll: React.FC = () => {
           </div>
 
           <div className="inline-flex items-center gap-2 sm:gap-4 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#0D0D0E]/12 shadow-xs font-mono text-[10px] sm:text-xs font-bold text-[#0D0D0E]">
-            <span className="tabular-nums">Turn: {turnDegrees}°</span>
+            <span ref={turnDegreesSpanRef} className="tabular-nums">Turn: {turnDegrees}°</span>
             <span className="text-[#0D0D0E]/25">|</span>
-            <span className="tabular-nums text-[#0D0D0E]/70">
+            <span ref={paddedFrameSpanRef} className="tabular-nums text-[#0D0D0E]/70">
               FRAME {paddedFrame} / {paddedTotal}
             </span>
             <span className="text-[#0D0D0E]/25 hidden sm:inline">|</span>

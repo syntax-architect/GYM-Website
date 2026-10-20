@@ -30,6 +30,22 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
   const isReducedMotionRef = useRef<boolean>(false);
   const onTelemetryChangeRef = useRef(onTelemetryChange);
 
+  // Prop refs to eliminate WebGL scene re-instantiations on scroll/telemetry
+  const scrollProgressRef = useRef(scrollProgress);
+  scrollProgressRef.current = scrollProgress;
+
+  const autoRotateSpeedRef = useRef(autoRotateSpeed);
+  autoRotateSpeedRef.current = autoRotateSpeed;
+
+  const explodedRef = useRef(exploded);
+  explodedRef.current = exploded;
+
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
+
+  const interactivePointerRef = useRef(interactivePointer);
+  interactivePointerRef.current = interactivePointer;
+
   useEffect(() => {
     onTelemetryChangeRef.current = onTelemetryChange;
   }, [onTelemetryChange]);
@@ -163,11 +179,9 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     }
 
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFShadowMap;
 
     container.appendChild(renderer.domElement);
 
@@ -359,12 +373,14 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
     rimLight.position.set(0, 3.5, -3.0);
     scene.add(rimLight);
 
-    // Pointer hover listener for slight perspective tilt
+    // Cached container rect for zero-reflow pointer hover tracking
+    let containerRect = container.getBoundingClientRect();
+
     const handlePointerMove = (e: MouseEvent) => {
-      if (!interactivePointer || isReducedMotionRef.current) return;
-      const rect = container.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+      if (!interactivePointerRef.current || isReducedMotionRef.current) return;
+      if (containerRect.width === 0 || containerRect.height === 0) return;
+      const x = ((e.clientX - containerRect.left) / containerRect.width) * 2 - 1;
+      const y = -(((e.clientY - containerRect.top) / containerRect.height) * 2 - 1);
       mouseHoverRef.current = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)) };
     };
 
@@ -374,6 +390,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       if (!mountRef.current) return;
       const w = mountRef.current.clientWidth || 600;
       const h = mountRef.current.clientHeight || 500;
+      containerRect = mountRef.current.getBoundingClientRect();
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -420,8 +437,8 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       // Dumbbell natural physical float
       dumbbellGroup.position.y = Math.sin(time * 1.3) * 0.04;
 
-      // Smooth Explode Animation (lerp to target)
-      const targetExplode = exploded ? 0.6 : 0;
+      // Smooth Explode Animation (lerp to target using ref)
+      const targetExplode = explodedRef.current ? 0.6 : 0;
       explodeProgressRef.current += (targetExplode - explodeProgressRef.current) * 0.1;
       const curExplode = explodeProgressRef.current;
 
@@ -439,7 +456,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
           velocityRef.current.y *= 0.93;
 
           // Continuous fluid auto-spin (increased speed for dynamic metallic reflections)
-          const autoSpin = autoRotateSpeed * 0.85 * delta;
+          const autoSpin = autoRotateSpeedRef.current * 0.85 * delta;
           rotationRef.current.y += velocityRef.current.x + autoSpin;
           rotationRef.current.x += velocityRef.current.y;
         } else {
@@ -455,8 +472,8 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
         const hoverX = mouseHoverRef.current.x * 0.12;
         const hoverY = mouseHoverRef.current.y * 0.1;
 
-        // Apply smooth target rotation
-        dumbbellGroup.rotation.y = rotationRef.current.y + (scrollProgress * Math.PI * 1.2);
+        // Apply smooth target rotation without recreating scene on scroll
+        dumbbellGroup.rotation.y = rotationRef.current.y + (scrollProgressRef.current * Math.PI * 1.2);
         dumbbellGroup.rotation.x = rotationRef.current.x - hoverY;
         dumbbellGroup.rotation.z = 0.08 + hoverX;
 
@@ -465,8 +482,8 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
           const normDegrees = Math.round((((rotationRef.current.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) * (180 / Math.PI));
           onTelemetryChangeRef.current({
             rotationY: normDegrees,
-            finish,
-            isExploded: exploded,
+            finish: finishRef.current,
+            isExploded: explodedRef.current,
           });
         }
       }
@@ -509,7 +526,7 @@ export const SculpturalDumbbellCanvas: React.FC<SculpturalDumbbellCanvasProps> =
       particleGeometry.dispose();
       particleMaterial.dispose();
     };
-  }, [scrollProgress, interactivePointer, autoRotateSpeed, exploded, finish, wireframe, brand.primaryColor, brand.secondaryColor]);
+  }, [brand.primaryColor, brand.secondaryColor]);
 
   // Pointer drag event handlers for 360° tactile orbit
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {

@@ -14,8 +14,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenInquiry }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
+    let lastState = window.scrollY > 20;
+    setIsScrolled(lastState);
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const nextState = window.scrollY > 20;
+          if (nextState !== lastState) {
+            lastState = nextState;
+            setIsScrolled(nextState);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);

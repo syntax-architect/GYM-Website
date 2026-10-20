@@ -21,6 +21,8 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
       return;
     }
 
+    const isTouch = window.matchMedia('(pointer: coarse)').matches;
+
     // Calibrate Lenis for high-performance fluid scroll on both desktop & mobile
     const lenis = new Lenis({
       duration: 1.15,
@@ -29,8 +31,10 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: 1.0,
+      touchMultiplier: isTouch ? 1.25 : 1.0,
+      syncTouch: true,
       autoResize: true,
+      autoRaf: false, // Unified single rAF ticker driven by GSAP
     });
 
     lenisRef.current = lenis;

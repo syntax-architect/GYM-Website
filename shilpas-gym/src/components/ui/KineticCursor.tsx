@@ -21,6 +21,8 @@ export const KineticCursor: React.FC = () => {
 
   const cursorRef = useRef<{ x: number; y: number }>({ x: -100, y: -100 });
 
+  const hasMadeVisibleRef = useRef(false);
+
   useEffect(() => {
     if (isTouch) return;
 
@@ -28,29 +30,37 @@ export const KineticCursor: React.FC = () => {
       cursorRef.current = { x: e.clientX, y: e.clientY };
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      if (!isVisible) setIsVisible(true);
+
+      if (!hasMadeVisibleRef.current) {
+        hasMadeVisibleRef.current = true;
+        setIsVisible(true);
+      }
 
       // Check cursor data attribute on target or parent
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
+      let nextType: 'default' | 'pointer' | '3d' | 'play' | 'view' = 'default';
       const cursorTarget = target.closest('[data-cursor]') as HTMLElement | null;
+
       if (cursorTarget) {
-        const val = cursorTarget.getAttribute('data-cursor') as 'pointer' | '3d' | 'play' | 'view';
-        setCursorType(val || 'pointer');
-        return;
+        nextType = (cursorTarget.getAttribute('data-cursor') as 'pointer' | '3d' | 'play' | 'view') || 'pointer';
+      } else if (target.closest('button, a, input, select, textarea, [role="button"]')) {
+        nextType = 'pointer';
       }
 
-      if (target.closest('button, a, input, select, textarea, [role="button"]')) {
-        setCursorType('pointer');
-        return;
-      }
-
-      setCursorType('default');
+      // React bail-out prevents re-rendering on every mouse move
+      setCursorType((prev) => (prev === nextType ? prev : nextType));
     };
 
-    const handleMouseLeave = () => setIsVisible(false);
-    const handleMouseEnter = () => setIsVisible(true);
+    const handleMouseLeave = () => {
+      hasMadeVisibleRef.current = false;
+      setIsVisible(false);
+    };
+    const handleMouseEnter = () => {
+      hasMadeVisibleRef.current = true;
+      setIsVisible(true);
+    };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
@@ -61,7 +71,7 @@ export const KineticCursor: React.FC = () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
     };
-  }, [isTouch, isVisible, mouseX, mouseY]);
+  }, [isTouch, mouseX, mouseY]);
 
   if (isTouch || !isVisible) return null;
 

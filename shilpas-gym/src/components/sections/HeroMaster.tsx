@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { ArrowUpRight, Phone, MapPin, Clock, Sparkles, Layers, Eye, Play, Box } from 'lucide-react';
 import {
   SculpturalDumbbellCanvas,
@@ -41,51 +41,48 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
   const [exploded, setExploded] = useState<boolean>(false);
   const [wireframe, setWireframe] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'3d' | 'loop'>('3d');
-  const [rotationY, setRotationY] = useState<number>(32);
-  const [velocityLabel, setVelocityLabel] = useState<string>('1.1x ORBIT');
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
 
+  const telemetryAngleSpanRef = useRef<HTMLSpanElement>(null);
+  const telemetryVelocitySpanRef = useRef<HTMLSpanElement>(null);
   const lastAngleRef = useRef<number>(32);
   const lastTimeRef = useRef<number>(performance.now());
-
-  useEffect(() => {
-    const onScroll = () => {
-      const progress = Math.min(1, window.scrollY / window.innerHeight);
-      setScrollProgress(progress);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const handleTelemetryChange = useCallback(
     (data: { rotationY: number; finish: DumbbellFinish; isExploded: boolean }) => {
       const now = performance.now();
       const dt = Math.max(16, now - lastTimeRef.current);
 
-      if (dt > 80) {
+      if (dt > 70) {
         let deltaDeg = Math.abs(data.rotationY - lastAngleRef.current);
         if (deltaDeg > 180) deltaDeg = 360 - deltaDeg;
 
         const degPerSec = (deltaDeg / dt) * 1000;
         const multiplier = Math.max(0.4, Math.min(4.8, +(degPerSec / 28).toFixed(1)));
 
+        let newLabel = `${multiplier.toFixed(1)}x ORBIT`;
         if (multiplier > 1.2) {
-          setVelocityLabel(`>> ${multiplier.toFixed(1)}x SCRUB`);
+          newLabel = `>> ${multiplier.toFixed(1)}x SCRUB`;
         } else if (multiplier < 0.6) {
-          setVelocityLabel(`< 0.4x SLOW`);
-        } else {
-          setVelocityLabel(`${multiplier.toFixed(1)}x ORBIT`);
+          newLabel = `< 0.4x SLOW`;
         }
 
         lastAngleRef.current = data.rotationY;
         lastTimeRef.current = now;
-        setRotationY(data.rotationY);
+
+        // Zero-render direct DOM update for high-frequency telemetry HUD
+        if (telemetryAngleSpanRef.current) {
+          const padded = String(data.rotationY).padStart(3, '0');
+          const prefix = data.finish === 'signature' ? '1' : data.finish === 'stealth' ? '2' : '3';
+          telemetryAngleSpanRef.current.textContent = `00:0${prefix}:${padded.slice(0, 2)}`;
+        }
+        if (telemetryVelocitySpanRef.current) {
+          telemetryVelocitySpanRef.current.textContent = newLabel;
+        }
       }
     },
     []
   );
 
-  const paddedAngle = String(rotationY).padStart(3, '0');
   const activeSpec = FINISH_SPECS[finish];
 
   return (
@@ -134,7 +131,7 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
               stroke="#D9381E"
               strokeWidth="1.5"
               strokeDasharray="360"
-              strokeDashoffset={Math.round(360 - (rotationY / 360) * 360)}
+              strokeDashoffset="240"
               className="transition-all duration-150"
             />
             <circle cx="480" cy="165" r="4" fill="#D9381E" />
@@ -155,7 +152,7 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
           <div className="pointer-events-none absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0D0D0E]/90 text-[#F4F1EA] backdrop-blur-md shadow-md">
             <span className="w-1.5 h-1.5 rounded-full bg-[#D9381E] animate-ping" />
             <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
-              DRAG 360° TO INSPECT · {paddedAngle}°
+              DRAG 360° TO ROTATE & INSPECT
             </span>
           </div>
         )}
@@ -167,7 +164,6 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
               exploded={exploded}
               finish={finish}
               onTelemetryChange={handleTelemetryChange}
-              scrollProgress={scrollProgress}
               wireframe={wireframe}
             />
           </div>
@@ -206,11 +202,11 @@ export const HeroMaster: React.FC<HeroMasterProps> = ({ onOpenInquiry }) => {
         <div className="hidden sm:flex items-center gap-3.5 px-4 py-1.5 rounded-full bg-[#0D0D0E] text-[#F4F1EA] font-mono text-[11px] tracking-wider shadow-md">
           <span className="text-[#D9381E] font-bold">REEL 01</span>
           <span className="text-white/25">·</span>
-          <span className="tabular-nums">
-            00:0{finish === 'signature' ? '1' : finish === 'stealth' ? '2' : '3'}:{paddedAngle.slice(0, 2)}
+          <span ref={telemetryAngleSpanRef} className="tabular-nums">
+            00:0{finish === 'signature' ? '1' : finish === 'stealth' ? '2' : '3'}:32
           </span>
           <span className="text-white/25">·</span>
-          <span className="text-[#C5A059] tabular-nums">{velocityLabel}</span>
+          <span ref={telemetryVelocitySpanRef} className="text-[#C5A059] tabular-nums">1.1x ORBIT</span>
         </div>
       </div>
 

@@ -102,20 +102,40 @@ export const TransformationVisualizer: React.FC<TransformationVisualizerProps> =
   const [activeTab, setActiveTab] = useState<CategoryKey>('fitness');
   const [sliderPos, setSliderPos] = useState<number>(50);
   const containerRef = useRef<HTMLDivElement>(null);
+  const containerRectRef = useRef<{ left: number; width: number } | null>(null);
   const isDraggingRef = useRef<boolean>(false);
+  const rafIdRef = useRef<number | null>(null);
 
   const currentCase = transformations[activeTab] || CASES[activeTab];
 
   const updateSliderFromClientX = useCallback((clientX: number) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const rawPct = ((clientX - rect.left) / rect.width) * 100;
-    setSliderPos(Math.max(8, Math.min(92, Math.round(rawPct))));
+    let rect = containerRectRef.current;
+    if (!rect && containerRef.current) {
+      const b = containerRef.current.getBoundingClientRect();
+      rect = { left: b.left, width: b.width };
+      containerRectRef.current = rect;
+    }
+    if (!rect || rect.width === 0) return;
+
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+    }
+
+    rafIdRef.current = window.requestAnimationFrame(() => {
+      const currentRect = containerRectRef.current;
+      if (!currentRect || currentRect.width === 0) return;
+      const rawPct = ((clientX - currentRect.left) / currentRect.width) * 100;
+      setSliderPos(Math.max(8, Math.min(92, Math.round(rawPct))));
+      rafIdRef.current = null;
+    });
   }, []);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     isDraggingRef.current = true;
+    if (containerRef.current) {
+      const b = containerRef.current.getBoundingClientRect();
+      containerRectRef.current = { left: b.left, width: b.width };
+    }
     updateSliderFromClientX(e.clientX);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
@@ -127,6 +147,11 @@ export const TransformationVisualizer: React.FC<TransformationVisualizerProps> =
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     isDraggingRef.current = false;
+    containerRectRef.current = null;
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {
